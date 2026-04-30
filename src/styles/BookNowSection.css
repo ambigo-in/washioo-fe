@@ -1,0 +1,27 @@
+    .book-now{
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(to right, #00a8b5, #00c6d7);
+    margin-top: 50px;
+    padding: 50px 0 50px 0;
+    color: white;
+}
+.book-now button{
+    background-color: #00a8b5;
+    color: white;
+}
+
+.footer{
+    display: flex;
+    background: black;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    padding: 50px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 20px;
+    font-weight:lighter;
+}

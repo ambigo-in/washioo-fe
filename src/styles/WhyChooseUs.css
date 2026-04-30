@@ -1,0 +1,238 @@
+.why-section {
+  width: 100%;
+  padding: 100px 20px;
+  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 50%, #e0f7ff 100%);
+}
+
+.why-container {
+  max-width: 1350px;
+  margin: auto;
+}
+
+/* Section Heading */
+.section-heading {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.section-heading span {
+  color: #0ea5e9;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: "Poppins", sans-serif;
+}
+
+.section-heading h2 {
+  font-size: 52px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-top: 12px;
+}
+
+.section-heading p {
+  margin-top: 14px;
+  font-size: 20px;
+  color: #64748b;
+}
+
+/* Steps Grid */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin-bottom: 110px;
+}
+
+.step-card {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 28px;
+  padding: 38px;
+  box-shadow: 0 20px 50px rgba(14, 165, 233, 0.08);
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.step-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 28px 60px rgba(14, 165, 233, 0.14);
+}
+
+.step-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.step-icon {
+  font-size: 42px;
+}
+
+.step-number {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0ea5e9;
+}
+
+.step-card h3 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #0f172a;
+}
+
+.step-card p {
+  color: #64748b;
+  line-height: 1.8;
+  font-size: 17px;
+}
+
+/* Why Highlight */
+.why-highlight {
+  /* background: linear-gradient(135deg, #0ea5e9, #036ea8df); */
+  border-radius: 34px;
+  padding: 70px 50px;
+  text-align: center;
+  color: #036ea8df;
+  margin-bottom: 60px;
+  /* box-shadow: 0 25px 60px rgba(14, 165, 233, 0.2); */
+}
+
+.why-highlight h2 {
+  font-size: 48px;
+  margin-bottom: 36px;
+  font-weight: 800;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.benefits-grid div {
+  background: rgba(255, 255, 255, 0.14);
+  padding: 20px;
+  border-radius: 18px;
+  font-size: 18px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+}
+
+/* Testimonials */
+.testimonial-heading {
+  margin-bottom: 55px;
+}
+
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.testimonial-card {
+  background: white;
+  border-radius: 26px;
+  padding: 34px;
+  text-align: center;
+  box-shadow: 0 18px 45px rgba(14, 165, 233, 0.08);
+  transition: all 0.35s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-8px);
+}
+
+.testimonial-card p {
+  font-size: 20px;
+  color: #0f172a;
+  font-weight: 500;
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+
+.stars {
+  color: #facc15;
+  font-size: 24px;
+  margin-bottom: 14px;
+}
+
+.testimonial-card span {
+  color: #64748b;
+  font-weight: 600;
+}
+/* Tablet */
+@media (max-width: 1024px) {
+  .steps-grid,
+  .testimonial-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .section-heading h2 {
+    font-size: 42px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .why-section {
+    padding: 70px 16px;
+  }
+
+  .steps-grid,
+  .testimonial-grid,
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading h2 {
+    font-size: 34px;
+  }
+
+  .section-heading p {
+    font-size: 17px;
+  }
+
+  .step-card,
+  .testimonial-card {
+    padding: 28px;
+  }
+
+  .why-highlight {
+    padding: 50px 24px;
+  }
+
+  .why-highlight h2 {
+    font-size: 34px;
+  }
+
+  .benefits-grid div {
+    font-size: 16px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .section-heading h2 {
+    font-size: 28px;
+  }
+
+  .step-card h3 {
+    font-size: 22px;
+  }
+
+  .testimonial-card p {
+    font-size: 17px;
+  }
+
+  .why-highlight h2 {
+    font-size: 28px;
+  }
+}

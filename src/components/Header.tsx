@@ -22,8 +22,15 @@ const Header: React.FC = () => {
   return (
     <header className="hero-header">
       <div className="logo-section" onClick={() => navigate("/")}>
-        <div className="logo-icon">✨</div>
-        <h1 className="logo-text">WashNow</h1>
+        <div className="logo-icon">
+          <img
+            src="/logo.png"
+            alt="Washioo Logo"
+            className="logo-image"
+          />
+        </div>
+
+        {/* <h1 className="logo-text">WashNow</h1> */}
       </div>
 
       <button className="auth-button" onClick={handlePrimaryAction}>
