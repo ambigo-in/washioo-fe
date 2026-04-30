@@ -7,4 +7,18 @@
 
 body {
   background: linear-gradient(135deg, #e0f7ff, #ffffff, #cceeff);
+  color: #0f172a;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+input, button {
+  font-family: inherit;
 }

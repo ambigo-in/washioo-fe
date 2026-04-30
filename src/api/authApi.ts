@@ -1,32 +1,46 @@
-import axiosInstance from "./axiosInstance";
+import { type AuthResponse, type SendOtpResponse } from "../types/authTypes";
 
-export const authApi = {
-  sendOTP: async (phone_number: string) => { const res = await axiosInstance.post("/auth/send-otp", { phone_number }); return res.data; },
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-  signup: async (payload: any) => {
-    const res = await axiosInstance.post("/auth/signup", payload);
-    return res.data;
-  },
+export const sendOtp = async (
+  phone_number: string,
+): Promise<SendOtpResponse> => {
+  const response = await fetch(`${API_BASE}/auth/send-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phone_number }),
+  });
 
-  signin: async (payload: any) => {
-    const res = await axiosInstance.post("/auth/signin", payload);
-    return res.data;
-  },
+  if (!response.ok) throw new Error("OTP send failed");
+  return response.json();
+};
 
-  refreshToken: async (refresh_token: string) => {
-    const res = await axiosInstance.post("/auth/refresh-token", {
-      refresh_token,
-    });
-    return res.data;
-  },
+export const signUp = async (payload: any): Promise<AuthResponse> => {
+  const response = await fetch(`${API_BASE}/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
 
-  logout: async (refresh_token: string) => {
-    const res = await axiosInstance.post("/auth/logout", { refresh_token });
-    return res.data;
-  },
+  if (!response.ok) throw new Error("Signup failed");
+  return response.json();
+};
 
-  getUserDetails: async () => {
-    const res = await axiosInstance.get("/auth/me");
-    return res.data;
-  },
+export const signIn = async (payload: any): Promise<AuthResponse> => {
+  const response = await fetch(`${API_BASE}/auth/signin`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) throw new Error("Signin failed");
+  return response.json();
+};
+
+export const logoutUser = async (refresh_token: string) => {
+  await fetch(`${API_BASE}/auth/logout`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh_token }),
+  });
 };
