@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
 import PhoneVerificationPage from "./pages/PhoneVerificationPage";
@@ -13,15 +13,29 @@ import { AuthProvider } from "./context/AuthContext";
 import PublicRoute from "./components/PublicRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Customer Pages
+import CustomerDashboard from "./pages/customer/CustomerDashboard";
+
+// Cleaner Pages
+import CleanerDashboard from "./pages/cleaner/CleanerDashboard";
+import CleanerAssignments from "./pages/cleaner/CleanerAssignments";
+import CleanerAvailability from "./pages/cleaner/CleanerAvailability";
+
+// Admin Pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminBookings from "./pages/admin/AdminBookings";
+import AdminCleaners from "./pages/admin/AdminCleaners";
+import AdminServices from "./pages/admin/AdminServices";
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public Home Page */}
+          {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
 
-          {/* OTP Verification */}
+          {/* Auth Routes */}
           <Route
             path="/verify-phone"
             element={
@@ -30,8 +44,6 @@ function App() {
               </PublicRoute>
             }
           />
-
-          {/* Sign In */}
           <Route
             path="/signin"
             element={
@@ -40,8 +52,6 @@ function App() {
               </PublicRoute>
             }
           />
-
-          {/* Sign Up */}
           <Route
             path="/signup"
             element={
@@ -51,7 +61,15 @@ function App() {
             }
           />
 
-          {/* Service Selection Page */}
+          {/* Customer Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute roles={["customer"]}>
+                <CustomerDashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/bookings"
             element={
@@ -60,8 +78,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* Checkout Page */}
           <Route
             path="/checkout"
             element={
@@ -70,8 +86,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* My Bookings Page */}
           <Route
             path="/my-bookings"
             element={
@@ -81,7 +95,68 @@ function App() {
             }
           />
 
-          <Route path="*" element={<HomePage />} />
+          {/* Cleaner Routes */}
+          <Route
+            path="/cleaner/dashboard"
+            element={
+              <ProtectedRoute roles={["cleaner"]}>
+                <CleanerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cleaner/assignments"
+            element={
+              <ProtectedRoute roles={["cleaner"]}>
+                <CleanerAssignments />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cleaner/availability"
+            element={
+              <ProtectedRoute roles={["cleaner"]}>
+                <CleanerAvailability />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Routes */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/bookings"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminBookings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/cleaners"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminCleaners />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/services"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminServices />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
@@ -89,4 +164,3 @@ function App() {
 }
 
 export default App;
-

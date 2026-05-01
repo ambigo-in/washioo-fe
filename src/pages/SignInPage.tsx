@@ -23,9 +23,16 @@ export default function SignInPage() {
 
   const routeAfterLogin = async () => {
     const user = await login();
-    navigate(user?.roles.includes("customer") ? "/bookings" : "/", {
-      replace: true,
-    });
+    // Route based on user roles - priority: admin > cleaner > customer
+    if (user?.roles.includes("admin")) {
+      navigate("/admin/dashboard", { replace: true });
+    } else if (user?.roles.includes("cleaner")) {
+      navigate("/cleaner/dashboard", { replace: true });
+    } else if (user?.roles.includes("customer")) {
+      navigate("/dashboard", { replace: true });
+    } else {
+      navigate("/", { replace: true });
+    }
   };
 
   const handleSignIn = async (event: FormEvent) => {
@@ -104,4 +111,3 @@ export default function SignInPage() {
     </main>
   );
 }
-

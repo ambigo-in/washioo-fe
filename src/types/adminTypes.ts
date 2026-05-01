@@ -1,0 +1,81 @@
+import type { BookingStatus, Address, AssignmentSummary } from "./apiTypes";
+
+export interface AdminUser {
+  id: string;
+  full_name: string | null;
+  phone: string;
+  email: string | null;
+  is_verified: boolean;
+  is_active: boolean;
+  roles: string[];
+  created_at: string;
+}
+
+export interface AdminServiceCategory {
+  id: string;
+  service_name: string;
+  description: string | null;
+  base_price: number;
+  estimated_duration_minutes: number | null;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface ServiceCategoryPayload {
+  service_name: string;
+  description?: string;
+  base_price: number;
+  estimated_duration_minutes?: number;
+  is_active?: boolean;
+}
+
+export interface AdminBooking {
+  id: string;
+  booking_reference: string;
+  customer_id: string;
+  customer_name: string;
+  customer_phone: string;
+  service_name: string;
+  service_category_id: string;
+  scheduled_date: string;
+  scheduled_time: string;
+  booking_status: BookingStatus;
+  estimated_price: number;
+  final_price: number | null;
+  special_instructions: string | null;
+  address: Address;
+  assignment: AssignmentSummary | null;
+  created_at: string;
+}
+
+export interface AdminBookingFilters {
+  status?: BookingStatus;
+}
+
+export interface CleanerFilters {
+  approval_status?: "pending" | "approved" | "rejected" | "suspended";
+  availability_status?: "offline" | "available" | "busy";
+}
+
+export interface DashboardStats {
+  totalBookings: number;
+  pendingBookings: number;
+  activeCleaners: number;
+  totalRevenue: number;
+  todayBookings: number;
+  weekBookings: number;
+}
+
+export interface CleanerFilters {
+  approval_status?: "pending" | "approved" | "rejected" | "suspended";
+  availability_status?: "offline" | "available" | "busy";
+}
+
+export interface DashboardStats {
+  totalBookings: number;
+  pendingBookings: number;
+  activeCleaners: number;
+  totalRevenue: number;
+  todayBookings: number;
+  weekBookings: number;
+}
