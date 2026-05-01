@@ -1,22 +1,27 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import HomePage from "./pages/HomePage";
 import PhoneVerificationPage from "./pages/PhoneVerificationPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
+import BookingsPage from "./pages/BookingsPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import MyBookingsPage from "./pages/MyBookingsPage";
+
 import { AuthProvider } from "./context/AuthContext";
+
 import PublicRoute from "./components/PublicRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
-import BookingsPage from "./pages/BookingsPage";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Main Landing Page */}
+          {/* Public Home Page */}
           <Route path="/" element={<HomePage />} />
 
-          {/* Public Routes (Blocked if logged in) */}
+          {/* OTP Verification */}
           <Route
             path="/verify-phone"
             element={
@@ -26,6 +31,7 @@ function App() {
             }
           />
 
+          {/* Sign In */}
           <Route
             path="/signin"
             element={
@@ -35,6 +41,7 @@ function App() {
             }
           />
 
+          {/* Sign Up */}
           <Route
             path="/signup"
             element={
@@ -44,15 +51,37 @@ function App() {
             }
           />
 
-          {/* Protected Route */}
+          {/* Service Selection Page */}
           <Route
             path="/bookings"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute roles={["customer"]}>
                 <BookingsPage />
               </ProtectedRoute>
             }
           />
+
+          {/* Checkout Page */}
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute roles={["customer"]}>
+                <CheckoutPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* My Bookings Page */}
+          <Route
+            path="/my-bookings"
+            element={
+              <ProtectedRoute roles={["customer"]}>
+                <MyBookingsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="*" element={<HomePage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
@@ -60,3 +89,4 @@ function App() {
 }
 
 export default App;
+

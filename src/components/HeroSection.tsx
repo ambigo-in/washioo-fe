@@ -1,9 +1,15 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 import "../styles/hero.css";
 
 const HeroSection: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, hasRole } = useAuth();
+
+  const handleBook = () => {
+    navigate(isAuthenticated && hasRole("customer") ? "/bookings" : "/verify-phone");
+  };
 
   return (
     <main className="hero-main">
@@ -24,7 +30,7 @@ const HeroSection: React.FC = () => {
         <div className="hero-buttons">
           <button
             className="primary-btn"
-            onClick={() => navigate("/verify-phone")}
+            onClick={handleBook}
           >
             Book Your Wash
           </button>
@@ -35,3 +41,4 @@ const HeroSection: React.FC = () => {
 };
 
 export default HeroSection;
+

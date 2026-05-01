@@ -1,13 +1,116 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { getApiErrorMessage } from "../api/client";
+import { fetchServices } from "../api/servicesApi";
 import Header from "../components/Header";
+import type { ServiceCategory } from "../types/apiTypes";
+import "../styles/BookNowSection.css";
 
-export default function BookingsPage() {
+type DisplayService = ServiceCategory & { image: string };
+
+const serviceImageFor = (serviceName: string) => {
+  const name = serviceName.toLowerCase();
+  if (name.includes("bike")) return "/p2.png";
+  if (name.includes("car")) return "/p1.png";
+  return "/p3.png";
+};
+
+const BookingsPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [services, setServices] = React.useState<DisplayService[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState("");
+
+  React.useEffect(() => {
+    const loadServices = async () => {
+      try {
+        const data = await fetchServices();
+        setServices(
+          data.services.map((service) => ({
+            ...service,
+            image: serviceImageFor(service.service_name),
+          })),
+        );
+      } catch (err) {
+        setError(getApiErrorMessage(err));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadServices();
+  }, []);
+
+  const handleBookNow = (service: DisplayService) => {
+    navigate("/checkout", {
+      state: {
+        serviceId: service.id,
+        serviceName: service.service_name,
+        price: service.base_price,
+        duration: service.estimated_duration_minutes,
+      },
+    });
+  };
+
   return (
     <>
       <Header />
-      <div className="booking-page">
-        <h1>Welcome to Bookings Dashboard</h1>
-        <p>Your wash bookings, scheduling, and services will appear here.</p>
-      </div>
+
+      <section className="bookings-page">
+        <div className="bookings-header">
+          <span>PREMIUM SERVICES</span>
+          <h1>Select Your Vehicle Wash Service</h1>
+          <p>
+            Choose a professional doorstep wash, pick your address and time, and
+            track the booking from pending to completion.
+          </p>
+        </div>
+
+        {loading ? (
+          <div className="loading-state">Loading services...</div>
+        ) : error ? (
+          <div className="error-state">{error}</div>
+        ) : services.length === 0 ? (
+          <div className="empty-state">No active services are available.</div>
+        ) : (
+          <div className="services-grid">
+            {services.map((service) => (
+              <article key={service.id} className="service-booking-card">
+                <div className="service-image-wrapper">
+                  <img
+                    src={service.image}
+                    alt={service.service_name}
+                    className="service-image"
+                  />
+                </div>
+
+                <div className="service-details">
+                  <h2>{service.service_name}</h2>
+                  <p>{service.description || "Premium doorstep wash service."}</p>
+
+                  <div className="service-meta">
+                    <span>Rs. {service.base_price}</span>
+                    <span>
+                      {service.estimated_duration_minutes || 0} mins
+                    </span>
+                  </div>
+
+                  <button
+                    className="book-service-btn"
+                    onClick={() => handleBookNow(service)}
+                    type="button"
+                  >
+                    Book Now
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
     </>
   );
-}
+};
+
+export default BookingsPage;
+

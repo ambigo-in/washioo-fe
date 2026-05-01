@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 import MobileMenu from "./MobileMenu";
 import "../styles/header.css";
 
@@ -9,13 +9,18 @@ const Header: React.FC = () => {
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handlePrimaryAction = () => {
+  const handlePrimaryAction = async () => {
     if (isAuthenticated) {
-      logout();
+      await logout();
       navigate("/");
     } else {
       navigate("/verify-phone");
     }
+    setMenuOpen(false);
+  };
+
+  const handleNavigate = (path: string) => {
+    navigate(path);
     setMenuOpen(false);
   };
 
@@ -33,9 +38,22 @@ const Header: React.FC = () => {
         {/* <h1 className="logo-text">WashNow</h1> */}
       </div>
 
-      <button className="auth-button" onClick={handlePrimaryAction}>
-        {isAuthenticated ? "Logout" : "Book Now"}
-      </button>
+      <nav className="header-nav" aria-label="Primary navigation">
+        {isAuthenticated && (
+          <>
+            <button type="button" onClick={() => handleNavigate("/bookings")}>
+              Services
+            </button>
+            <button type="button" onClick={() => handleNavigate("/my-bookings")}>
+              My Bookings
+            </button>
+          </>
+        )}
+
+        <button className="auth-button" onClick={handlePrimaryAction}>
+          {isAuthenticated ? "Logout" : "Book Now"}
+        </button>
+      </nav>
 
       <div className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
         <span></span>
@@ -47,9 +65,11 @@ const Header: React.FC = () => {
         isOpen={menuOpen}
         isAuthenticated={isAuthenticated}
         onPrimaryAction={handlePrimaryAction}
+        onNavigate={handleNavigate}
       />
     </header>
   );
 };
 
 export default Header;
+

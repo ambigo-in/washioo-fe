@@ -1,6 +1,7 @@
 import React from "react";
-import "../styles/VehicleServiceShowcase.css";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
+import "../styles/VehicleServiceShowcase.css";
 
 const services = [
   {
@@ -15,16 +16,10 @@ const services = [
 
 const VehicleServicesShowcase: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, hasRole } = useAuth();
 
-  const handleLogoClick = () => {
-    const accessToken = localStorage.getItem("access_token");
-    const refreshToken = localStorage.getItem("refresh_token");
-
-    if (accessToken && refreshToken) {
-      navigate("/bookings");
-    } else {
-      navigate("/verify-phone");
-    }
+  const handleBookClick = () => {
+    navigate(isAuthenticated && hasRole("customer") ? "/bookings" : "/verify-phone");
   };
 
   return (
@@ -36,15 +31,15 @@ const VehicleServicesShowcase: React.FC = () => {
             <h2>What Can We Do For Your Vehicle?</h2>
           </div>
 
-          <button onClick={handleLogoClick} className="view-all-btn">
-            View All <span>→</span>
+          <button onClick={handleBookClick} className="view-all-btn">
+            View All
           </button>
         </div>
 
         <div className="services-card-row">
-          {services.map((service, index) => (
+          {services.map((service) => (
             <div
-              key={index}
+              key={service.title}
               className="service-card"
               style={{
                 backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0.15)), url(${service.image})`,
@@ -52,8 +47,8 @@ const VehicleServicesShowcase: React.FC = () => {
             >
               <div className="service-card-content">
                 <h3>{service.title}</h3>
-                <button onClick={handleLogoClick} className="service-arrow">
-                  →
+                <button onClick={handleBookClick} className="service-arrow">
+                  Book
                 </button>
               </div>
             </div>

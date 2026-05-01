@@ -1,0 +1,250 @@
+.my-bookings-page {
+  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 48%, #e0f7ff 100%);
+  min-height: 100vh;
+  padding: 60px 20px 90px;
+}
+
+.my-bookings-heading {
+  margin: 0 auto 48px;
+  max-width: 760px;
+  text-align: center;
+}
+
+.my-bookings-heading span {
+  color: #0ea5e9;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.my-bookings-heading h1 {
+  color: #0f172a;
+  font-size: 52px;
+  font-weight: 800;
+  margin: 12px 0;
+}
+
+.my-bookings-heading p {
+  color: #64748b;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.my-bookings-page > .form-alert {
+  margin: 0 auto 24px;
+  max-width: 900px;
+}
+
+.bookings-list {
+  display: grid;
+  gap: 24px;
+  margin: auto;
+  max-width: 1100px;
+}
+
+.booking-card {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #dbeafe;
+  border-radius: 26px;
+  box-shadow: 0 20px 55px rgba(14, 165, 233, 0.08);
+  padding: 28px;
+}
+
+.booking-card-top {
+  align-items: flex-start;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+}
+
+.booking-reference {
+  color: #0284c7;
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.booking-card h2 {
+  color: #0f172a;
+  font-size: 28px;
+}
+
+.status-badge {
+  border-radius: 999px;
+  color: #0369a1;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 9px 14px;
+  white-space: nowrap;
+}
+
+.status-badge.pending {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.status-badge.assigned,
+.status-badge.accepted {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-badge.in_progress {
+  background: #cffafe;
+  color: #0e7490;
+}
+
+.status-badge.completed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-badge.cancelled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.booking-details-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 26px 0;
+}
+
+.booking-details-grid div,
+.booking-address,
+.booking-edit-form {
+  background: #f8fcff;
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.booking-details-grid span,
+.booking-address span {
+  color: #0284c7;
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.booking-details-grid strong {
+  color: #0f172a;
+}
+
+.booking-address {
+  margin-top: 14px;
+}
+
+.booking-address p {
+  color: #475569;
+  line-height: 1.6;
+}
+
+.booking-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.booking-actions button {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  border: none;
+  border-radius: 999px;
+  color: white;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 13px 18px;
+}
+
+.booking-actions .danger-action {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.booking-actions .secondary-action {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.booking-edit-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.booking-edit-form input,
+.booking-edit-form textarea {
+  background: white;
+  border: 2px solid #dbeafe;
+  border-radius: 14px;
+  font-size: 15px;
+  outline: none;
+  padding: 13px 14px;
+}
+
+.booking-edit-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.empty-state {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 24px;
+  box-shadow: 0 18px 45px rgba(14, 165, 233, 0.08);
+  margin: auto;
+  max-width: 560px;
+  padding: 42px 24px;
+}
+
+.empty-state h2 {
+  color: #0369a1;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .my-bookings-page {
+    padding: 45px 16px 70px;
+  }
+
+  .my-bookings-heading h1 {
+    font-size: 36px;
+  }
+
+  .booking-card {
+    border-radius: 22px;
+    padding: 22px;
+  }
+
+  .booking-card-top {
+    flex-direction: column;
+  }
+
+  .booking-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-bookings-heading h1 {
+    font-size: 30px;
+  }
+
+  .booking-card h2 {
+    font-size: 23px;
+  }
+
+  .booking-actions button {
+    width: 100%;
+  }
+}

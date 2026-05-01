@@ -1,46 +1,40 @@
-import { type AuthResponse, type SendOtpResponse } from "../types/authTypes";
+import { apiRequest } from "./client";
+import type {
+  AuthResponse,
+  SendOtpResponse,
+  SignInPayload,
+  SignUpPayload,
+} from "../types/authTypes";
+import type { UserProfile } from "../types/apiTypes";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
-export const sendOtp = async (
-  phone_number: string,
-): Promise<SendOtpResponse> => {
-  const response = await fetch(`${API_BASE}/auth/send-otp`, {
+export const sendOtp = (phone_number: string) =>
+  apiRequest<SendOtpResponse>("/auth/send-otp", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ phone_number }),
+    body: { phone_number },
   });
 
-  if (!response.ok) throw new Error("OTP send failed");
-  return response.json();
-};
-
-export const signUp = async (payload: any): Promise<AuthResponse> => {
-  const response = await fetch(`${API_BASE}/auth/signup`, {
+export const signUp = (payload: SignUpPayload) =>
+  apiRequest<AuthResponse>("/auth/signup", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: payload,
   });
 
-  if (!response.ok) throw new Error("Signup failed");
-  return response.json();
-};
-
-export const signIn = async (payload: any): Promise<AuthResponse> => {
-  const response = await fetch(`${API_BASE}/auth/signin`, {
+export const signIn = (payload: SignInPayload) =>
+  apiRequest<AuthResponse>("/auth/signin", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: payload,
   });
 
-  if (!response.ok) throw new Error("Signin failed");
-  return response.json();
-};
-
-export const logoutUser = async (refresh_token: string) => {
-  await fetch(`${API_BASE}/auth/logout`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refresh_token }),
+export const getCurrentUser = () =>
+  apiRequest<{ message: string; user: UserProfile }>("/auth/me", {
+    auth: true,
   });
-};
+
+export const logoutUser = (refresh_token: string) =>
+  apiRequest<{ message: string }>("/auth/logout", {
+    method: "POST",
+    auth: true,
+    body: { refresh_token },
+    retryOnUnauthorized: false,
+  });
+

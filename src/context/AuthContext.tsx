@@ -1,39 +1,88 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { getAccessToken, clearTokens } from "../utils/tokenManager";
-
-interface AuthContextType {
-  isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextType | null>(null);
+import React, { useEffect, useState } from "react";
+import { getAccessToken, getRefreshToken, clearTokens } from "../utils/tokenManager";
+import { getCurrentUser, logoutUser } from "../api/authApi";
+import { AuthContext } from "./authContextValue";
+import type { UserProfile, UserRole } from "../types/apiTypes";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!getAccessToken());
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsAuthenticated(!!getAccessToken());
+    let active = true;
+
+    const hydrateSession = async () => {
+      if (!getAccessToken()) {
+        if (active) setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await getCurrentUser();
+        if (!active) return;
+        setUser(response.user);
+        setIsAuthenticated(true);
+      } catch {
+        clearTokens();
+        if (!active) return;
+        setUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        if (active) setIsLoading(false);
+      }
+    };
+
+    hydrateSession();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const login = () => setIsAuthenticated(true);
+  const refreshUser = async () => {
+    const response = await getCurrentUser();
+    setUser(response.user);
+    setIsAuthenticated(true);
+    return response.user;
+  };
 
-  const logout = () => {
+  const login = refreshUser;
+
+  const logout = async () => {
+    const refreshToken = getRefreshToken();
+    if (refreshToken && getAccessToken()) {
+      try {
+        await logoutUser(refreshToken);
+      } catch {
+        // Local logout must still complete if the server token is already invalid.
+      }
+    }
     clearTokens();
+    setUser(null);
     setIsAuthenticated(false);
   };
 
+  const roles = user?.roles ?? [];
+  const hasRole = (role: UserRole) => roles.includes(role);
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        isLoading,
+        user,
+        roles,
+        hasRole,
+        refreshUser,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
-};

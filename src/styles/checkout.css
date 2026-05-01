@@ -1,0 +1,374 @@
+.checkout-page {
+  min-height: 100vh;
+  padding: 60px 20px 90px;
+  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 45%, #e0f7ff 100%);
+}
+
+.checkout-heading {
+  margin-bottom: 55px;
+  text-align: center;
+}
+
+.checkout-heading span {
+  color: #0ea5e9;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.checkout-page h1 {
+  color: #0f172a;
+  font-size: 56px;
+  font-weight: 800;
+  margin-top: 10px;
+}
+
+.checkout-layout {
+  align-items: flex-start;
+  display: grid;
+  gap: 35px;
+  grid-template-columns: 1.3fr 0.9fr;
+  margin: auto;
+  max-width: 1450px;
+}
+
+.address-section,
+.booking-summary {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 30px;
+  box-shadow: 0 20px 55px rgba(14, 165, 233, 0.08);
+  padding: 35px;
+}
+
+.address-section h2,
+.booking-summary h2 {
+  color: #0f172a;
+  font-size: 34px;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+
+.address-card {
+  background: #f8fcff;
+  border: 2px solid #dbeafe;
+  border-radius: 20px;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 18px;
+  padding: 20px;
+  text-align: left;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.address-card:hover {
+  border-color: #0ea5e9;
+  transform: translateY(-2px);
+}
+
+.address-card.selected {
+  background: linear-gradient(135deg, #e0f7ff, #f0f9ff);
+  border-color: #0284c7;
+  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.1);
+}
+
+.address-card h3 {
+  color: #0369a1;
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.address-card p,
+.address-section p {
+  color: #64748b;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.address-card span {
+  color: #0369a1;
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.address-section > button {
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  border: none;
+  border-radius: 999px;
+  color: white;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 700;
+  margin-top: 10px;
+  padding: 15px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.address-section > button:hover {
+  box-shadow: 0 14px 28px rgba(14, 165, 233, 0.2);
+  transform: translateY(-2px);
+}
+
+.address-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.address-form input,
+.booking-summary input,
+.booking-summary textarea {
+  background: #f8fcff;
+  border: 2px solid #dbeafe;
+  border-radius: 16px;
+  font-size: 15px;
+  outline: none;
+  padding: 15px 16px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.address-form input:focus,
+.booking-summary input:focus,
+.booking-summary textarea:focus {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.08);
+}
+
+.form-row {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.checkbox-row {
+  align-items: center;
+  background: #f8fcff;
+  border: 2px solid #dbeafe;
+  border-radius: 16px;
+  color: #0369a1;
+  display: flex;
+  font-weight: 700;
+  gap: 10px;
+  min-height: 54px;
+  padding: 0 16px;
+}
+
+.checkbox-row input {
+  margin: 0;
+  width: auto;
+}
+
+.address-form button {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  border: none;
+  border-radius: 16px;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px;
+  transition: all 0.3s ease;
+}
+
+.address-form button:hover {
+  transform: translateY(-2px);
+}
+
+.booking-summary {
+  position: sticky;
+  top: 110px;
+}
+
+.booking-summary h2 {
+  margin-bottom: 10px;
+}
+
+.summary-price {
+  color: #0284c7;
+  font-size: 30px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.booking-summary p {
+  color: #0369a1;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.booking-summary label {
+  color: #0369a1;
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  margin-top: 18px;
+}
+
+.booking-summary label input {
+  margin-top: 8px;
+}
+
+.booking-summary textarea {
+  margin-top: 18px;
+  min-height: 120px;
+  resize: vertical;
+}
+
+.selected-address-summary {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 18px;
+  margin: 20px 0;
+  padding: 16px;
+}
+
+.selected-address-summary span {
+  color: #0284c7;
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.selected-address-summary strong {
+  color: #0f172a;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.selected-address-summary p {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.booking-summary button {
+  background: linear-gradient(135deg, #0ea5e9, #0369a1);
+  border: none;
+  border-radius: 999px;
+  box-shadow: 0 15px 32px rgba(14, 165, 233, 0.2);
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 800;
+  margin-top: 20px;
+  padding: 18px;
+  transition: all 0.35s ease;
+  width: 100%;
+}
+
+.booking-summary button:hover {
+  box-shadow: 0 18px 38px rgba(14, 165, 233, 0.28);
+  transform: translateY(-3px);
+}
+
+@media (max-width: 1024px) {
+  .checkout-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-summary {
+    position: static;
+  }
+
+  .checkout-page h1 {
+    font-size: 46px;
+  }
+}
+
+@media (max-width: 768px) {
+  .checkout-page {
+    padding: 45px 16px 70px;
+  }
+
+  .checkout-heading {
+    margin-bottom: 35px;
+  }
+
+  .checkout-page h1 {
+    font-size: 36px;
+  }
+
+  .address-section,
+  .booking-summary {
+    border-radius: 24px;
+    padding: 24px;
+  }
+
+  .address-section h2,
+  .booking-summary h2 {
+    font-size: 28px;
+  }
+
+  .address-card {
+    padding: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-summary p {
+    font-size: 16px;
+  }
+
+  .booking-summary button {
+    font-size: 17px;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-page h1 {
+    font-size: 30px;
+  }
+
+  .address-section h2,
+  .booking-summary h2 {
+    font-size: 24px;
+  }
+
+  .address-form input,
+  .booking-summary input,
+  .booking-summary textarea {
+    font-size: 14px;
+    padding: 13px;
+  }
+
+  .address-form button,
+  .booking-summary button,
+  .address-section > button {
+    font-size: 15px;
+    padding: 13px;
+  }
+
+  .address-card h3 {
+    font-size: 18px;
+  }
+
+  .address-card p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .checkout-page {
+    padding: 35px 12px 55px;
+  }
+
+  .checkout-page h1 {
+    font-size: 26px;
+  }
+
+  .address-section,
+  .booking-summary {
+    padding: 20px;
+  }
+}
