@@ -1,4 +1,9 @@
-import type { BookingStatus, Address, AssignmentSummary } from "./apiTypes";
+import type {
+  BookingStatus,
+  Address,
+  AssignmentSummary,
+  PaymentStatus,
+} from "./apiTypes";
 
 export interface CleanerProfile {
   id: string;
@@ -7,7 +12,10 @@ export interface CleanerProfile {
   phone: string;
   email: string | null;
   vehicle_type: string | null;
-  government_id_number: string | null;
+  aadhaar_number_masked?: string | null;
+  driving_license_number_masked?: string | null;
+  has_aadhaar?: boolean;
+  has_driving_license?: boolean;
   service_radius_km: number | null;
   approval_status: "pending" | "approved" | "rejected" | "suspended";
   availability_status: "offline" | "available" | "busy";
@@ -19,7 +27,13 @@ export interface CleanerProfile {
 export interface Assignment {
   id: string;
   cleaner_id: string;
-  assignment_status: "assigned" | "accepted" | "rejected" | "completed";
+  assignment_status:
+    | "assigned"
+    | "accepted"
+    | "in_progress"
+    | "rejected"
+    | "completed"
+    | "cancelled";
   assigned_at: string;
   accepted_at: string | null;
   started_at: string | null;
@@ -48,10 +62,44 @@ export interface Assignment {
   };
 }
 
+export interface CleanerBookingDetail {
+  id: string;
+  booking_reference: string;
+  customer_id: string;
+  customer_name: string | null;
+  customer_phone: string | null;
+  customer_email: string | null;
+  service_name: string | null;
+  service_category_id: string;
+  scheduled_date: string;
+  scheduled_time: string;
+  booking_status: BookingStatus;
+  estimated_price: number;
+  final_price: number | null;
+  special_instructions: string | null;
+  address: Address;
+  assignment: AssignmentSummary | null;
+  vehicle_details: {
+    make: string | null;
+    model: string | null;
+    license_plate: string | null;
+  };
+  payment: {
+    payment_status: PaymentStatus;
+    amount: number;
+    payment_method?: string | null;
+    transaction_reference?: string | null;
+    collected_by_cleaner?: boolean;
+    paid_at?: string | null;
+  };
+  created_at: string;
+}
+
 export interface CleanerPayload {
   user_id: string;
   vehicle_type?: string;
-  government_id_number?: string;
+  aadhaar_number?: string;
+  driving_license_number?: string;
   service_radius_km?: number;
   approval_status?: "pending" | "approved" | "rejected" | "suspended";
   availability_status?: "offline" | "available" | "busy";

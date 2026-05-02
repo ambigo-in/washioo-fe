@@ -1,9 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { getApiErrorMessage } from "../api/client";
-import { fetchServices } from "../api/servicesApi";
 import Header from "../components/Header";
 import type { ServiceCategory } from "../types/apiTypes";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { loadServices } from "../store/slices/servicesSlice";
 import "../styles/BookNowSection.css";
 
 type DisplayService = ServiceCategory & { image: string };
@@ -17,29 +17,16 @@ const serviceImageFor = (serviceName: string) => {
 
 const BookingsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [services, setServices] = React.useState<DisplayService[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState("");
+  const dispatch = useAppDispatch();
+  const { items, loading, error } = useAppSelector((state) => state.services);
+  const services: DisplayService[] = items.map((service) => ({
+    ...service,
+    image: serviceImageFor(service.service_name),
+  }));
 
   React.useEffect(() => {
-    const loadServices = async () => {
-      try {
-        const data = await fetchServices();
-        setServices(
-          data.services.map((service) => ({
-            ...service,
-            image: serviceImageFor(service.service_name),
-          })),
-        );
-      } catch (err) {
-        setError(getApiErrorMessage(err));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadServices();
-  }, []);
+    dispatch(loadServices());
+  }, [dispatch]);
 
   const handleBookNow = (service: DisplayService) => {
     navigate("/checkout", {

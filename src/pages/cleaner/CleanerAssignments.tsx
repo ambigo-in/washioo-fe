@@ -1,48 +1,37 @@
+import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  fetchCleanerAssignments,
-  acceptAssignment,
-  rejectAssignment,
-  startAssignment,
-  completeAssignment,
-} from "../../api/cleanerApi";
-import type { Assignment } from "../../types/cleanerTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  acceptCleanerAssignment,
+  completeCleanerAssignment,
+  loadCleanerAssignments,
+  rejectCleanerAssignment,
+  startCleanerAssignment,
+} from "../../store/slices/cleanerSlice";
 import "./CleanerAssignments.css";
 
-type FilterStatus = "all" | "assigned" | "accepted" | "completed";
+type FilterStatus = "all" | "assigned" | "accepted" | "in_progress" | "completed";
 
 export default function CleanerAssignments() {
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { assignments, loading } = useAppSelector((state) => state.cleaner);
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const status = filter === "all" ? undefined : filter;
-        const response = await fetchCleanerAssignments(status);
-        setAssignments(response.assignments);
-      } catch (error) {
-        console.error("Failed to fetch assignments:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [filter]);
+    dispatch(loadCleanerAssignments(filter === "all" ? undefined : filter));
+  }, [dispatch, filter]);
 
   const handleAccept = async (assignmentId: string) => {
     setActionLoading(assignmentId);
     try {
-      await acceptAssignment(assignmentId, { cleaner_notes: "Accepted" });
-      // Refresh the list
-      const response = await fetchCleanerAssignments(
-        filter === "all" ? undefined : filter,
-      );
-      setAssignments(response.assignments);
+      await dispatch(
+        acceptCleanerAssignment({
+          assignmentId,
+          actionPayload: { cleaner_notes: "Accepted" },
+        }),
+      ).unwrap();
     } catch (error) {
       console.error("Failed to accept assignment:", error);
     } finally {
@@ -53,11 +42,12 @@ export default function CleanerAssignments() {
   const handleReject = async (assignmentId: string) => {
     setActionLoading(assignmentId);
     try {
-      await rejectAssignment(assignmentId, { cleaner_notes: "Rejected" });
-      const response = await fetchCleanerAssignments(
-        filter === "all" ? undefined : filter,
-      );
-      setAssignments(response.assignments);
+      await dispatch(
+        rejectCleanerAssignment({
+          assignmentId,
+          actionPayload: { cleaner_notes: "Rejected" },
+        }),
+      ).unwrap();
     } catch (error) {
       console.error("Failed to reject assignment:", error);
     } finally {
@@ -68,11 +58,12 @@ export default function CleanerAssignments() {
   const handleStart = async (assignmentId: string) => {
     setActionLoading(assignmentId);
     try {
-      await startAssignment(assignmentId, { cleaner_notes: "Started" });
-      const response = await fetchCleanerAssignments(
-        filter === "all" ? undefined : filter,
-      );
-      setAssignments(response.assignments);
+      await dispatch(
+        startCleanerAssignment({
+          assignmentId,
+          actionPayload: { cleaner_notes: "Started" },
+        }),
+      ).unwrap();
     } catch (error) {
       console.error("Failed to start assignment:", error);
     } finally {
@@ -83,11 +74,12 @@ export default function CleanerAssignments() {
   const handleComplete = async (assignmentId: string) => {
     setActionLoading(assignmentId);
     try {
-      await completeAssignment(assignmentId, { cleaner_notes: "Completed" });
-      const response = await fetchCleanerAssignments(
-        filter === "all" ? undefined : filter,
-      );
-      setAssignments(response.assignments);
+      await dispatch(
+        completeCleanerAssignment({
+          assignmentId,
+          actionPayload: { cleaner_notes: "Completed" },
+        }),
+      ).unwrap();
     } catch (error) {
       console.error("Failed to complete assignment:", error);
     } finally {
@@ -99,6 +91,7 @@ export default function CleanerAssignments() {
     const colors: Record<string, string> = {
       assigned: "#ffc107",
       accepted: "#6f42c1",
+      in_progress: "#007bff",
       rejected: "#dc3545",
       completed: "#28a745",
     };
@@ -110,7 +103,7 @@ export default function CleanerAssignments() {
       <div className="cleaner-assignments">
         {/* Filter Tabs */}
         <div className="filter-tabs">
-          {(["all", "assigned", "accepted", "completed"] as FilterStatus[]).map(
+          {(["all", "assigned", "accepted", "in_progress", "completed"] as FilterStatus[]).map(
             (status) => (
               <button
                 key={status}
@@ -188,6 +181,12 @@ export default function CleanerAssignments() {
                 </div>
 
                 <div className="assignment-actions">
+                  <Link
+                    className="btn-details"
+                    to={`/cleaner/bookings/${assignment.booking_id}`}
+                  >
+                    View Details
+                  </Link>
                   {assignment.assignment_status === "assigned" && (
                     <>
                       <button
@@ -220,8 +219,7 @@ export default function CleanerAssignments() {
                           : "Start Job"}
                       </button>
                     )}
-                  {assignment.assignment_status === "accepted" &&
-                    assignment.started_at && (
+                  {assignment.assignment_status === "in_progress" && (
                       <button
                         className="btn-complete"
                         onClick={() => handleComplete(assignment.id)}

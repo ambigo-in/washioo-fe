@@ -123,11 +123,13 @@
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .cleaner-select {
   flex: 1;
   max-width: 300px;
+  min-width: 220px;
   padding: 10px 12px;
   border: 1px solid #e9ecef;
   border-radius: 8px;
@@ -155,6 +157,21 @@
 .btn-assign:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .booking-header,
+  .booking-ref {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .booking-actions,
+  .cleaner-select,
+  .btn-assign {
+    max-width: none;
+    width: 100%;
+  }
 }
 
 /* Empty State */

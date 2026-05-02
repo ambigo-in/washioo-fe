@@ -1,5 +1,5 @@
 .users-page {
-  max-width: 1400px;
+  max-width: 1200px;
 }
 
 .page-header {
@@ -106,16 +106,16 @@
   overflow-x: auto;
 }
 
-table {
+.users-table table {
   width: 100%;
   border-collapse: collapse;
 }
 
-thead {
+.users-table thead {
   background: #f8f9fa;
 }
 
-th {
+.users-table th {
   padding: 14px 16px;
   text-align: left;
   font-size: 0.85rem;
@@ -125,18 +125,18 @@ th {
   border-bottom: 1px solid #e9ecef;
 }
 
-td {
+.users-table td {
   padding: 14px 16px;
   font-size: 0.95rem;
   color: #2c3e50;
   border-bottom: 1px solid #e9ecef;
 }
 
-tbody tr:hover {
+.users-table tbody tr:hover {
   background: #f8f9fa;
 }
 
-tbody tr:last-child td {
+.users-table tbody tr:last-child td {
   border-bottom: none;
 }
 
@@ -190,41 +190,14 @@ tbody tr:last-child td {
   color: #c62828;
 }
 
-.btn-action {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
-}
-
-.btn-action.activate {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.btn-action.activate:hover {
-  background: #c8e6c9;
-}
-
-.btn-action.deactivate {
-  background: #ffebee;
-  color: #c62828;
-}
-
-.btn-action.deactivate:hover {
-  background: #ffcdd2;
-}
-
 /* Responsive */
 @media (max-width: 1024px) {
   .users-table {
     overflow-x: scroll;
   }
 
-  table {
-    min-width: 900px;
+  .users-table table {
+    min-width: 760px;
   }
 }
 

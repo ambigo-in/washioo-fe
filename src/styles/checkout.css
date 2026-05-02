@@ -48,6 +48,16 @@
   margin-bottom: 24px;
 }
 
+.address-list {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.address-list .address-card {
+  margin-bottom: 0;
+}
+
 .address-card {
   background: #f8fcff;
   border: 2px solid #dbeafe;
@@ -83,6 +93,7 @@
   color: #64748b;
   font-size: 15px;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .address-card span {
@@ -107,7 +118,7 @@
   width: 100%;
 }
 
-.address-section > button:hover {
+.address-section > button:hover:not(:disabled) {
   box-shadow: 0 14px 28px rgba(14, 165, 233, 0.2);
   transform: translateY(-2px);
 }
@@ -174,8 +185,19 @@
   transition: all 0.3s ease;
 }
 
-.address-form button:hover {
+.address-form button:hover:not(:disabled) {
   transform: translateY(-2px);
+}
+
+.location-captured {
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  border-radius: 12px;
+  color: #0f766e !important;
+  font-size: 0.9rem !important;
+  font-weight: 800;
+  margin: 0;
+  padding: 10px 12px;
 }
 
 .booking-summary {
@@ -264,7 +286,7 @@
   width: 100%;
 }
 
-.booking-summary button:hover {
+.booking-summary button:hover:not(:disabled) {
   box-shadow: 0 18px 38px rgba(14, 165, 233, 0.28);
   transform: translateY(-3px);
 }

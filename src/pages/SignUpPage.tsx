@@ -4,11 +4,14 @@ import { signUp, sendOtp } from "../api/authApi";
 import { getApiErrorMessage } from "../api/client";
 import { useAuth } from "../context/useAuth";
 import { saveTokens } from "../utils/tokenManager";
+import type { AccountType } from "../types/authTypes";
 import "../styles/SignUpPage.css";
 
 export default function SignUpPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [aadhaarNumber, setAadhaarNumber] = useState("");
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,7 +21,10 @@ export default function SignUpPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const phone = (location.state as { phone?: string } | null)?.phone || "";
+  const state = location.state as { phone?: string; accountType?: AccountType } | null;
+  const phone = state?.phone || "";
+  const accountType =
+    state?.accountType === "cleaner" ? state.accountType : "customer";
 
   useEffect(() => {
     if (!phone) navigate("/verify-phone", { replace: true });
@@ -37,6 +43,11 @@ export default function SignUpPage() {
       return;
     }
 
+    if (accountType === "cleaner" && !aadhaarNumber.trim()) {
+      setError("Aadhaar number is required for cleaner signup.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -46,8 +57,13 @@ export default function SignUpPage() {
         phone_number: phone,
         email: email.trim() || undefined,
         otp_code: otpCode.trim(),
-        role: "customer",
-      });
+        aadhaar_number:
+          accountType === "cleaner" ? aadhaarNumber.trim() : undefined,
+        driving_license_number:
+          accountType === "cleaner"
+            ? drivingLicenseNumber.trim() || undefined
+            : undefined,
+      }, accountType);
 
       saveTokens(response.access_token, response.refresh_token);
       const user = await login();
@@ -73,7 +89,7 @@ export default function SignUpPage() {
     setError("");
 
     try {
-      await sendOtp(phone);
+      await sendOtp(phone, accountType);
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {
@@ -84,7 +100,9 @@ export default function SignUpPage() {
   return (
     <main className="signup-page-wrapper">
       <form className="auth-container" onSubmit={handleSignUp}>
-        <h2>Create Account</h2>
+        <h2>
+          {accountType === "cleaner" ? "Create Cleaner Account" : "Create Account"}
+        </h2>
         <p className="signup-subtitle">
           We need a few details before your first doorstep wash.
         </p>
@@ -112,6 +130,23 @@ export default function SignUpPage() {
           autoComplete="one-time-code"
           inputMode="numeric"
         />
+        {accountType === "cleaner" && (
+          <>
+            <input
+              value={aadhaarNumber}
+              onChange={(event) => setAadhaarNumber(event.target.value)}
+              placeholder="Aadhaar number"
+              inputMode="numeric"
+              autoComplete="off"
+            />
+            <input
+              value={drivingLicenseNumber}
+              onChange={(event) => setDrivingLicenseNumber(event.target.value)}
+              placeholder="Driving license optional"
+              autoComplete="off"
+            />
+          </>
+        )}
         <button disabled={loading} type="submit">
           {loading ? "Creating account..." : "Create Account"}
         </button>

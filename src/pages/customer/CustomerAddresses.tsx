@@ -6,7 +6,11 @@ import {
   updateAddress,
   deleteAddress,
 } from "../../api/addressApi";
-import type { Address } from "../../types/apiTypes";
+import type { Address, AddressPayload } from "../../types/apiTypes";
+import {
+  getCurrentCoordinates,
+  reverseGeocodeCoordinates,
+} from "../../utils/locationUtils";
 import "./CustomerAddresses.css";
 
 interface AddressFormData {
@@ -15,8 +19,21 @@ interface AddressFormData {
   city: string;
   state: string;
   pincode: string;
+  latitude: number | null;
+  longitude: number | null;
   is_default: boolean;
 }
+
+const emptyFormData: AddressFormData = {
+  address_label: "",
+  address_line1: "",
+  city: "",
+  state: "",
+  pincode: "",
+  latitude: null,
+  longitude: null,
+  is_default: false,
+};
 
 export default function CustomerAddresses() {
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -24,14 +41,9 @@ export default function CustomerAddresses() {
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
-  const [formData, setFormData] = useState<AddressFormData>({
-    address_label: "",
-    address_line1: "",
-    city: "",
-    state: "",
-    pincode: "",
-    is_default: false,
-  });
+  const [locating, setLocating] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [formData, setFormData] = useState<AddressFormData>(emptyFormData);
 
   useEffect(() => {
     loadAddresses();
@@ -52,22 +64,28 @@ export default function CustomerAddresses() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.latitude == null || formData.longitude == null) {
+      setError("Use My Live Location is required before saving an address.");
+      return;
+    }
+
+    const payload: AddressPayload = {
+      ...formData,
+      country: "India",
+      location_verified: true,
+    };
+
     try {
       if (editingAddress) {
-        await updateAddress(String(editingAddress.id), formData);
+        await updateAddress(String(editingAddress.id), payload);
       } else {
-        await createAddress(formData);
+        await createAddress(payload);
       }
       setShowForm(false);
       setEditingAddress(null);
-      setFormData({
-        address_label: "",
-        address_line1: "",
-        city: "",
-        state: "",
-        pincode: "",
-        is_default: false,
-      });
+      setFormData(emptyFormData);
+      setSuccess("Address saved.");
       loadAddresses();
     } catch (err) {
       setError("Failed to save address");
@@ -83,6 +101,8 @@ export default function CustomerAddresses() {
       city: address.city || "",
       state: address.state || "",
       pincode: address.pincode || "",
+      latitude: address.latitude ?? null,
+      longitude: address.longitude ?? null,
       is_default: address.is_default,
     });
     setShowForm(true);
@@ -111,6 +131,43 @@ export default function CustomerAddresses() {
     }
   };
 
+  const handleUseLiveLocation = async () => {
+    setLocating(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const coordinates = await getCurrentCoordinates();
+      let geocoded: Partial<AddressPayload> = {};
+
+      try {
+        geocoded = await reverseGeocodeCoordinates(coordinates);
+      } catch {
+        setSuccess(
+          "Location captured. Address lookup failed, so you can fill the address manually.",
+        );
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        address_line1: geocoded.address_line1 || prev.address_line1,
+        city: geocoded.city || prev.city,
+        state: geocoded.state || prev.state,
+        pincode: geocoded.pincode || prev.pincode,
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude,
+      }));
+
+      if (Object.keys(geocoded).length) {
+        setSuccess("Location captured and address fields updated.");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to capture location.");
+    } finally {
+      setLocating(false);
+    }
+  };
+
   return (
     <DashboardLayout title="My Addresses">
       <div className="addresses-page">
@@ -121,14 +178,7 @@ export default function CustomerAddresses() {
             onClick={() => {
               setShowForm(true);
               setEditingAddress(null);
-              setFormData({
-                address_label: "",
-                address_line1: "",
-                city: "",
-                state: "",
-                pincode: "",
-                is_default: false,
-              });
+              setFormData(emptyFormData);
             }}
           >
             + Add New Address
@@ -136,6 +186,7 @@ export default function CustomerAddresses() {
         </div>
 
         {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">{success}</div>}
 
         {loading ? (
           <div className="loading-container">
@@ -162,6 +213,11 @@ export default function CustomerAddresses() {
                 <p className="address-text">
                   {address.city}, {address.state} - {address.pincode}
                 </p>
+                {address.latitude != null && address.longitude != null && (
+                  <p className="location-text">
+                    Location: {address.latitude}, {address.longitude}
+                  </p>
+                )}
                 <div className="address-actions">
                   {!address.is_default && (
                     <button
@@ -274,6 +330,19 @@ export default function CustomerAddresses() {
                     </label>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  className="btn-location"
+                  disabled={locating}
+                  onClick={handleUseLiveLocation}
+                >
+                  {locating ? "Capturing Location..." : "Use My Live Location"}
+                </button>
+                {formData.latitude != null && formData.longitude != null && (
+                  <div className="location-preview">
+                    Location captured: {formData.latitude}, {formData.longitude}
+                  </div>
+                )}
                 <div className="form-actions">
                   <button
                     type="button"

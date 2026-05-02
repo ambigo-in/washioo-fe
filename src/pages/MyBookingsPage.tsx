@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
-import {
-  cancelBooking,
-  fetchBookings,
-  updateBooking,
-} from "../api/bookingApi";
-import { getApiErrorMessage } from "../api/client";
 import type { BookingStatus, CustomerBooking } from "../types/apiTypes";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  cancelCustomerBooking,
+  loadCustomerBookings,
+  patchBooking,
+} from "../store/slices/customerSlice";
 import "../styles/myBookings.css";
 
 const statusLabel: Record<BookingStatus, string> = {
@@ -24,8 +24,10 @@ const canCancel = (status: BookingStatus) =>
 const canEdit = (status: BookingStatus) => status === "pending";
 
 const MyBookingsPage: React.FC = () => {
-  const [bookings, setBookings] = useState<CustomerBooking[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { bookings, loading, error: storeError } = useAppSelector(
+    (state) => state.customer,
+  );
   const [workingId, setWorkingId] = useState("");
   const [editingId, setEditingId] = useState("");
   const [editDate, setEditDate] = useState("");
@@ -33,38 +35,9 @@ const MyBookingsPage: React.FC = () => {
   const [editInstructions, setEditInstructions] = useState("");
   const [error, setError] = useState("");
 
-  const loadBookings = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const data = await fetchBookings();
-      setBookings(data.bookings || []);
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    let active = true;
-
-    fetchBookings()
-      .then((data) => {
-        if (active) setBookings(data.bookings || []);
-      })
-      .catch((err) => {
-        if (active) setError(getApiErrorMessage(err));
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
+    dispatch(loadCustomerBookings());
+  }, [dispatch]);
 
   const startEdit = (booking: CustomerBooking) => {
     setEditingId(booking.id);
@@ -79,15 +52,19 @@ const MyBookingsPage: React.FC = () => {
     setError("");
 
     try {
-      await updateBooking(booking.id, {
-        scheduled_date: editDate,
-        scheduled_time: editTime,
-        special_instructions: editInstructions.trim() || null,
-      });
+      await dispatch(
+        patchBooking({
+          bookingId: booking.id,
+          changes: {
+            scheduled_date: editDate,
+            scheduled_time: editTime,
+            special_instructions: editInstructions.trim() || null,
+          },
+        }),
+      ).unwrap();
       setEditingId("");
-      await loadBookings();
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(String(err));
     } finally {
       setWorkingId("");
     }
@@ -98,10 +75,9 @@ const MyBookingsPage: React.FC = () => {
     setError("");
 
     try {
-      await cancelBooking(booking.id);
-      await loadBookings();
+      await dispatch(cancelCustomerBooking(booking.id)).unwrap();
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(String(err));
     } finally {
       setWorkingId("");
     }
@@ -117,7 +93,9 @@ const MyBookingsPage: React.FC = () => {
           <p>Track active bookings and manage pending requests.</p>
         </div>
 
-        {error && <p className="form-alert error">{error}</p>}
+        {(error || storeError) && (
+          <p className="form-alert error">{error || storeError}</p>
+        )}
 
         {loading ? (
           <div className="loading-state">Loading bookings...</div>
@@ -157,6 +135,18 @@ const MyBookingsPage: React.FC = () => {
                       Rs. {booking.final_price ?? booking.estimated_price}
                     </strong>
                   </div>
+                  {booking.payment && (
+                    <>
+                      <div>
+                        <span>Payment Status</span>
+                        <strong>{booking.payment.payment_status}</strong>
+                      </div>
+                      <div>
+                        <span>Payment Method</span>
+                        <strong>{booking.payment.payment_method || "N/A"}</strong>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="booking-address">

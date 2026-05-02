@@ -154,9 +154,29 @@
   background: #218838;
 }
 
+.btn-details {
+  background: #ffffff;
+  border: 1px solid #1976d2;
+  border-radius: 8px;
+  color: #1976d2;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 10px 20px;
+  text-decoration: none;
+}
+
+.btn-details:hover {
+  background: #e3f2fd;
+}
+
 .assignment-actions button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.assignment-actions .btn-start,
+.assignment-actions .btn-complete {
+  min-width: 130px;
 }
 
 .completed-badge,
@@ -175,6 +195,25 @@
 .rejected-badge {
   background: #f8d7da;
   color: #721c24;
+}
+
+@media (max-width: 640px) {
+  .assignment-header {
+    gap: 12px;
+    flex-direction: column;
+  }
+
+  .assignment-actions,
+  .assignment-actions button,
+  .btn-details {
+    width: 100%;
+  }
+
+  .assignment-actions button,
+  .btn-details {
+    justify-content: center;
+    text-align: center;
+  }
 }
 
 /* Empty State */

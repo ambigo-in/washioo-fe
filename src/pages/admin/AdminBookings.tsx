@@ -1,70 +1,44 @@
 import { useEffect, useState } from "react";
-import {
-  fetchAllBookings,
-  fetchBookingsByStatus,
-  assignBooking,
-} from "../../api/adminApi";
-import { fetchCleaners } from "../../api/adminApi";
-import type { AdminBooking } from "../../types/adminTypes";
-import type { CleanerProfile } from "../../types/cleanerTypes";
 import type { BookingStatus } from "../../types/apiTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  assignAdminBooking,
+  loadAdminBookings,
+  loadAdminCleaners,
+} from "../../store/slices/adminSlice";
 import "./AdminBookings.css";
 
 type FilterStatus = "all" | BookingStatus;
 
 export default function AdminBookings() {
-  const [bookings, setBookings] = useState<AdminBooking[]>([]);
-  const [cleaners, setCleaners] = useState<CleanerProfile[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { bookings, cleaners, loading } = useAppSelector((state) => state.admin);
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [assigningBooking, setAssigningBooking] = useState<string | null>(null);
   const [selectedCleaner, setSelectedCleaner] = useState<string>("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response =
-          filter === "all"
-            ? await fetchAllBookings()
-            : await fetchBookingsByStatus(filter as BookingStatus);
-        setBookings(response.bookings);
-      } catch (error) {
-        console.error("Failed to fetch bookings:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [filter]);
+    dispatch(loadAdminBookings(filter));
+  }, [dispatch, filter]);
 
   useEffect(() => {
-    const fetchCleanersList = async () => {
-      try {
-        const response = await fetchCleaners({
-          approval_status: "approved",
-          availability_status: "available",
-        });
-        setCleaners(response.cleaners);
-      } catch (error) {
-        console.error("Failed to fetch cleaners:", error);
-      }
-    };
-    fetchCleanersList();
-  }, []);
+    dispatch(
+      loadAdminCleaners({
+        approval_status: "approved",
+        availability_status: "available",
+      }),
+    );
+  }, [dispatch]);
 
   const handleAssign = async (bookingId: string) => {
     if (!selectedCleaner) return;
     setAssigningBooking(bookingId);
     try {
-      await assignBooking(bookingId, { cleaner_id: selectedCleaner });
-      // Refresh bookings
-      const response =
-        filter === "all"
-          ? await fetchAllBookings()
-          : await fetchBookingsByStatus(filter as BookingStatus);
-      setBookings(response.bookings);
+      await dispatch(
+        assignAdminBooking({ bookingId, cleanerId: selectedCleaner }),
+      ).unwrap();
+      dispatch(loadAdminBookings(filter));
       setSelectedCleaner("");
     } catch (error) {
       console.error("Failed to assign booking:", error);

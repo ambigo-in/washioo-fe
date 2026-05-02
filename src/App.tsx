@@ -24,10 +24,12 @@ import CleanerAssignments from "./pages/cleaner/CleanerAssignments";
 import CleanerAvailability from "./pages/cleaner/CleanerAvailability";
 import CleanerHistory from "./pages/cleaner/CleanerHistory";
 import CleanerProfile from "./pages/cleaner/CleanerProfile";
+import CleanerBookingDetails from "./pages/cleaner/CleanerBookingDetails";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminBookings from "./pages/admin/AdminBookings";
+import AdminPayments from "./pages/admin/AdminPayments";
 import AdminCleaners from "./pages/admin/AdminCleaners";
 import AdminServices from "./pages/admin/AdminServices";
 import AdminUsers from "./pages/admin/AdminUsers";
@@ -135,6 +137,14 @@ function App() {
             }
           />
           <Route
+            path="/cleaner/bookings/:bookingId"
+            element={
+              <ProtectedRoute roles={["cleaner"]}>
+                <CleanerBookingDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/cleaner/availability"
             element={
               <ProtectedRoute roles={["cleaner"]}>
@@ -173,6 +183,14 @@ function App() {
             element={
               <ProtectedRoute roles={["admin"]}>
                 <AdminBookings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/payments"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminPayments />
               </ProtectedRoute>
             }
           />

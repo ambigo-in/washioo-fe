@@ -32,6 +32,7 @@ export interface Address {
   country?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  location_verified?: boolean;
   is_default: boolean;
 }
 
@@ -46,6 +47,7 @@ export interface AddressPayload {
   country?: string;
   latitude?: number | null;
   longitude?: number | null;
+  location_verified?: boolean;
   is_default?: boolean;
 }
 
@@ -57,10 +59,32 @@ export type BookingStatus =
   | "completed"
   | "cancelled";
 
+export type PaymentStatus = "pending" | "paid" | "failed";
+
+export interface PaymentRecord {
+  id: string;
+  booking_id: string;
+  customer_id: string;
+  payment_method: string | null;
+  transaction_reference: string | null;
+  amount: number;
+  payment_status: PaymentStatus;
+  collected_by_cleaner: boolean;
+  paid_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AssignmentSummary {
   id: string;
   cleaner_id: string;
-  assignment_status: "assigned" | "accepted" | "rejected" | "completed";
+  assignment_status:
+    | "assigned"
+    | "accepted"
+    | "in_progress"
+    | "rejected"
+    | "completed"
+    | "cancelled";
   assigned_at: string;
   accepted_at: string | null;
   started_at: string | null;
@@ -80,6 +104,24 @@ export interface CustomerBooking {
   special_instructions: string | null;
   address: Address;
   assignment: AssignmentSummary | null;
+  payment?: {
+    payment_status: PaymentStatus;
+    amount: number;
+    payment_method?: string | null;
+    transaction_reference?: string | null;
+    paid_at?: string | null;
+  };
+  created_at: string;
+}
+
+export interface CreatedBooking {
+  id: string;
+  booking_reference: string;
+  service_id: string;
+  scheduled_date: string;
+  scheduled_time: string;
+  booking_status: BookingStatus;
+  estimated_price: number;
   created_at: string;
 }
 

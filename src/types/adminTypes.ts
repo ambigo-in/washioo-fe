@@ -1,4 +1,6 @@
-import type { BookingStatus, Address, AssignmentSummary } from "./apiTypes";
+import type { BookingStatus, Address, AssignmentSummary, PaymentRecord } from "./apiTypes";
+
+export interface AdminPayment extends PaymentRecord {}
 
 export interface AdminUser {
   id: string;

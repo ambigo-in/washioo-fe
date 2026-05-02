@@ -69,6 +69,7 @@ const navItems: NavItem[] = [
     roles: ["admin"],
   },
   { path: "/admin/bookings", label: "Bookings", icon: "📋", roles: ["admin"] },
+  { path: "/admin/payments", label: "Payments", icon: "💳", roles: ["admin"] },
   { path: "/admin/cleaners", label: "Cleaners", icon: "🧹", roles: ["admin"] },
   { path: "/admin/services", label: "Services", icon: "🔧", roles: ["admin"] },
     { path: "/admin/users", label: "Users", icon: "👥", roles: ["admin"] },

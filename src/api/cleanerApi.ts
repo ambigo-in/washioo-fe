@@ -1,7 +1,8 @@
-import { apiRequest } from "./client";
+import { apiRequest, withQuery, type PaginationParams } from "./client";
 import type {
   CleanerProfile,
   Assignment,
+  CleanerBookingDetail,
   AvailabilityPayload,
   AssignmentActionPayload,
   CompleteAssignmentPayload,
@@ -25,18 +26,34 @@ export const updateCleanerAvailability = (payload: AvailabilityPayload) =>
   );
 
 // Assignment APIs
-export const fetchCleanerAssignments = (status?: string) => {
-  const query = status ? `?status=${status}` : "";
+export const fetchCleanerAssignments = (
+  status?: string,
+  params: PaginationParams = {},
+) => {
   return apiRequest<{
     message: string;
     assignments: Assignment[];
     total: number;
-  }>(`/services/cleaner/assignments${query}`, { auth: true });
+  }>(
+    withQuery("/services/cleaner/assignments", {
+      status,
+      limit: 50,
+      offset: 0,
+      ...params,
+    }),
+    { auth: true },
+  );
 };
 
 export const fetchCleanerAssignment = (assignmentId: string) =>
   apiRequest<{ message: string; assignment: Assignment }>(
     `/services/cleaner/assignments/${assignmentId}`,
+    { auth: true },
+  );
+
+export const fetchCleanerBooking = (bookingId: string) =>
+  apiRequest<{ message: string; booking: CleanerBookingDetail }>(
+    `/cleaner/bookings/${bookingId}`,
     { auth: true },
   );
 
@@ -95,6 +112,6 @@ export const completeAssignment = (
 // Legacy alias for jobs endpoint
 export const fetchCleanerJobs = () =>
   apiRequest<{ message: string; assignments: Assignment[]; total: number }>(
-    "/auth/cleaner/jobs",
+    withQuery("/auth/cleaner/jobs", { limit: 50, offset: 0 }),
     { auth: true },
   );

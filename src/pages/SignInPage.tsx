@@ -4,6 +4,7 @@ import { signIn, sendOtp } from "../api/authApi";
 import { getApiErrorMessage } from "../api/client";
 import { useAuth } from "../context/useAuth";
 import { saveTokens } from "../utils/tokenManager";
+import type { AccountType } from "../types/authTypes";
 import "../styles/SignInPage.css";
 
 export default function SignInPage() {
@@ -15,7 +16,9 @@ export default function SignInPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const phone = (location.state as { phone?: string } | null)?.phone || "";
+  const state = location.state as { phone?: string; accountType?: AccountType } | null;
+  const phone = state?.phone || "";
+  const accountType = state?.accountType || "customer";
 
   useEffect(() => {
     if (!phone) navigate("/verify-phone", { replace: true });
@@ -50,7 +53,7 @@ export default function SignInPage() {
       const response = await signIn({
         phone_number: phone,
         otp_code: otpCode.trim(),
-      });
+      }, accountType);
 
       saveTokens(response.access_token, response.refresh_token);
       await routeAfterLogin();
@@ -66,7 +69,7 @@ export default function SignInPage() {
     setError("");
 
     try {
-      await sendOtp(phone);
+      await sendOtp(phone, accountType);
     } catch (err) {
       setError(getApiErrorMessage(err));
     } finally {

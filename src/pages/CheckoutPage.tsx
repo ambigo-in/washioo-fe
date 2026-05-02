@@ -1,10 +1,17 @@
 import React, { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { createAddress, fetchAddresses } from "../api/addressApi";
-import { createBooking } from "../api/bookingApi";
-import { getApiErrorMessage } from "../api/client";
 import Header from "../components/Header";
-import type { Address, AddressPayload } from "../types/apiTypes";
+import type { AddressPayload } from "../types/apiTypes";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  bookService,
+  loadAddresses,
+  saveAddress,
+} from "../store/slices/customerSlice";
+import {
+  getCurrentCoordinates,
+  reverseGeocodeCoordinates,
+} from "../utils/locationUtils";
 import "../styles/checkout.css";
 
 type CheckoutState = {
@@ -39,8 +46,9 @@ const compactAddressPayload = (payload: AddressPayload): AddressPayload => ({
   state: payload.state?.trim() || null,
   pincode: payload.pincode?.trim() || null,
   country: payload.country?.trim() || "India",
-  latitude: payload.latitude ?? null,
-  longitude: payload.longitude ?? null,
+  latitude: payload.latitude,
+  longitude: payload.longitude,
+  location_verified: payload.latitude != null && payload.longitude != null,
   is_default: payload.is_default ?? false,
 });
 
@@ -52,11 +60,12 @@ const CheckoutPage: React.FC = () => {
     [location.state],
   );
 
-  const [addresses, setAddresses] = useState<Address[]>([]);
+  const dispatch = useAppDispatch();
+  const { addresses, loading } = useAppSelector((state) => state.customer);
   const [selectedAddressId, setSelectedAddressId] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [savingAddress, setSavingAddress] = useState(false);
+  const [locating, setLocating] = useState(false);
   const [booking, setBooking] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -73,51 +82,58 @@ const CheckoutPage: React.FC = () => {
   }, [navigate, serviceData?.serviceId]);
 
   useEffect(() => {
-    const loadAddresses = async () => {
-      try {
-        const data = await fetchAddresses();
-        setAddresses(data.addresses || []);
-        const defaultAddress =
-          data.addresses?.find((address) => address.is_default) ||
-          data.addresses?.[0];
+    dispatch(loadAddresses()).unwrap().catch((err) => setError(String(err)));
+  }, [dispatch]);
 
-        if (defaultAddress) {
-          setSelectedAddressId(defaultAddress.id);
-        } else {
-          setShowForm(true);
-        }
-      } catch (err) {
-        setError(getApiErrorMessage(err));
-      } finally {
-        setLoading(false);
-      }
-    };
+  useEffect(() => {
+    const defaultAddress =
+      addresses.find((address) => address.is_default) || addresses[0];
 
-    loadAddresses();
-  }, []);
+    if (defaultAddress && !selectedAddressId) {
+      setSelectedAddressId(defaultAddress.id);
+    } else if (!defaultAddress && !loading) {
+      setShowForm(true);
+    }
+  }, [addresses, loading, selectedAddressId]);
 
   const updateForm = (field: keyof AddressPayload, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const getLiveLocation = () => {
-    if (!navigator.geolocation) {
-      setError("Location is not available in this browser.");
-      return;
-    }
+  const getLiveLocation = async () => {
+    setLocating(true);
+    setError("");
+    setSuccess("");
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setError("");
-        setFormData((prev) => ({
-          ...prev,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        }));
-        setSuccess("Location captured for this address.");
-      },
-      () => setError("Unable to capture location. You can still save manually."),
-    );
+    try {
+      const coordinates = await getCurrentCoordinates();
+      let geocoded: Partial<AddressPayload> = {};
+
+      try {
+        geocoded = await reverseGeocodeCoordinates(coordinates);
+      } catch {
+        setSuccess(
+          "Location captured. Address lookup failed, so you can fill the address manually.",
+        );
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        ...Object.fromEntries(
+          Object.entries(geocoded).filter(([, value]) => value),
+        ),
+        ...coordinates,
+        location_verified: true,
+      }));
+
+      if (Object.keys(geocoded).length) {
+        setSuccess("Location captured and address fields updated.");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to capture location.");
+    } finally {
+      setLocating(false);
+    }
   };
 
   const handleCreateAddress = async (event: FormEvent) => {
@@ -129,20 +145,23 @@ const CheckoutPage: React.FC = () => {
       return;
     }
 
+    if (payload.latitude == null || payload.longitude == null) {
+      setError("Use My Live Location is required before saving an address.");
+      return;
+    }
+
     setSavingAddress(true);
     setError("");
     setSuccess("");
 
     try {
-      const response = await createAddress(payload);
-      const nextAddresses = [response.address, ...addresses];
-      setAddresses(nextAddresses);
+      const response = await dispatch(saveAddress(payload)).unwrap();
       setSelectedAddressId(response.address.id);
       setFormData(emptyAddress);
       setShowForm(false);
       setSuccess("Address saved.");
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(String(err));
     } finally {
       setSavingAddress(false);
     }
@@ -166,16 +185,18 @@ const CheckoutPage: React.FC = () => {
     setSuccess("");
 
     try {
-      await createBooking({
-        service_category_id: serviceData.serviceId,
-        address_id: selectedAddressId,
-        scheduled_date: scheduledDate,
-        scheduled_time: scheduledTime,
-        special_instructions: instructions.trim() || null,
-      });
+      await dispatch(
+        bookService({
+          service_category_id: serviceData.serviceId,
+          address_id: selectedAddressId,
+          scheduled_date: scheduledDate,
+          scheduled_time: scheduledTime,
+          special_instructions: instructions.trim() || null,
+        }),
+      ).unwrap();
       navigate("/my-bookings", { replace: true });
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(String(err));
     } finally {
       setBooking(false);
     }
@@ -286,9 +307,14 @@ const CheckoutPage: React.FC = () => {
                     Default
                   </label>
                 </div>
-                <button onClick={getLiveLocation} type="button">
-                  Use Live Location
+                <button disabled={locating} onClick={getLiveLocation} type="button">
+                  {locating ? "Capturing Location..." : "Use My Live Location"}
                 </button>
+                {formData.latitude != null && formData.longitude != null && (
+                  <p className="location-captured">
+                    Location captured: {formData.latitude}, {formData.longitude}
+                  </p>
+                )}
                 <button disabled={savingAddress} type="submit">
                   {savingAddress ? "Saving..." : "Save Address"}
                 </button>

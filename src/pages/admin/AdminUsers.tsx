@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
-import { fetchUsers, updateUserStatus } from "../../api/adminApi";
+import { fetchUsers } from "../../api/adminApi";
 import type { AdminUser } from "../../types/adminTypes";
 import "./AdminUsers.css";
 
@@ -27,16 +27,6 @@ export default function AdminUsers() {
       console.error(err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleStatusChange = async (userId: string, isActive: boolean) => {
-    try {
-      await updateUserStatus(Number(userId), isActive);
-      loadUsers();
-    } catch (err) {
-      setError("Failed to update user status");
-      console.error(err);
     }
   };
 
@@ -130,7 +120,6 @@ export default function AdminUsers() {
                   <th>Roles</th>
                   <th>Status</th>
                   <th>Joined</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -153,16 +142,6 @@ export default function AdminUsers() {
                       </span>
                     </td>
                     <td>{formatDate(user.created_at)}</td>
-                    <td>
-                      <button
-                        className={`btn-action ${user.is_active ? "deactivate" : "activate"}`}
-                        onClick={() =>
-                          handleStatusChange(String(user.id), !user.is_active)
-                        }
-                      >
-                        {user.is_active ? "Deactivate" : "Activate"}
-                      </button>
-                    </td>
                   </tr>
                 ))}
               </tbody>

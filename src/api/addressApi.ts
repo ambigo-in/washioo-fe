@@ -1,9 +1,9 @@
-import { apiRequest } from "./client";
+import { apiRequest, withQuery, type PaginationParams } from "./client";
 import type { Address, AddressPayload } from "../types/apiTypes";
 
-export const fetchAddresses = () =>
+export const fetchAddresses = (params: PaginationParams = {}) =>
   apiRequest<{ message: string; addresses: Address[]; total: number }>(
-    "/services/addresses",
+    withQuery("/services/addresses", params),
     { auth: true },
   );
 
@@ -16,7 +16,7 @@ export const createAddress = (payload: AddressPayload) =>
 
 export const updateAddress = (addressId: string, payload: Partial<AddressPayload>) =>
   apiRequest<{ message: string; address: Address }>(
-    `/services/address/${addressId}`,
+    `/customer/addresses/${addressId}`,
     {
       method: "PATCH",
       auth: true,

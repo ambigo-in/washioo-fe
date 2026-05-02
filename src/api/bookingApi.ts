@@ -1,16 +1,17 @@
 import { apiRequest } from "./client";
-import type { BookingPayload, CustomerBooking } from "../types/apiTypes";
+import { withQuery, type PaginationParams } from "./client";
+import type { BookingPayload, CreatedBooking, CustomerBooking } from "../types/apiTypes";
 
 export const createBooking = (payload: BookingPayload) =>
-  apiRequest<{ message: string; booking: CustomerBooking }>("/services/book", {
+  apiRequest<{ message: string; booking: CreatedBooking }>("/services/book", {
     method: "POST",
     auth: true,
     body: payload,
   });
 
-export const fetchBookings = () =>
+export const fetchBookings = (params: PaginationParams = {}) =>
   apiRequest<{ message: string; bookings: CustomerBooking[]; total: number }>(
-    "/services/my-bookings",
+    withQuery("/services/my-bookings", { limit: 50, offset: 0, ...params }),
     { auth: true },
   );
 

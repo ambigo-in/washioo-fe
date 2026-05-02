@@ -1,21 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { fetchBookings } from "../../api/bookingApi";
-import { fetchAddresses } from "../../api/addressApi";
-import { fetchServices } from "../../api/servicesApi";
-import type {
-  CustomerBooking,
-  ServiceCategory,
-  Address,
-} from "../../types/apiTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  loadAddresses,
+  loadCustomerBookings,
+} from "../../store/slices/customerSlice";
+import { loadServices } from "../../store/slices/servicesSlice";
 import "./CustomerDashboard.css";
 
 export default function CustomerDashboard() {
-  const [bookings, setBookings] = useState<CustomerBooking[]>([]);
-  const [services, setServices] = useState<ServiceCategory[]>([]);
-  const [addresses, setAddresses] = useState<Address[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { bookings, addresses, loading: customerLoading } = useAppSelector(
+    (state) => state.customer,
+  );
+  const { items: services, loading: servicesLoading } = useAppSelector(
+    (state) => state.services,
+  );
+  const loading = customerLoading || servicesLoading;
   const serviceImages =[
     "/p1.png",
     "/p2.png",
@@ -23,24 +25,10 @@ export default function CustomerDashboard() {
   ]
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [bookingsRes, servicesRes, addressesRes] = await Promise.all([
-          fetchBookings(),
-          fetchServices(),
-          fetchAddresses(),
-        ]);
-        setBookings(bookingsRes.bookings);
-        setServices(servicesRes.services);
-        setAddresses(addressesRes.addresses);
-      } catch (error) {
-        console.error("Failed to fetch dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+    dispatch(loadCustomerBookings());
+    dispatch(loadServices());
+    dispatch(loadAddresses());
+  }, [dispatch]);
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {

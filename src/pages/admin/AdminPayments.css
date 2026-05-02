@@ -1,0 +1,202 @@
+.admin-payments {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.payment-stats {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 16px 32px rgba(17, 24, 39, 0.08);
+}
+
+.payment-stats h2 {
+  margin-bottom: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat-card.warning {
+  background: #fff7cd;
+}
+
+.stat-card.success {
+  background: #d1fae5;
+}
+
+.stat-card.danger {
+  background: #fee2e2;
+}
+
+.stat-card.revenue {
+  background: #e0f2fe;
+}
+
+.stat-card.pending-total {
+  background: #eef2ff;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.stat-label {
+  color: #475569;
+}
+
+.payment-actions {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 16px 32px rgba(17, 24, 39, 0.08);
+}
+
+.filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.filter-button {
+  border: 1px solid #d1d5db;
+  background: #f8fafc;
+  color: #0f172a;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-button.active,
+.filter-button:hover {
+  background: #1d4ed8;
+  color: #fff;
+  border-color: transparent;
+}
+
+.payments-table-wrapper {
+  overflow-x: auto;
+}
+
+.payments-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.payments-table th,
+.payments-table td {
+  padding: 0.9rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.payments-table th {
+  color: #475569;
+  font-weight: 700;
+  background: #f8fafc;
+}
+
+.status-pill {
+  display: inline-flex;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.row-actions {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  border: none;
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-action.success {
+  background: #10b981;
+  color: #fff;
+}
+
+.btn-action.danger {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn-action.delete {
+  background: #f97316;
+  color: #fff;
+}
+
+.btn-action:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem 0;
+  color: #475569;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #1d4ed8;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.form-alert.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+}

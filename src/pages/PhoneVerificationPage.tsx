@@ -2,12 +2,15 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { sendOtp } from "../api/authApi";
 import { getApiErrorMessage } from "../api/client";
+import type { AccountType } from "../types/authTypes";
 import "../styles/PhoneVerificationPage.css";
 
 const normalizePhone = (value: string) => value.replace(/\s+/g, "");
 
 export default function PhoneVerificationPage() {
   const [phone, setPhone] = useState("");
+  const [accountType, setAccountType] = useState<AccountType>("customer");
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -25,9 +28,9 @@ export default function PhoneVerificationPage() {
     setError("");
 
     try {
-      const response = await sendOtp(phoneNumber);
-      navigate(response.user_exist ? "/signin" : "/signup", {
-        state: { phone: phoneNumber, userExists: response.user_exist },
+      await sendOtp(phoneNumber, accountType);
+      navigate(authMode === "signup" && accountType !== "admin" ? "/signup" : "/signin", {
+        state: { phone: phoneNumber, accountType, authMode },
       });
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -53,6 +56,29 @@ export default function PhoneVerificationPage() {
           autoComplete="tel"
           inputMode="tel"
         />
+        <select
+          value={accountType}
+          onChange={(event) => {
+            const nextType = event.target.value as AccountType;
+            setAccountType(nextType);
+            if (nextType === "admin") setAuthMode("signin");
+          }}
+        >
+          <option value="customer">Customer</option>
+          <option value="cleaner">Cleaner</option>
+          <option value="admin">Admin</option>
+        </select>
+        {accountType !== "admin" && (
+          <select
+            value={authMode}
+            onChange={(event) =>
+              setAuthMode(event.target.value as "signin" | "signup")
+            }
+          >
+            <option value="signin">Sign in</option>
+            <option value="signup">Create account</option>
+          </select>
+        )}
         <button disabled={loading} type="submit">
           {loading ? "Sending OTP..." : "Continue"}
         </button>

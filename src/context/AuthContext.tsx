@@ -1,72 +1,35 @@
-import React, { useEffect, useState } from "react";
-import {
-  getAccessToken,
-  getRefreshToken,
-  clearTokens,
-} from "../utils/tokenManager";
-import { getCurrentUser, logoutUser } from "../api/authApi";
+import React, { useEffect } from "react";
 import { AuthContext } from "./authContextValue";
 import type { UserProfile, UserRole } from "../types/apiTypes";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  hydrateSession,
+  logoutSession,
+  refreshCurrentUser,
+  setUser as setAuthUser,
+} from "../store/slices/authSlice";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(!!getAccessToken());
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { user, isAuthenticated, isLoading } = useAppSelector(
+    (state) => state.auth,
+  );
 
   useEffect(() => {
-    let active = true;
-
-    const hydrateSession = async () => {
-      if (!getAccessToken()) {
-        if (active) setIsLoading(false);
-        return;
-      }
-
-      try {
-        const response = await getCurrentUser();
-        if (!active) return;
-        setUser(response.user);
-        setIsAuthenticated(true);
-      } catch {
-        clearTokens();
-        if (!active) return;
-        setUser(null);
-        setIsAuthenticated(false);
-      } finally {
-        if (active) setIsLoading(false);
-      }
-    };
-
-    hydrateSession();
-
-    return () => {
-      active = false;
-    };
-  }, []);
+    dispatch(hydrateSession());
+  }, [dispatch]);
 
   const refreshUser = async () => {
-    const response = await getCurrentUser();
-    setUser(response.user);
-    setIsAuthenticated(true);
-    return response.user;
+    const response = await dispatch(refreshCurrentUser()).unwrap();
+    return response;
   };
 
   const login = refreshUser;
 
   const logout = async () => {
-    const refreshToken = getRefreshToken();
-    if (refreshToken && getAccessToken()) {
-      try {
-        await logoutUser(refreshToken);
-      } catch {
-        // Local logout must still complete if the server token is already invalid.
-      }
-    }
-    clearTokens();
-    setUser(null);
-    setIsAuthenticated(false);
+    await dispatch(logoutSession()).unwrap();
   };
 
   const roles = user?.roles ?? [];
@@ -83,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshUser,
         login,
         logout,
-        setUser,
+        setUser: (nextUser: UserProfile | null) => dispatch(setAuthUser(nextUser)),
       }}
     >
       {children}

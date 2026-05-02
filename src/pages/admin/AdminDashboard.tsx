@@ -129,6 +129,13 @@ export default function AdminDashboard() {
                 <p>Approve and manage cleaners</p>
               </div>
             </Link>
+            <Link to="/admin/payments" className="action-card">
+              <div className="action-icon">💳</div>
+              <div className="action-content">
+                <h3>Manage Payments</h3>
+                <p>Track and update payment status</p>
+              </div>
+            </Link>
             <Link to="/admin/services" className="action-card">
               <div className="action-icon">🔧</div>
               <div className="action-content">
