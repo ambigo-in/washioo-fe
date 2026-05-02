@@ -3,9 +3,11 @@ import type {
   Address,
   AssignmentSummary,
   PaymentRecord,
+  PaymentStatus,
+  PaymentType,
 } from "./apiTypes";
 
-export interface AdminPayment extends PaymentRecord {}
+export type AdminPayment = PaymentRecord;
 
 export interface AdminUser {
   id: string;
@@ -52,6 +54,13 @@ export interface AdminBooking {
   special_instructions: string | null;
   address: Address;
   assignment: AssignmentSummary | null;
+  payment?: {
+    payment_status: PaymentStatus;
+    legacy_payment_status?: string;
+    payment_type?: PaymentType | null;
+    amount: number;
+    collected_amount?: number | null;
+  };
   created_at: string;
 }
 

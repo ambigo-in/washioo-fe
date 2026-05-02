@@ -70,14 +70,13 @@ export const assignAdminBooking = createAsyncThunk(
   "admin/assignBooking",
   async (
     payload: { bookingId: string; cleanerId: string; cleanerNotes?: string },
-    { dispatch, rejectWithValue },
+    { rejectWithValue },
   ) => {
     try {
       const response = await assignBooking(payload.bookingId, {
         cleaner_id: payload.cleanerId,
         cleaner_notes: payload.cleanerNotes,
       });
-      dispatch(loadAdminBookings("all"));
       return response;
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error));

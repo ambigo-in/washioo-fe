@@ -1,276 +1,291 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-  deletePayment,
-  fetchPaymentStats,
-  fetchPayments,
-  markPaymentFailed,
-  markPaymentPaid,
-} from "../../api/adminApi";
-import { getApiErrorMessage } from "../../api/client";
-import type { AdminPayment } from "../../types/adminTypes";
-import type { PaymentStatus } from "../../types/apiTypes";
+  loadAdminBookings,
+  loadAdminCleaners,
+  loadAdminUsers,
+} from "../../store/slices/adminSlice";
+import {
+  loadAdminPayments,
+  submitAdminSplit,
+} from "../../store/slices/paymentSlice";
+import type { Payment, PaymentStatus } from "../../types/apiTypes";
 import "./AdminPayments.css";
 
-const statusLabels: Record<string, string> = {
-  all: "All",
-  pending: "Pending",
-  paid: "Paid",
-  failed: "Failed",
-};
+type FilterStatus = "all" | "collected" | "split_done";
+
+const filterTabs: { label: string; value: FilterStatus }[] = [
+  { label: "All", value: "all" },
+  { label: "Collected", value: "collected" },
+  { label: "Split Done", value: "split_done" },
+];
+
+const formatMoney = (value?: number | null) =>
+  `Rs. ${(value ?? 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+
+const formatLabel = (value?: string | null) =>
+  value ? value.replace("_", " ") : "Not available";
+
+function PaymentTypeBadge({ type }: { type: Payment["payment_type"] }) {
+  if (!type) return <span className="payment-type-badge muted">N/A</span>;
+  return (
+    <span className={`payment-type-badge ${type}`}>
+      {type === "upi" ? "UPI" : "Cash"}
+    </span>
+  );
+}
+
+function StatusBadge({ status }: { status: PaymentStatus }) {
+  return <span className={`payment-status-badge ${status}`}>{formatLabel(status)}</span>;
+}
+
+function SplitForm({
+  payment,
+  onSubmit,
+  submitting,
+}: {
+  payment: Payment;
+  onSubmit: (cleanerShare: number, adminShare: number) => Promise<void>;
+  submitting: boolean;
+}) {
+  const collectedAmount = payment.collected_amount ?? 0;
+  const [cleanerShare, setCleanerShare] = useState("");
+  const cleanerShareNumber = Number(cleanerShare);
+  const adminShare =
+    Number.isFinite(cleanerShareNumber) && cleanerShare !== ""
+      ? Math.max(collectedAmount - cleanerShareNumber, 0)
+      : collectedAmount;
+  const fieldError =
+    cleanerShare !== "" &&
+    (cleanerShareNumber <= 0 || cleanerShareNumber >= collectedAmount)
+      ? "Cleaner share must be greater than 0 and less than collected amount."
+      : "";
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (fieldError || cleanerShare === "") return;
+    await onSubmit(cleanerShareNumber, adminShare);
+  };
+
+  return (
+    <form className="split-form" onSubmit={handleSubmit}>
+      <label>
+        <span>Cleaner Share (Rs.)</span>
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          value={cleanerShare}
+          onChange={(event) => setCleanerShare(event.target.value)}
+        />
+      </label>
+
+      <label>
+        <span>Admin Share (Rs.)</span>
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          value={adminShare.toFixed(2)}
+          readOnly
+        />
+      </label>
+
+      {fieldError && <p className="field-error">{fieldError}</p>}
+
+      <button
+        type="submit"
+        className="confirm-split-btn"
+        disabled={submitting || !!fieldError || cleanerShare === ""}
+      >
+        {submitting ? "Splitting..." : "Confirm Split"}
+      </button>
+    </form>
+  );
+}
 
 export default function AdminPayments() {
-  const [payments, setPayments] = useState<AdminPayment[]>([]);
-  const [stats, setStats] = useState({
-    total_payments: 0,
-    pending_count: 0,
-    paid_count: 0,
-    failed_count: 0,
-    total_amount_paid: 0,
-    total_amount_pending: 0,
-  });
-  const [filter, setFilter] = useState<"all" | PaymentStatus>("all");
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [error, setError] = useState("");
-
-  const loadPayments = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const [statsRes, paymentsRes] = await Promise.all([
-        fetchPaymentStats(),
-        fetchPayments({ status: filter === "all" ? undefined : filter }),
-      ]);
-      setStats(statsRes.statistics);
-      setPayments(paymentsRes.payments);
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
-    }
-  };
+  const dispatch = useAppDispatch();
+  const { bookings, cleaners, users } = useAppSelector((state) => state.admin);
+  const { payments, loading, error } = useAppSelector((state) => state.payments);
+  const [filter, setFilter] = useState<FilterStatus>("all");
+  const [submittingId, setSubmittingId] = useState<string | null>(null);
+  const [localError, setLocalError] = useState("");
 
   useEffect(() => {
-    loadPayments();
-  }, [filter]);
+    const status = filter === "all" ? undefined : filter;
+    dispatch(loadAdminPayments(status));
+  }, [dispatch, filter]);
 
-  const handleMarkPaid = async (payment: AdminPayment) => {
-    setActionLoading(payment.id);
-    setError("");
+  useEffect(() => {
+    dispatch(loadAdminBookings("all"));
+    dispatch(loadAdminCleaners(undefined));
+    dispatch(loadAdminUsers());
+  }, [dispatch]);
+
+  const bookingById = useMemo(
+    () => new Map(bookings.map((booking) => [booking.id, booking])),
+    [bookings],
+  );
+  const cleanerById = useMemo(
+    () => new Map(cleaners.map((cleaner) => [cleaner.id, cleaner])),
+    [cleaners],
+  );
+  const userById = useMemo(
+    () => new Map(users.map((user) => [user.id, user])),
+    [users],
+  );
+
+  const handleSplit = async (
+    payment: Payment,
+    cleanerShare: number,
+    adminShare: number,
+  ) => {
+    setSubmittingId(payment.id);
+    setLocalError("");
+
     try {
-      await markPaymentPaid(
-        payment.id,
-        payment.transaction_reference ?? undefined,
-      );
-      await loadPayments();
+      await dispatch(
+        submitAdminSplit({
+          paymentId: payment.id,
+          body: {
+            cleaner_share: cleanerShare,
+            admin_share: adminShare,
+          },
+        }),
+      ).unwrap();
+      dispatch(loadAdminPayments(filter === "all" ? undefined : filter));
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setLocalError(String(err));
     } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleMarkFailed = async (payment: AdminPayment) => {
-    setActionLoading(payment.id);
-    setError("");
-    try {
-      await markPaymentFailed(payment.id);
-      await loadPayments();
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const handleDelete = async (payment: AdminPayment) => {
-    if (!window.confirm("Delete this pending payment?")) return;
-    setActionLoading(payment.id);
-    setError("");
-    try {
-      await deletePayment(payment.id);
-      await loadPayments();
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const statusColor = (status: string) => {
-    switch (status) {
-      case "paid":
-        return "#28a745";
-      case "pending":
-        return "#ffc107";
-      case "failed":
-        return "#dc3545";
-      default:
-        return "#6c757d";
+      setSubmittingId(null);
     }
   };
 
   return (
     <DashboardLayout title="Payment Management">
       <div className="admin-payments">
-        <section className="payment-stats">
-          <h2>Payment Dashboard</h2>
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-value">{stats.total_payments}</div>
-              <div className="stat-label">Total Payments</div>
-            </div>
-            <div className="stat-card warning">
-              <div className="stat-value">{stats.pending_count}</div>
-              <div className="stat-label">Pending</div>
-            </div>
-            <div className="stat-card success">
-              <div className="stat-value">{stats.paid_count}</div>
-              <div className="stat-label">Paid</div>
-            </div>
-            <div className="stat-card danger">
-              <div className="stat-value">{stats.failed_count}</div>
-              <div className="stat-label">Failed</div>
-            </div>
-            <div className="stat-card revenue">
-              <div className="stat-value">
-                ₹{stats.total_amount_paid.toLocaleString()}
-              </div>
-              <div className="stat-label">Amount Paid</div>
-            </div>
-            <div className="stat-card pending-total">
-              <div className="stat-value">
-                ₹{stats.total_amount_pending.toLocaleString()}
-              </div>
-              <div className="stat-label">Amount Pending</div>
-            </div>
+        <section className="payments-toolbar">
+          <div>
+            <h2>Payment Reconciliation</h2>
+            <p>Review cleaner collections and split each collected payment.</p>
+          </div>
+
+          <div className="filter-tabs">
+            {filterTabs.map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                className={`filter-tab ${filter === tab.value ? "active" : ""}`}
+                onClick={() => setFilter(tab.value)}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </section>
 
-        <section className="payment-actions">
-          <div className="filter-row">
-            <div className="filter-buttons">
-              {Object.entries(statusLabels).map(([value, label]) => (
-                <button
-                  key={value}
-                  className={`filter-button ${filter === value ? "active" : ""}`}
-                  type="button"
-                  onClick={() => setFilter(value as "all" | PaymentStatus)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+        {(error || localError) && (
+          <p className="form-alert error">{localError || error}</p>
+        )}
+
+        {loading ? (
+          <div className="loading-state">
+            <div className="loading-spinner" />
+            <p>Loading payments...</p>
           </div>
+        ) : payments.length === 0 ? (
+          <div className="empty-state">
+            <h3>No payments found.</h3>
+            <p>Collected payments will appear here after cleaners record them.</p>
+          </div>
+        ) : (
+          <div className="payment-card-list">
+            {payments.map((payment) => {
+              const booking = bookingById.get(payment.booking_id);
+              const cleaner = payment.collected_by
+                ? cleanerById.get(payment.collected_by)
+                : undefined;
+              const splitAdmin = payment.split_updated_by
+                ? userById.get(payment.split_updated_by)
+                : undefined;
 
-          {error && <p className="form-alert error">{error}</p>}
+              return (
+                <article key={payment.id} className="payment-card">
+                  <div className="payment-card-header">
+                    <div>
+                      <span className="booking-reference">
+                        {booking?.booking_reference || payment.booking_id}
+                      </span>
+                      <h3>{booking?.service_name || "Service booking"}</h3>
+                    </div>
+                    <StatusBadge status={payment.status} />
+                  </div>
 
-          {loading ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Loading payments...</p>
-            </div>
-          ) : payments.length === 0 ? (
-            <div className="empty-state">
-              <h3>No payments found.</h3>
-              <p>Try a different filter or come back later.</p>
-            </div>
-          ) : (
-            <div className="payments-table-wrapper">
-              <table className="payments-table">
-                <thead>
-                  <tr>
-                    <th>Booking</th>
-                    <th>Customer</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Status</th>
-                    <th>Collected</th>
-                    <th>Reference</th>
-                    <th>Paid At</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {payments.map((payment) => (
-                    <tr key={payment.id}>
-                      <td>{payment.booking_id}</td>
-                      <td>{payment.customer_id}</td>
-                      <td>₹{payment.amount}</td>
-                      <td>{payment.payment_method || "N/A"}</td>
-                      <td>
-                        <span
-                          className="status-pill"
-                          style={{
-                            backgroundColor: statusColor(
-                              payment.payment_status,
-                            ),
-                          }}
-                        >
-                          {payment.payment_status}
-                        </span>
-                      </td>
-                      <td>{payment.collected_by_cleaner ? "Yes" : "No"}</td>
-                      <td>{payment.transaction_reference || "—"}</td>
-                      <td>
-                        {payment.paid_at
-                          ? new Date(payment.paid_at).toLocaleString()
-                          : "—"}
-                      </td>
-                      <td>
-                        <div className="row-actions">
-                          {payment.payment_status === "pending" && (
-                            <>
-                              <button
-                                className="btn-action success"
-                                onClick={() => handleMarkPaid(payment)}
-                                disabled={actionLoading === payment.id}
-                              >
-                                {actionLoading === payment.id
-                                  ? "Processing..."
-                                  : "Mark Paid"}
-                              </button>
-                              <button
-                                className="btn-action danger"
-                                onClick={() => handleMarkFailed(payment)}
-                                disabled={actionLoading === payment.id}
-                              >
-                                {actionLoading === payment.id
-                                  ? "Processing..."
-                                  : "Mark Failed"}
-                              </button>
-                              <button
-                                className="btn-action delete"
-                                onClick={() => handleDelete(payment)}
-                                disabled={actionLoading === payment.id}
-                              >
-                                {actionLoading === payment.id
-                                  ? "Processing..."
-                                  : "Delete"}
-                              </button>
-                            </>
-                          )}
-                          {payment.payment_status === "failed" && (
-                            <button
-                              className="btn-action success"
-                              onClick={() => handleMarkPaid(payment)}
-                              disabled={actionLoading === payment.id}
-                            >
-                              {actionLoading === payment.id
-                                ? "Processing..."
-                                : "Mark Paid"}
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
+                  <div className="payment-card-grid">
+                    <div>
+                      <span>Customer</span>
+                      <strong>
+                        {booking?.customer_name || payment.customer_id || "N/A"}
+                      </strong>
+                    </div>
+                    <div>
+                      <span>Cleaner</span>
+                      <strong>{cleaner?.full_name || payment.collected_by || "N/A"}</strong>
+                    </div>
+                    <div>
+                      <span>Collected Amount</span>
+                      <strong>{formatMoney(payment.collected_amount)}</strong>
+                    </div>
+                    <div>
+                      <span>Payment Type</span>
+                      <PaymentTypeBadge type={payment.payment_type} />
+                    </div>
+                  </div>
+
+                  {payment.status === "collected" && (
+                    <SplitForm
+                      payment={payment}
+                      submitting={submittingId === payment.id}
+                      onSubmit={(cleanerShare, adminShare) =>
+                        handleSplit(payment, cleanerShare, adminShare)
+                      }
+                    />
+                  )}
+
+                  {payment.status === "split_done" && (
+                    <div className="split-summary">
+                      <div>
+                        <span>Cleaner Share</span>
+                        <strong>{formatMoney(payment.cleaner_share)}</strong>
+                      </div>
+                      <div>
+                        <span>Admin Share</span>
+                        <strong>{formatMoney(payment.admin_share)}</strong>
+                      </div>
+                      <div>
+                        <span>Split By</span>
+                        <strong>{splitAdmin?.full_name || payment.split_updated_by || "N/A"}</strong>
+                      </div>
+                      <div>
+                        <span>Split At</span>
+                        <strong>
+                          {payment.split_updated_at
+                            ? new Date(payment.split_updated_at).toLocaleString()
+                            : "N/A"}
+                        </strong>
+                      </div>
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

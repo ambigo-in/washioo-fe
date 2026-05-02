@@ -1,0 +1,66 @@
+.cleaner-earnings {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.cleaner-earnings .section-header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cleaner-earnings h2 {
+  color: #0f172a;
+  margin: 0 0 4px;
+}
+
+.cleaner-earnings p {
+  color: #64748b;
+  margin: 0;
+}
+
+.earnings-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+
+.earnings-card {
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+}
+
+.earnings-card.pending {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.earnings-card span {
+  color: #475569;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.earnings-card strong {
+  color: #0f172a;
+  font-size: 1.45rem;
+}
+
+.earnings-card small {
+  color: #78350f;
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.earnings-updated {
+  font-size: 0.9rem;
+  margin-top: 14px !important;
+}

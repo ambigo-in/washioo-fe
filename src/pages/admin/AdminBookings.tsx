@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import type { BookingStatus } from "../../types/apiTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -13,10 +14,13 @@ type FilterStatus = "all" | BookingStatus;
 
 export default function AdminBookings() {
   const dispatch = useAppDispatch();
-  const { bookings, cleaners, loading } = useAppSelector((state) => state.admin);
+  const { bookings, cleaners, loading } = useAppSelector(
+    (state) => state.admin,
+  );
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [assigningBooking, setAssigningBooking] = useState<string | null>(null);
   const [selectedCleaner, setSelectedCleaner] = useState<string>("");
+  const [assignError, setAssignError] = useState("");
 
   useEffect(() => {
     dispatch(loadAdminBookings(filter));
@@ -34,14 +38,15 @@ export default function AdminBookings() {
   const handleAssign = async (bookingId: string) => {
     if (!selectedCleaner) return;
     setAssigningBooking(bookingId);
+    setAssignError("");
     try {
       await dispatch(
         assignAdminBooking({ bookingId, cleanerId: selectedCleaner }),
       ).unwrap();
-      dispatch(loadAdminBookings(filter));
+      await dispatch(loadAdminBookings(filter)).unwrap();
       setSelectedCleaner("");
     } catch (error) {
-      console.error("Failed to assign booking:", error);
+      setAssignError(String(error));
     } finally {
       setAssigningBooking(null);
     }
@@ -96,6 +101,8 @@ export default function AdminBookings() {
             <p>Loading bookings...</p>
           </div>
         ) : bookings.length > 0 ? (
+          <>
+          {assignError && <p className="form-alert error">{assignError}</p>}
           <div className="bookings-list">
             {bookings.map((booking) => (
               <div key={booking.id} className="booking-card">
@@ -112,7 +119,10 @@ export default function AdminBookings() {
                     </span>
                   </div>
                   <div className="booking-price">
-                    ₹{booking.estimated_price}
+                    Rs. {booking.estimated_price.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                   </div>
                 </div>
 
@@ -142,16 +152,21 @@ export default function AdminBookings() {
                       {booking.address.address_line1}, {booking.address.city}
                     </span>
                   </div>
-                  {booking.assignment && (
-                    <div className="detail-item">
-                      <span className="label">Assigned To</span>
-                      <span className="value">
-                        {booking.assignment.cleaner_id
-                          ? "Cleaner Assigned"
-                          : "Not Assigned"}
-                      </span>
-                    </div>
-                  )}
+                  <div className="detail-item">
+                    <span className="label">Price</span>
+                    <span className="value">
+                      Rs. {(booking.final_price ?? booking.estimated_price).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Cleaner</span>
+                    <span className="value">
+                      {booking.assignment?.cleaner_name ?? "Not Assigned"}
+                    </span>
+                  </div>
                 </div>
 
                 {booking.booking_status === "pending" && (
@@ -181,9 +196,21 @@ export default function AdminBookings() {
                     </button>
                   </div>
                 )}
+
+                {booking.booking_status === "completed" && (
+                  <div className="booking-actions admin-payment-actions">
+                    <p className="payment-note">
+                      Payment should be reconciled in Payments.
+                    </p>
+                    <Link to="/admin/payments" className="btn-manage-payment">
+                      Manage Payments
+                    </Link>
+                  </div>
+                )}
               </div>
             ))}
           </div>
+          </>
         ) : (
           <div className="empty-state">
             <p>No bookings found.</p>

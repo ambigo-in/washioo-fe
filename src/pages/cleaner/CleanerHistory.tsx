@@ -75,6 +75,13 @@ export default function CleanerHistory() {
   const cancelledJobs = assignments.filter(
     (a) => a.assignment_status === "rejected",
   ).length;
+  const totalEarnings = assignments.reduce((sum, assignment) => {
+    if (assignment.assignment_status !== "completed") return sum;
+    if (assignment.booking?.payment?.payment_status === "split_done") {
+      return sum + assignment.booking.payment.amount;
+    }
+    return sum;
+  }, 0);
 
   return (
     <DashboardLayout title="Work History">
@@ -91,6 +98,15 @@ export default function CleanerHistory() {
           <div className="stat-card">
             <span className="stat-value cancelled">{cancelledJobs}</span>
             <span className="stat-label">Cancelled</span>
+          </div>
+          <div className="stat-card revenue">
+            <span className="stat-value">
+              Rs. {totalEarnings.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </span>
+            <span className="stat-label">Total Earnings</span>
           </div>
         </div>
 
@@ -162,12 +178,30 @@ export default function CleanerHistory() {
                   <div className="detail-row">
                     <span className="detail-label">Amount Earned</span>
                     <span className="detail-value price">
-                      ₹
-                      {assignment.booking?.final_price ||
-                        assignment.booking?.estimated_price ||
-                        0}
+                      {assignment.booking?.payment?.payment_status === "split_done"
+                        ? `Rs. ${assignment.booking.payment.amount.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}`
+                        : "Pending"}
                     </span>
                   </div>
+                  {assignment.booking?.payment?.payment_status && (
+                    <div className="detail-row">
+                      <span className="detail-label">Payment Status</span>
+                      <span className="detail-value">
+                        {assignment.booking.payment.payment_status}
+                      </span>
+                    </div>
+                  )}
+                  {assignment.booking?.payment?.payment_method && (
+                    <div className="detail-row">
+                      <span className="detail-label">Payment Mode</span>
+                      <span className="detail-value">
+                        {assignment.booking.payment.payment_method}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

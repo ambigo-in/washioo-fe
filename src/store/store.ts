@@ -3,6 +3,7 @@ import adminReducer from "./slices/adminSlice";
 import authReducer from "./slices/authSlice";
 import cleanerReducer from "./slices/cleanerSlice";
 import customerReducer from "./slices/customerSlice";
+import paymentReducer from "./slices/paymentSlice";
 import servicesReducer from "./slices/servicesSlice";
 
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
     auth: authReducer,
     cleaner: cleanerReducer,
     customer: customerReducer,
+    payments: paymentReducer,
     services: servicesReducer,
   },
 });

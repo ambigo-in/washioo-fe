@@ -6,6 +6,7 @@ import {
   loadCleanerAssignments,
   loadCleanerProfile,
 } from "../../store/slices/cleanerSlice";
+import CleanerEarnings from "./CleanerEarnings";
 import "./CleanerDashboard.css";
 
 export default function CleanerDashboard() {
@@ -92,6 +93,8 @@ export default function CleanerDashboard() {
             </div>
           </div>
         </section>
+
+        <CleanerEarnings />
 
         <section className="pending-assignments">
           <div className="section-header">

@@ -33,6 +33,11 @@
   color: #dc3545;
 }
 
+.stat-card.revenue {
+  background: #e0f2fe;
+  border-color: #bae6fd;
+}
+
 .stat-label {
   font-size: 0.85rem;
   color: #6c757d;

@@ -2,7 +2,9 @@ import type {
   BookingStatus,
   Address,
   AssignmentSummary,
+  LegacyPaymentStatus,
   PaymentStatus,
+  PaymentType,
 } from "./apiTypes";
 
 export interface CleanerProfile {
@@ -57,6 +59,17 @@ export interface Assignment {
     final_price: number | null;
     special_instructions: string | null;
     address: Address;
+    payment?: {
+      payment_status: PaymentStatus;
+      legacy_payment_status?: LegacyPaymentStatus;
+      payment_type?: PaymentType | null;
+      amount: number;
+      collected_amount?: number | null;
+      payment_method?: string | null;
+      transaction_reference?: string | null;
+      collected_by_cleaner?: boolean;
+      paid_at?: string | null;
+    };
     assignment: AssignmentSummary | null;
     created_at: string;
   };
@@ -86,7 +99,10 @@ export interface CleanerBookingDetail {
   };
   payment: {
     payment_status: PaymentStatus;
+    legacy_payment_status?: LegacyPaymentStatus;
+    payment_type?: PaymentType | null;
     amount: number;
+    collected_amount?: number | null;
     payment_method?: string | null;
     transaction_reference?: string | null;
     collected_by_cleaner?: boolean;
@@ -115,6 +131,9 @@ export interface AssignmentActionPayload {
 
 export interface CompleteAssignmentPayload extends AssignmentActionPayload {
   final_price?: number;
+  payment_method?: string;
+  transaction_reference?: string;
+  collected_by_cleaner?: boolean;
 }
 
 export interface AssignBookingPayload {

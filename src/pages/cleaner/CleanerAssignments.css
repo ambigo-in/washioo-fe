@@ -179,6 +179,53 @@
   min-width: 130px;
 }
 
+.complete-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  width: 100%;
+}
+
+.payment-collect-fields {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.field-row {
+  display: grid;
+  gap: 6px;
+}
+
+.field-row label {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.field-row input,
+.field-row select {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #0f172a;
+  padding: 10px 12px;
+}
+
+.form-alert.error {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  color: #991b1b;
+  font-weight: 700;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+}
+
 .completed-badge,
 .rejected-badge {
   padding: 10px 20px;

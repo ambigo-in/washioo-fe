@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import type { BookingStatus, CustomerBooking } from "../types/apiTypes";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -22,6 +23,26 @@ const canCancel = (status: BookingStatus) =>
   !["in_progress", "completed", "cancelled"].includes(status);
 
 const canEdit = (status: BookingStatus) => status === "pending";
+
+const formatMoney = (value: number) =>
+  value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+const formatPaymentMethod = (booking: CustomerBooking) => {
+  const payment = booking.payment;
+  if (payment?.payment_type) return payment.payment_type.toUpperCase();
+  if (payment?.payment_status === "pending") return "Awaiting collection";
+  return "N/A";
+};
+
+const formatPaymentStatus = (booking: CustomerBooking) => {
+  const status = booking.payment?.payment_status;
+  if (status === "done") return "Done";
+  if (status === "failed") return "Failed";
+  return "Pending";
+};
 
 const MyBookingsPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -134,20 +155,22 @@ const MyBookingsPage: React.FC = () => {
                   <div>
                     <span>Price</span>
                     <strong>
-                      Rs. {booking.final_price ?? booking.estimated_price}
+                      Rs. {formatMoney(
+                        booking.payment?.amount ??
+                          booking.final_price ??
+                          booking.estimated_price,
+                      )}
                     </strong>
                   </div>
                   {booking.payment && (
                     <>
                       <div>
                         <span>Payment Status</span>
-                        <strong>{booking.payment.payment_status}</strong>
+                        <strong>{formatPaymentStatus(booking)}</strong>
                       </div>
                       <div>
                         <span>Payment Method</span>
-                        <strong>
-                          {booking.payment.payment_method || "N/A"}
-                        </strong>
+                        <strong>{formatPaymentMethod(booking)}</strong>
                       </div>
                     </>
                   )}
@@ -206,6 +229,12 @@ const MyBookingsPage: React.FC = () => {
                   </div>
                 ) : (
                   <div className="booking-actions">
+                    <Link
+                      className="secondary-action"
+                      to={`/customer/bookings/${booking.id}`}
+                    >
+                      View Details
+                    </Link>
                     {canEdit(booking.booking_status) && (
                       <button onClick={() => startEdit(booking)} type="button">
                         Edit Pending Booking

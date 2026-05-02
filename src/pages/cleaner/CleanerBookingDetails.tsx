@@ -4,28 +4,53 @@ import { fetchCleanerBooking } from "../../api/cleanerApi";
 import { getApiErrorMessage } from "../../api/client";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import OpenInMapsButton from "../../components/OpenInMapsButton";
+import { useAppDispatch } from "../../store/hooks";
+import {
+  collectPayment,
+  loadAdminPayments,
+  loadCleanerEarnings,
+} from "../../store/slices/paymentSlice";
+import type { Payment, PaymentStatus, PaymentType } from "../../types/apiTypes";
 import type { CleanerBookingDetail } from "../../types/cleanerTypes";
 import "./CleanerBookingDetails.css";
 
 const formatStatus = (value?: string | null) =>
   value ? value.replace("_", " ") : "Not available";
 
+const formatMoney = (value: number) =>
+  value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
 export default function CleanerBookingDetails() {
   const { bookingId } = useParams();
+  const dispatch = useAppDispatch();
   const [booking, setBooking] = useState<CleanerBookingDetail | null>(null);
+  const [workflowPayment, setWorkflowPayment] = useState<Payment | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submittingPayment, setSubmittingPayment] = useState(false);
   const [error, setError] = useState("");
+  const [paymentError, setPaymentError] = useState("");
+  const [paymentSuccess, setPaymentSuccess] = useState("");
+  const [collectedAmount, setCollectedAmount] = useState("");
+  const [paymentType, setPaymentType] = useState<PaymentType>("cash");
 
   useEffect(() => {
     if (!bookingId) return;
 
     let active = true;
-    setLoading(true);
-    setError("");
 
     fetchCleanerBooking(bookingId)
       .then((response) => {
-        if (active) setBooking(response.booking);
+        if (active) {
+          setBooking(response.booking);
+          const amount =
+            response.booking.payment.amount ??
+            response.booking.final_price ??
+            response.booking.estimated_price;
+          setCollectedAmount(String(amount));
+        }
       })
       .catch((err) => {
         if (active) setError(getApiErrorMessage(err));
@@ -42,6 +67,54 @@ export default function CleanerBookingDetails() {
   const address = booking?.address;
   const amount =
     booking?.payment.amount ?? booking?.final_price ?? booking?.estimated_price;
+  const inferredPaymentStatus: PaymentStatus =
+    workflowPayment?.status ??
+    booking?.payment.payment_status ??
+    "pending_collection";
+  const inferredPaymentType =
+    workflowPayment?.payment_type ??
+    booking?.payment.payment_type ??
+    (booking?.payment.payment_method?.toLowerCase() as PaymentType | undefined);
+  const collectedDisplayAmount =
+    workflowPayment?.collected_amount ??
+    booking?.payment.collected_amount ??
+    amount ??
+    0;
+  const canRecordPayment =
+    booking?.booking_status === "completed" &&
+    inferredPaymentStatus === "pending_collection";
+
+  const handleCollectPayment = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!bookingId) return;
+
+    const parsedAmount = Number(collectedAmount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      setPaymentError("Enter a valid collected amount.");
+      return;
+    }
+
+    setSubmittingPayment(true);
+    setPaymentError("");
+    setPaymentSuccess("");
+
+    try {
+      const response = await dispatch(
+        collectPayment({
+          bookingId,
+          body: { amount: parsedAmount, payment_type: paymentType },
+        }),
+      ).unwrap();
+      setWorkflowPayment(response.payment);
+      setPaymentSuccess("Payment collection recorded successfully.");
+      dispatch(loadCleanerEarnings());
+      void dispatch(loadAdminPayments("collected"));
+    } catch (err) {
+      setPaymentError(String(err));
+    } finally {
+      setSubmittingPayment(false);
+    }
+  };
 
   return (
     <DashboardLayout title="Booking Details">
@@ -161,44 +234,81 @@ export default function CleanerBookingDetails() {
 
             <section className="detail-card">
               <h3>Payment</h3>
-              <dl>
-                <div>
-                  <dt>Status</dt>
-                  <dd>{formatStatus(booking.payment.payment_status)}</dd>
-                </div>
-                <div>
-                  <dt>Amount</dt>
-                  <dd>Rs. {amount}</dd>
-                </div>
-                {booking.payment.payment_method && (
-                  <div>
-                    <dt>Method</dt>
-                    <dd>{booking.payment.payment_method}</dd>
+              <div className="payment-workflow">
+                <span className={`payment-status ${inferredPaymentStatus}`}>
+                  {formatStatus(inferredPaymentStatus)}
+                </span>
+
+                {canRecordPayment ? (
+                  <form
+                    className="record-payment-form"
+                    onSubmit={handleCollectPayment}
+                  >
+                    <label>
+                      <span>Amount Collected (Rs.)</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={collectedAmount}
+                        onChange={(event) =>
+                          setCollectedAmount(event.target.value)
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      <span>Payment Type</span>
+                      <select
+                        value={paymentType}
+                        onChange={(event) =>
+                          setPaymentType(event.target.value as PaymentType)
+                        }
+                      >
+                        <option value="cash">Cash</option>
+                        <option value="upi">UPI</option>
+                      </select>
+                    </label>
+
+                    {paymentError && (
+                      <p className="payment-message error">{paymentError}</p>
+                    )}
+                    {paymentSuccess && (
+                      <p className="payment-message success">
+                        {paymentSuccess}
+                      </p>
+                    )}
+
+                    <button
+                      type="submit"
+                      className="mark-collected-btn"
+                      disabled={submittingPayment}
+                    >
+                      {submittingPayment ? "Saving..." : "Mark as Collected"}
+                    </button>
+                    <p className="earnings-note">
+                      Earnings update after admin reconciliation.
+                    </p>
+                  </form>
+                ) : inferredPaymentStatus === "collected" ||
+                  inferredPaymentStatus === "split_done" ? (
+                  <div className="payment-collected-summary">
+                    <span
+                      className={`payment-type-badge ${
+                        inferredPaymentType || "cash"
+                      }`}
+                    >
+                      {inferredPaymentType?.toUpperCase() || "CASH"}
+                    </span>
+                    <strong>
+                      Rs. {formatMoney(collectedDisplayAmount)} collected via{" "}
+                      {inferredPaymentType?.toUpperCase() || "Cash"}
+                    </strong>
                   </div>
+                ) : (
+                  <p className="payment-muted">Payment pending collection.</p>
                 )}
-                {booking.payment.transaction_reference && (
-                  <div>
-                    <dt>Reference</dt>
-                    <dd>{booking.payment.transaction_reference}</dd>
-                  </div>
-                )}
-                {booking.payment.collected_by_cleaner !== undefined && (
-                  <div>
-                    <dt>Collected by Cleaner</dt>
-                    <dd>
-                      {booking.payment.collected_by_cleaner ? "Yes" : "No"}
-                    </dd>
-                  </div>
-                )}
-                {booking.payment.paid_at && (
-                  <div>
-                    <dt>Paid At</dt>
-                    <dd>
-                      {new Date(booking.payment.paid_at).toLocaleString()}
-                    </dd>
-                  </div>
-                )}
-              </dl>
+              </div>
             </section>
 
             {booking.special_instructions && (

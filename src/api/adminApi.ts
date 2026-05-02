@@ -9,7 +9,7 @@ import type {
 } from "../types/adminTypes";
 import type { CleanerProfile } from "../types/cleanerTypes";
 import type { Assignment } from "../types/cleanerTypes";
-import type { BookingStatus, PaymentStatus } from "../types/apiTypes";
+import type { BookingStatus, LegacyPaymentStatus } from "../types/apiTypes";
 
 // Admin Dashboard
 export const fetchAdminDashboard = () =>
@@ -241,7 +241,10 @@ export const fetchPaymentStats = () =>
     };
   }>("/payments/stats", { auth: true });
 
-export const fetchPayments = (params: PaginationParams = {}) =>
+export const fetchPayments = (
+  status?: LegacyPaymentStatus,
+  params: PaginationParams = {},
+) =>
   apiRequest<{
     message: string;
     payments: AdminPayment[];
@@ -249,9 +252,17 @@ export const fetchPayments = (params: PaginationParams = {}) =>
     pending_count: number;
     paid_count: number;
     failed_count: number;
-  }>(withQuery("/payments/", { limit: 50, offset: 0, ...params }), {
-    auth: true,
-  });
+  }>(
+    withQuery("/payments/", {
+      limit: 50,
+      offset: 0,
+      status,
+      ...params,
+    }),
+    {
+      auth: true,
+    },
+  );
 
 export const fetchPaymentByBooking = (bookingId: string) =>
   apiRequest<{ message: string; payment: AdminPayment }>(
@@ -285,7 +296,7 @@ export const fetchPayment = (paymentId: string) =>
 
 export type UpdatePaymentPayload = Partial<{
   payment_method: string;
-  payment_status: PaymentStatus;
+  payment_status: LegacyPaymentStatus;
   transaction_reference: string;
   amount: number;
   collected_by_cleaner: boolean;

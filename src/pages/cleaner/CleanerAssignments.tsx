@@ -9,15 +9,38 @@ import {
   rejectCleanerAssignment,
   startCleanerAssignment,
 } from "../../store/slices/cleanerSlice";
+import {
+  collectPayment,
+  loadCleanerEarnings,
+} from "../../store/slices/paymentSlice";
+import type { PaymentType } from "../../types/apiTypes";
 import "./CleanerAssignments.css";
 
-type FilterStatus = "all" | "assigned" | "accepted" | "in_progress" | "completed";
+type FilterStatus =
+  | "all"
+  | "assigned"
+  | "accepted"
+  | "in_progress"
+  | "completed";
+
+const formatMoney = (value: number) =>
+  value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
 export default function CleanerAssignments() {
   const dispatch = useAppDispatch();
   const { assignments, loading } = useAppSelector((state) => state.cleaner);
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [completeAmount, setCompleteAmount] = useState<Record<string, number>>(
+    {},
+  );
+  const [paymentType, setPaymentType] = useState<Record<string, PaymentType>>(
+    {},
+  );
+  const [actionError, setActionError] = useState("");
 
   useEffect(() => {
     dispatch(loadCleanerAssignments(filter === "all" ? undefined : filter));
@@ -25,6 +48,7 @@ export default function CleanerAssignments() {
 
   const handleAccept = async (assignmentId: string) => {
     setActionLoading(assignmentId);
+    setActionError("");
     try {
       await dispatch(
         acceptCleanerAssignment({
@@ -33,7 +57,7 @@ export default function CleanerAssignments() {
         }),
       ).unwrap();
     } catch (error) {
-      console.error("Failed to accept assignment:", error);
+      setActionError(String(error));
     } finally {
       setActionLoading(null);
     }
@@ -41,6 +65,7 @@ export default function CleanerAssignments() {
 
   const handleReject = async (assignmentId: string) => {
     setActionLoading(assignmentId);
+    setActionError("");
     try {
       await dispatch(
         rejectCleanerAssignment({
@@ -49,7 +74,7 @@ export default function CleanerAssignments() {
         }),
       ).unwrap();
     } catch (error) {
-      console.error("Failed to reject assignment:", error);
+      setActionError(String(error));
     } finally {
       setActionLoading(null);
     }
@@ -57,6 +82,7 @@ export default function CleanerAssignments() {
 
   const handleStart = async (assignmentId: string) => {
     setActionLoading(assignmentId);
+    setActionError("");
     try {
       await dispatch(
         startCleanerAssignment({
@@ -65,23 +91,51 @@ export default function CleanerAssignments() {
         }),
       ).unwrap();
     } catch (error) {
-      console.error("Failed to start assignment:", error);
+      setActionError(String(error));
     } finally {
       setActionLoading(null);
     }
   };
 
-  const handleComplete = async (assignmentId: string) => {
+  const handleComplete = async (assignmentId: string, bookingId: string) => {
+    const assignment = assignments.find((item) => item.id === assignmentId);
+    const amount =
+      completeAmount[assignmentId] ??
+      assignment?.booking.final_price ??
+      assignment?.booking.estimated_price ??
+      0;
+    const type = paymentType[assignmentId] ?? "cash";
+
+    if (!amount || amount <= 0) {
+      setActionError("Enter a valid collected amount before completing the job.");
+      return;
+    }
+
     setActionLoading(assignmentId);
+    setActionError("");
     try {
       await dispatch(
         completeCleanerAssignment({
           assignmentId,
-          actionPayload: { cleaner_notes: "Completed" },
+          actionPayload: {
+            cleaner_notes: "Completed",
+            final_price: amount,
+          },
         }),
       ).unwrap();
+      await dispatch(
+        collectPayment({
+          bookingId,
+          body: {
+            amount,
+            payment_type: type,
+          },
+        }),
+      ).unwrap();
+      dispatch(loadCleanerEarnings());
+      dispatch(loadCleanerAssignments(filter === "all" ? undefined : filter));
     } catch (error) {
-      console.error("Failed to complete assignment:", error);
+      setActionError(String(error));
     } finally {
       setActionLoading(null);
     }
@@ -103,17 +157,23 @@ export default function CleanerAssignments() {
       <div className="cleaner-assignments">
         {/* Filter Tabs */}
         <div className="filter-tabs">
-          {(["all", "assigned", "accepted", "in_progress", "completed"] as FilterStatus[]).map(
-            (status) => (
-              <button
-                key={status}
-                className={`filter-tab ${filter === status ? "active" : ""}`}
-                onClick={() => setFilter(status)}
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            ),
-          )}
+          {(
+            [
+              "all",
+              "assigned",
+              "accepted",
+              "in_progress",
+              "completed",
+            ] as FilterStatus[]
+          ).map((status) => (
+            <button
+              key={status}
+              className={`filter-tab ${filter === status ? "active" : ""}`}
+              onClick={() => setFilter(status)}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </button>
+          ))}
         </div>
 
         {loading ? (
@@ -122,6 +182,8 @@ export default function CleanerAssignments() {
             <p>Loading assignments...</p>
           </div>
         ) : assignments.length > 0 ? (
+          <>
+          {actionError && <p className="form-alert error">{actionError}</p>}
           <div className="assignments-list">
             {assignments.map((assignment) => (
               <div key={assignment.id} className="assignment-card">
@@ -163,7 +225,7 @@ export default function CleanerAssignments() {
                   </div>
                   <div className="detail-row">
                     <span className="label">💰 Price:</span>
-                    <span>₹{assignment.booking.estimated_price}</span>
+                    <span>Rs. {formatMoney(assignment.booking.estimated_price)}</span>
                   </div>
                   <div className="detail-row">
                     <span className="label">📍 Location:</span>
@@ -220,16 +282,56 @@ export default function CleanerAssignments() {
                       </button>
                     )}
                   {assignment.assignment_status === "in_progress" && (
+                    <div className="complete-section">
+                      <div className="payment-collect-fields">
+                        <div className="field-row">
+                          <label>Amount Collected (Rs.)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={
+                              completeAmount[assignment.id] ??
+                              assignment.booking.final_price ??
+                              assignment.booking.estimated_price
+                            }
+                            onChange={(event) =>
+                              setCompleteAmount((current) => ({
+                                ...current,
+                                [assignment.id]: Number(event.target.value),
+                              }))
+                            }
+                          />
+                        </div>
+                        <div className="field-row">
+                          <label>Payment Type</label>
+                          <select
+                            value={paymentType[assignment.id] ?? "cash"}
+                            onChange={(event) =>
+                              setPaymentType((current) => ({
+                                ...current,
+                                [assignment.id]: event.target.value as PaymentType,
+                              }))
+                            }
+                          >
+                            <option value="cash">Cash</option>
+                            <option value="upi">UPI</option>
+                          </select>
+                        </div>
+                      </div>
                       <button
                         className="btn-complete"
-                        onClick={() => handleComplete(assignment.id)}
+                        onClick={() =>
+                          handleComplete(assignment.id, assignment.booking_id)
+                        }
                         disabled={actionLoading === assignment.id}
                       >
                         {actionLoading === assignment.id
                           ? "Completing..."
                           : "Complete Job"}
                       </button>
-                    )}
+                    </div>
+                  )}
                   {assignment.assignment_status === "completed" && (
                     <span className="completed-badge">Job Completed ✅</span>
                   )}
@@ -240,6 +342,7 @@ export default function CleanerAssignments() {
               </div>
             ))}
           </div>
+          </>
         ) : (
           <div className="empty-state">
             <p>No assignments found.</p>

@@ -59,7 +59,13 @@ export type BookingStatus =
   | "completed"
   | "cancelled";
 
-export type PaymentStatus = "pending" | "paid" | "failed";
+export type LegacyPaymentStatus = "pending" | "paid" | "failed";
+
+export type PaymentType = "cash" | "upi";
+
+export type PaymentStatus = "pending_collection" | "collected" | "split_done";
+
+export type CustomerBookingPaymentStatus = "pending" | "done" | "failed";
 
 export interface PaymentRecord {
   id: string;
@@ -68,16 +74,58 @@ export interface PaymentRecord {
   payment_method: string | null;
   transaction_reference: string | null;
   amount: number;
-  payment_status: PaymentStatus;
+  payment_status: LegacyPaymentStatus;
   collected_by_cleaner: boolean;
   paid_at: string | null;
   created_at: string;
   updated_at: string;
 }
 
+export interface Payment {
+  id: string;
+  booking_id: string;
+  customer_id?: string;
+  collected_amount: number | null;
+  payment_type: PaymentType | null;
+  collected_by: string | null;
+  collected_at: string | null;
+  cleaner_share: number | null;
+  admin_share: number | null;
+  split_updated_by: string | null;
+  split_updated_at: string | null;
+  status: PaymentStatus;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CleanerPaymentCollectRequest {
+  amount: number;
+  payment_type: PaymentType;
+}
+
+export interface AdminPaymentSplitRequest {
+  cleaner_share: number;
+  admin_share: number;
+}
+
+export interface CleanerEarningsSummary {
+  cleaner_id?: string;
+  total_earned: number;
+  pending_payout: number;
+  last_updated: string | null;
+}
+
+export interface CustomerPaymentStatus {
+  booking_id?: string;
+  status: PaymentStatus;
+  payment_type: PaymentType | null;
+  message?: string;
+}
+
 export interface AssignmentSummary {
   id: string;
   cleaner_id: string;
+  cleaner_name?: string | null;
   assignment_status:
     | "assigned"
     | "accepted"
@@ -105,8 +153,11 @@ export interface CustomerBooking {
   address: Address;
   assignment: AssignmentSummary | null;
   payment?: {
-    payment_status: PaymentStatus;
+    payment_status: CustomerBookingPaymentStatus;
+    legacy_payment_status?: LegacyPaymentStatus;
+    payment_type?: PaymentType | null;
     amount: number;
+    collected_amount?: number | null;
     payment_method?: string | null;
     transaction_reference?: string | null;
     paid_at?: string | null;

@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 // Customer Pages
 import CustomerDashboard from "./pages/customer/CustomerDashboard";
 import CustomerAddresses from "./pages/customer/CustomerAddresses";
+import CustomerBookingDetail from "./pages/customer/CustomerBookingDetail";
 import CustomerProfile from "./pages/customer/CustomerProfile";
 
 // Cleaner Pages
@@ -99,6 +100,14 @@ function App() {
             element={
               <ProtectedRoute roles={["customer"]}>
                 <MyBookingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/customer/bookings/:bookingId"
+            element={
+              <ProtectedRoute roles={["customer"]}>
+                <CustomerBookingDetail />
               </ProtectedRoute>
             }
           />
