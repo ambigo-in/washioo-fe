@@ -15,17 +15,23 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 // Customer Pages
 import CustomerDashboard from "./pages/customer/CustomerDashboard";
+import CustomerAddresses from "./pages/customer/CustomerAddresses";
+import CustomerProfile from "./pages/customer/CustomerProfile";
 
 // Cleaner Pages
 import CleanerDashboard from "./pages/cleaner/CleanerDashboard";
 import CleanerAssignments from "./pages/cleaner/CleanerAssignments";
 import CleanerAvailability from "./pages/cleaner/CleanerAvailability";
+import CleanerHistory from "./pages/cleaner/CleanerHistory";
+import CleanerProfile from "./pages/cleaner/CleanerProfile";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminCleaners from "./pages/admin/AdminCleaners";
 import AdminServices from "./pages/admin/AdminServices";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminSettings from "./pages/admin/AdminSettings";
 
 function App() {
   return (
@@ -94,6 +100,22 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/addresses"
+            element={
+              <ProtectedRoute roles={["customer"]}>
+                <CustomerAddresses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute roles={["customer"]}>
+                <CustomerProfile />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Cleaner Routes */}
           <Route
@@ -117,6 +139,22 @@ function App() {
             element={
               <ProtectedRoute roles={["cleaner"]}>
                 <CleanerAvailability />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cleaner/history"
+            element={
+              <ProtectedRoute roles={["cleaner"]}>
+                <CleanerHistory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cleaner/profile"
+            element={
+              <ProtectedRoute roles={["cleaner"]}>
+                <CleanerProfile />
               </ProtectedRoute>
             }
           />
@@ -151,6 +189,22 @@ function App() {
             element={
               <ProtectedRoute roles={["admin"]}>
                 <AdminServices />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminSettings />
               </ProtectedRoute>
             }
           />

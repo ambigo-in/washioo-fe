@@ -16,6 +16,11 @@ export default function CustomerDashboard() {
   const [services, setServices] = useState<ServiceCategory[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
+  const serviceImages =[
+    "/p1.png",
+    "/p2.png",
+    "/p3.png",
+  ]
 
   useEffect(() => {
     const fetchData = async () => {
@@ -128,8 +133,13 @@ export default function CustomerDashboard() {
         <section className="available-services">
           <h2>Available Services</h2>
           <div className="services-grid">
-            {activeServices.map((service) => (
+            {activeServices.map((service, index) => (
               <div key={service.id} className="service-card">
+                <img
+                  src={serviceImages[index % serviceImages.length]}
+                  alt={service.service_name}
+                  className="service-image"
+                />
                 <h3>{service.service_name}</h3>
                 <p>{service.description}</p>
                 <div className="service-footer">

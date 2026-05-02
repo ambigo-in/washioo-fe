@@ -38,3 +38,13 @@ export const logoutUser = (refresh_token: string) =>
     retryOnUnauthorized: false,
   });
 
+export const updateProfile = (payload: {
+  full_name?: string;
+  email?: string;
+  phone?: string;
+}) =>
+  apiRequest<{ message: string; user: UserProfile }>("/auth/profile", {
+    method: "PATCH",
+    auth: true,
+    body: payload,
+  });

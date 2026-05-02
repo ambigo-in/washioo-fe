@@ -10,7 +10,7 @@ export interface AuthContextType {
   refreshUser: () => Promise<UserProfile | null>;
   login: () => Promise<UserProfile | null>;
   logout: () => Promise<void>;
+  setUser: (user: UserProfile | null) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
-

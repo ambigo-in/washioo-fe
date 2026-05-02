@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 import type { UserRole } from "../../types/apiTypes";
@@ -21,13 +21,13 @@ const navItems: NavItem[] = [
     icon: "📋",
     roles: ["customer"],
   },
-//   {
-//     path: "/addresses",
-//     label: "My Addresses",
-//     icon: "📍",
-//     roles: ["customer"],
-//   },
-//   { path: "/profile", label: "Profile", icon: "👤", roles: ["customer"] },
+    {
+      path: "/addresses",
+      label: "My Addresses",
+      icon: "📍",
+      roles: ["customer"],
+    },
+    { path: "/profile", label: "Profile", icon: "👤", roles: ["customer"] },
 
   // Cleaner routes
   {
@@ -42,24 +42,24 @@ const navItems: NavItem[] = [
     icon: "📋",
     roles: ["cleaner"],
   },
-//   {
-//     path: "/cleaner/history",
-//     label: "Work History",
-//     icon: "📜",
-//     roles: ["cleaner"],
-//   },
+    {
+      path: "/cleaner/history",
+      label: "Work History",
+      icon: "📜",
+      roles: ["cleaner"],
+    },
   {
     path: "/cleaner/availability",
     label: "Availability",
     icon: "⏰",
     roles: ["cleaner"],
   },
-//   {
-//     path: "/cleaner/profile",
-//     label: "Profile",
-//     icon: "👤",
-//     roles: ["cleaner"],
-//   },
+    {
+      path: "/cleaner/profile",
+      label: "Profile",
+      icon: "👤",
+      roles: ["cleaner"],
+    },
 
   // Admin routes
   {
@@ -71,8 +71,8 @@ const navItems: NavItem[] = [
   { path: "/admin/bookings", label: "Bookings", icon: "📋", roles: ["admin"] },
   { path: "/admin/cleaners", label: "Cleaners", icon: "🧹", roles: ["admin"] },
   { path: "/admin/services", label: "Services", icon: "🔧", roles: ["admin"] },
-//   { path: "/admin/users", label: "Users", icon: "👥", roles: ["admin"] },
-//   { path: "/admin/settings", label: "Settings", icon: "⚙️", roles: ["admin"] },
+    { path: "/admin/users", label: "Users", icon: "👥", roles: ["admin"] },
+    { path: "/admin/settings", label: "Settings", icon: "⚙️", roles: ["admin"] },
 ];
 
 interface DashboardLayoutProps {
@@ -86,6 +86,7 @@ export default function DashboardLayout({
 }: DashboardLayoutProps) {
   const { user, logout, roles } = useAuth();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const filteredNavItems = navItems.filter((item) =>
     item.roles.some((role) => roles.includes(role)),
@@ -103,9 +104,32 @@ export default function DashboardLayout({
     return "User";
   };
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
+
   return (
     <div className="dashboard-layout">
-      <aside className="dashboard-sidebar">
+      {/* Mobile Header */}
+      <header className="mobile-header">
+        <button className="mobile-menu-btn" onClick={toggleSidebar}>
+          ☰
+        </button>
+        <span className="mobile-logo">Washioo</span>
+        <div className="mobile-user">{user?.full_name?.charAt(0) || "U"}</div>
+      </header>
+
+      {/* Overlay for mobile */}
+      <div
+        className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`}
+        onClick={closeSidebar}
+      />
+
+      <aside className={`dashboard-sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-header">
           <h2>Washioo</h2>
           <span className="role-badge">{getRoleDisplay()}</span>
@@ -119,6 +143,7 @@ export default function DashboardLayout({
               className={({ isActive }) =>
                 `nav-item ${isActive ? "active" : ""}`
               }
+              onClick={closeSidebar}
             >
               <span className="nav-icon">{item.icon}</span>
               <span className="nav-label">{item.label}</span>

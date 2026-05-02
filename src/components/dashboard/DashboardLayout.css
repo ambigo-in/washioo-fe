@@ -4,6 +4,7 @@
   background-color: #f8f9fa;
 }
 
+/* Sidebar */
 .dashboard-sidebar {
   width: 260px;
   background: #ffffff;
@@ -13,6 +14,8 @@
   position: fixed;
   height: 100vh;
   overflow-y: auto;
+  z-index: 1000;
+  transition: transform 0.3s ease;
 }
 
 .sidebar-header {
@@ -42,6 +45,7 @@
 .sidebar-nav {
   flex: 1;
   padding: 16px 12px;
+  overflow-y: auto;
 }
 
 .nav-item {
@@ -117,27 +121,125 @@
   flex: 1;
   margin-left: 260px;
   padding: 24px 32px;
+  min-height: 100vh;
 }
 
-.dashboard-header {
-  margin-bottom: 24px;
+/* Mobile Header */
+.mobile-header {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid #e9ecef;
+  z-index: 999;
+  padding: 0 16px;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.dashboard-header h1 {
-  margin: 0;
-  font-size: 1.75rem;
+.mobile-menu-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
   color: #2c3e50;
-  font-weight: 600;
 }
 
-/* Responsive */
+.mobile-logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.mobile-user {
+  width: 36px;
+  height: 36px;
+  background: #e3f2fd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+/* Overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* Responsive - Tablet */
+@media (max-width: 1024px) {
+  .dashboard-sidebar {
+    width: 220px;
+  }
+  
+  .dashboard-main {
+    margin-left: 220px;
+    padding: 20px 24px;
+  }
+}
+
+/* Responsive - Mobile */
 @media (max-width: 768px) {
   .dashboard-sidebar {
-    width: 200px;
+    width: 280px;
+    transform: translateX(-100%);
   }
-
+  
+  .dashboard-sidebar.open {
+    transform: translateX(0);
+  }
+  
   .dashboard-main {
-    margin-left: 200px;
-    padding: 16px;
+    margin-left: 0;
+    padding: 80px 16px 20px;
+  }
+  
+  .mobile-header {
+    display: flex;
+  }
+  
+  .sidebar-overlay.show {
+    display: block;
+  }
+  
+  .sidebar-header {
+    padding: 16px 20px;
+  }
+  
+  .sidebar-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .nav-item {
+    padding: 14px 16px;
+  }
+  
+  .nav-label {
+    font-size: 1rem;
+  }
+  
+  .sidebar-footer {
+    padding: 12px 20px;
   }
 }
+
+/* Extra small devices */
+@media (max-width: 480px) {
+  .dashboard-main {
+    padding: 76px 12px 16px;
+  }
+  
+  .mobile-logo {
+    font-size: 1.1rem;

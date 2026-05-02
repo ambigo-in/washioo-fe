@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getAccessToken, getRefreshToken, clearTokens } from "../utils/tokenManager";
+import {
+  getAccessToken,
+  getRefreshToken,
+  clearTokens,
+} from "../utils/tokenManager";
 import { getCurrentUser, logoutUser } from "../api/authApi";
 import { AuthContext } from "./authContextValue";
 import type { UserProfile, UserRole } from "../types/apiTypes";
@@ -79,10 +83,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshUser,
         login,
         logout,
+        setUser,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
-

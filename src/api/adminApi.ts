@@ -4,6 +4,7 @@ import type {
   AdminServiceCategory,
   ServiceCategoryPayload,
   CleanerFilters,
+  AdminUser,
 } from "../types/adminTypes";
 import type { CleanerProfile } from "../types/cleanerTypes";
 import type { Assignment } from "../types/cleanerTypes";
@@ -189,3 +190,26 @@ export const fetchAdminAssignments = (status?: string) => {
     total: number;
   }>(`/services/admin/assignments${query}`, { auth: true });
 };
+
+// User Management APIs
+export const fetchUsers = () =>
+  apiRequest<{ message: string; users: AdminUser[]; total: number }>(
+    "/services/admin/users",
+    { auth: true },
+  );
+
+export const fetchUser = (userId: string) =>
+  apiRequest<{ message: string; user: AdminUser }>(
+    `/services/admin/users/${userId}`,
+    { auth: true },
+  );
+
+export const updateUserStatus = (userId: number, isActive: boolean) =>
+  apiRequest<{ message: string; user: AdminUser }>(
+    `/services/admin/users/${userId}/status`,
+    {
+      method: "PATCH",
+      auth: true,
+      body: { is_active: isActive },
+    },
+  );
