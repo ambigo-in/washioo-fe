@@ -145,13 +145,13 @@ export default function CleanerAssignments() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      assigned: "#ffc107",
-      accepted: "#6f42c1",
-      in_progress: "#007bff",
+      assigned: "var(--brand-teal)",
+      accepted: "var(--brand-teal-dark)",
+      in_progress: "var(--brand-teal)",
       rejected: "#dc3545",
-      completed: "#28a745",
+      completed: "var(--brand-teal)",
     };
-    return colors[status] || "#6c757d";
+    return colors[status] || "var(--brand-text-muted)";
   };
 
   return (

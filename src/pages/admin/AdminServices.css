@@ -13,13 +13,13 @@
 .page-header h2 {
   margin: 0;
   font-size: 1.25rem;
-  color: #2c3e50;
+  color: var(--brand-text);
 }
 
 .btn-add {
   padding: 10px 20px;
-  background: #1976d2;
-  color: #ffffff;
+  background: var(--brand-teal);
+  color: var(--brand-white);
   border: none;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -29,14 +29,14 @@
 }
 
 .btn-add:hover {
-  background: #1565c0;
+  background: var(--brand-teal-dark);
 }
 
 /* Service Form */
 .service-form-card {
-  background: #ffffff;
+  background: var(--brand-white);
   border-radius: 12px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--brand-border);
   padding: 24px;
   margin-bottom: 24px;
 }
@@ -44,7 +44,7 @@
 .service-form-card h3 {
   margin: 0 0 20px;
   font-size: 1.1rem;
-  color: #2c3e50;
+  color: var(--brand-text);
 }
 
 .form-row {
@@ -61,7 +61,7 @@
 
 .form-group label {
   font-size: 0.85rem;
-  color: #495057;
+  color: var(--brand-text-muted);
   margin-bottom: 6px;
   font-weight: 500;
 }
@@ -69,16 +69,16 @@
 .form-group input,
 .form-group textarea {
   padding: 10px 12px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--brand-border);
   border-radius: 8px;
   font-size: 0.9rem;
-  color: #2c3e50;
+  color: var(--brand-text);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #1976d2;
+  border-color: var(--brand-teal);
 }
 
 .checkbox-label {
@@ -100,8 +100,8 @@
 
 .btn-save {
   padding: 10px 24px;
-  background: #28a745;
-  color: #ffffff;
+  background: var(--brand-teal);
+  color: var(--brand-white);
   border: none;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -111,7 +111,7 @@
 }
 
 .btn-save:hover:not(:disabled) {
-  background: #218838;
+  background: var(--brand-teal-dark);
 }
 
 .btn-save:disabled {
@@ -127,9 +127,9 @@
 }
 
 .service-card {
-  background: #ffffff;
+  background: var(--brand-white);
   border-radius: 12px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--brand-border);
   padding: 20px;
 }
 
@@ -153,7 +153,7 @@
 .service-info h3 {
   margin: 0;
   font-size: 1.1rem;
-  color: #2c3e50;
+  color: var(--brand-text);
 }
 
 .status-badge {
@@ -165,8 +165,8 @@
 }
 
 .status-badge.active {
-  background: #d4edda;
-  color: #155724;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
 }
 
 .status-badge.inactive {
@@ -177,13 +177,13 @@
 .service-price {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #28a745;
+  color: var(--brand-teal);
 }
 
 .service-description {
   margin: 0 0 12px;
   font-size: 0.9rem;
-  color: #6c757d;
+  color: var(--brand-text-muted);
 }
 
 .service-meta {
@@ -191,7 +191,7 @@
   gap: 16px;
   margin-bottom: 16px;
   font-size: 0.85rem;
-  color: #6c757d;
+  color: var(--brand-text-muted);
 }
 
 .service-actions {
@@ -210,21 +210,21 @@
 }
 
 .btn-edit {
-  background: #1976d2;
-  color: #ffffff;
+  background: var(--brand-teal);
+  color: var(--brand-white);
 }
 
 .btn-edit:hover {
-  background: #1565c0;
+  background: var(--brand-teal-dark);
 }
 
 .btn-toggle {
-  background: #fff3cd;
-  color: #856404;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
 }
 
 .btn-toggle:hover {
-  background: #ffeeba;
+  background: var(--brand-teal-border);
 }
 
 .btn-delete {
@@ -233,21 +233,21 @@
 }
 
 .btn-delete:hover {
-  background: #f5c6cb;
+  background: var(--brand-teal-border);
 }
 
 /* Empty State */
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  background: #ffffff;
+  background: var(--brand-white);
   border-radius: 12px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--brand-border);
 }
 
 .empty-state p {
   margin: 0;
-  color: #6c757d;
+  color: var(--brand-text-muted);
 }
 
 /* Loading */
@@ -262,8 +262,8 @@
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #e9ecef;
-  border-top-color: #1976d2;
+  border: 3px solid var(--brand-border);
+  border-top-color: var(--brand-teal);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -276,5 +276,5 @@
 
 .loading-container p {
   margin: 16px 0 0;
-  color: #6c757d;
+  color: var(--brand-text-muted);
 }

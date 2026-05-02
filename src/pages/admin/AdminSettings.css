@@ -9,14 +9,14 @@
 .settings-section h3 {
   margin: 0 0 16px;
   font-size: 1.1rem;
-  color: #2c3e50;
+  color: var(--brand-text);
 }
 
 .settings-card {
-  background: #ffffff;
+  background: var(--brand-white);
   padding: 24px;
   border-radius: 12px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--brand-border);
 }
 
 .form-group {
@@ -27,14 +27,14 @@
   display: block;
   margin-bottom: 6px;
   font-size: 0.9rem;
-  color: #495057;
+  color: var(--brand-text-muted);
   font-weight: 500;
 }
 
 .form-group input {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--brand-border);
   border-radius: 8px;
   font-size: 0.95rem;
   transition: border-color 0.2s ease;
@@ -42,7 +42,7 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #1976d2;
+  border-color: var(--brand-teal);
 }
 
 .form-actions {
@@ -51,8 +51,8 @@
 
 .btn-primary {
   padding: 10px 24px;
-  background: #1976d2;
-  color: #ffffff;
+  background: var(--brand-teal);
+  color: var(--brand-white);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -61,19 +61,19 @@
 }
 
 .btn-primary:hover {
-  background: #1565c0;
+  background: var(--brand-teal-dark);
 }
 
 .btn-primary:disabled {
-  background: #a0c4e8;
+  background: var(--brand-teal-light);
   cursor: not-allowed;
 }
 
 .success-message {
   padding: 12px 16px;
-  background: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #c8e6c9;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
+  border: 1px solid var(--brand-teal-border);
   border-radius: 8px;
   margin-bottom: 16px;
 }
@@ -91,7 +91,7 @@
   display: flex;
   justify-content: space-between;
   padding: 12px 0;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--brand-border);
 }
 
 .info-row:last-child {
@@ -99,12 +99,12 @@
 }
 
 .info-label {
-  color: #6c757d;
+  color: var(--brand-text-muted);
   font-size: 0.95rem;
 }
 
 .info-value {
-  color: #2c3e50;
+  color: var(--brand-text);
   font-size: 0.95rem;
   font-weight: 500;
 }
@@ -118,13 +118,13 @@
 .action-info h4 {
   margin: 0 0 4px;
   font-size: 1rem;
-  color: #2c3e50;
+  color: var(--brand-text);
 }
 
 .action-info p {
   margin: 0;
   font-size: 0.85rem;
-  color: #6c757d;
+  color: var(--brand-text-muted);
 }
 
 .btn-danger {

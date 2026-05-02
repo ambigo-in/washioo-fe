@@ -1,6 +1,6 @@
 .cleaner-earnings {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
   border-radius: 12px;
   padding: 20px;
 }
@@ -13,12 +13,12 @@
 }
 
 .cleaner-earnings h2 {
-  color: #0f172a;
+  color: var(--brand-text);
   margin: 0 0 4px;
 }
 
 .cleaner-earnings p {
-  color: #64748b;
+  color: var(--brand-text-muted);
   margin: 0;
 }
 
@@ -29,8 +29,8 @@
 }
 
 .earnings-card {
-  background: #ecfdf5;
-  border: 1px solid #bbf7d0;
+  background: var(--brand-teal-soft);
+  border: 1px solid var(--brand-teal-border);
   border-radius: 12px;
   display: grid;
   gap: 8px;
@@ -38,29 +38,29 @@
 }
 
 .earnings-card.due {
-  background: #fffbeb;
-  border-color: #fde68a;
+  background: var(--brand-teal-soft);
+  border-color: var(--brand-teal-border);
 }
 
 .earnings-card.settled {
-  background: #eff6ff;
-  border-color: #bfdbfe;
+  background: var(--brand-teal-soft);
+  border-color: var(--brand-teal-border);
 }
 
 .earnings-card span {
-  color: #475569;
+  color: var(--brand-text-muted);
   font-size: 0.85rem;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .earnings-card strong {
-  color: #0f172a;
+  color: var(--brand-text);
   font-size: 1.45rem;
 }
 
 .earnings-card small {
-  color: #475569;
+  color: var(--brand-text-muted);
   font-size: 0.85rem;
   line-height: 1.45;
 }

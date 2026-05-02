@@ -1,14 +1,14 @@
 .dashboard-layout {
   display: flex;
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: var(--brand-surface);
 }
 
 /* Sidebar */
 .dashboard-sidebar {
   width: 260px;
-  background: #ffffff;
-  border-right: 1px solid #e9ecef;
+  background: var(--brand-white);
+  border-right: 1px solid var(--brand-border);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -20,7 +20,7 @@
 
 .sidebar-header {
   padding: 24px 20px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid var(--brand-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -29,13 +29,13 @@
 .sidebar-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: #2c3e50;
+  color: var(--brand-text);
 }
 
 .role-badge {
   padding: 4px 12px;
-  background: #e3f2fd;
-  color: #1976d2;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal);
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -54,19 +54,19 @@
   padding: 12px 16px;
   margin-bottom: 4px;
   border-radius: 8px;
-  color: #495057;
+  color: var(--brand-text-muted);
   text-decoration: none;
   transition: all 0.2s ease;
 }
 
 .nav-item:hover {
-  background: #f8f9fa;
-  color: #2c3e50;
+  background: var(--brand-surface);
+  color: var(--brand-text);
 }
 
 .nav-item.active {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal);
   font-weight: 500;
 }
 
@@ -81,7 +81,7 @@
 
 .sidebar-footer {
   padding: 16px 20px;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--brand-border);
 }
 
 .user-info {
@@ -91,13 +91,13 @@
 .user-name {
   margin: 0;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--brand-text);
   font-size: 0.95rem;
 }
 
 .user-phone {
   margin: 4px 0 0;
-  color: #6c757d;
+  color: var(--brand-text-muted);
   font-size: 0.85rem;
 }
 
@@ -132,8 +132,8 @@
   left: 0;
   right: 0;
   height: 60px;
-  background: #ffffff;
-  border-bottom: 1px solid #e9ecef;
+  background: var(--brand-white);
+  border-bottom: 1px solid var(--brand-border);
   z-index: 999;
   padding: 0 16px;
   align-items: center;
@@ -146,19 +146,19 @@
   font-size: 1.5rem;
   cursor: pointer;
   padding: 8px;
-  color: #2c3e50;
+  color: var(--brand-text);
 }
 
 .mobile-logo {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: var(--brand-text);
 }
 
 .mobile-user {
   width: 36px;
   height: 36px;
-  background: #e3f2fd;
+  background: var(--brand-teal-soft);
   border-radius: 50%;
   display: flex;
   align-items: center;

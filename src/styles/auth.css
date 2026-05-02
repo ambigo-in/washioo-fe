@@ -4,12 +4,12 @@
   padding: 40px;
   background: rgba(255,255,255,0.95);
   border-radius: 24px;
-  box-shadow: 0 15px 40px rgba(14,165,233,0.12);
+  box-shadow: 0 15px 40px rgba(var(--brand-teal-rgb),0.12);
 }
 
 .auth-container h2 {
   text-align: center;
-  color: #0369a1;
+  color: var(--brand-teal-dark);
   margin-bottom: 24px;
 }
 
@@ -17,7 +17,7 @@
   width: 100%;
   padding: 14px 16px;
   margin-bottom: 16px;
-  border: 2px solid #bae6fd;
+  border: 2px solid var(--brand-teal-border);
   border-radius: 14px;
 }
 
@@ -26,14 +26,14 @@
   padding: 14px;
   border: none;
   border-radius: 999px;
-  background: #0ea5e9;
+  background: var(--brand-teal);
   color: white;
   font-size: 16px;
   font-weight: 600;
 }
 
 .auth-container button:hover {
-  background: #0284c7;
+  background: var(--brand-teal-dark);
 }
 
 @media (max-width: 768px) {

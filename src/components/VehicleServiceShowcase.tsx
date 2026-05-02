@@ -38,20 +38,28 @@ const VehicleServicesShowcase: React.FC = () => {
 
         <div className="services-card-row">
           {services.map((service) => (
-            <div
+            <article
               key={service.title}
               className="service-card"
-              style={{
-                backgroundImage: `linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0.15)), url(${service.image})`,
-              }}
             >
+              <div className="service-card-media">
+                <img src={service.image} alt={service.title} />
+              </div>
               <div className="service-card-content">
-                <h3>{service.title}</h3>
-                <button onClick={handleBookClick} className="service-arrow">
+                <div>
+                  <span>Premium doorstep care</span>
+                  <h3>{service.title}</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleBookClick}
+                  className="service-arrow"
+                  aria-label={`Book ${service.title}`}
+                >
                   Book
                 </button>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>

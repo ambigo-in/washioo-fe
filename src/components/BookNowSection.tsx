@@ -13,15 +13,23 @@ const BookNowSection: React.FC = () => {
 
   return (
     <>
-      <div className="book-now">
-        <h1>Book Your First Wash Today</h1>
-        <button onClick={handleBookClick} className="primary-btn">
+      <section className="book-now" aria-labelledby="book-now-title">
+        <div className="book-now-content">
+          <span className="book-now-label">Ready when you are</span>
+          <h1 id="book-now-title">Book Your First Wash Today</h1>
+          <p>
+            Fast doorstep vehicle care with simple booking, transparent pricing,
+            and a clean finish every time.
+          </p>
+        </div>
+
+        <button onClick={handleBookClick} className="book-now-btn">
           Book Now
         </button>
-      </div>
-      <div className="footer">
+      </section>
+      <footer className="footer">
         <p>Copyright 2026 Washioo. All rights reserved.</p>
-      </div>
+      </footer>
     </>
   );
 };

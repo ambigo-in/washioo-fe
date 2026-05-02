@@ -5,8 +5,8 @@
 
 .payments-toolbar {
   align-items: flex-start;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
   border-radius: 12px;
   display: flex;
   gap: 18px;
@@ -15,12 +15,12 @@
 }
 
 .payments-toolbar h2 {
-  color: #0f172a;
+  color: var(--brand-text);
   margin: 0 0 6px;
 }
 
 .payments-toolbar p {
-  color: #64748b;
+  color: var(--brand-text-muted);
   margin: 0;
 }
 
@@ -31,10 +31,10 @@
 }
 
 .filter-tab {
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border-strong);
   border-radius: 999px;
-  color: #334155;
+  color: var(--brand-text);
   cursor: pointer;
   font-weight: 800;
   padding: 9px 14px;
@@ -42,9 +42,9 @@
 
 .filter-tab.active,
 .filter-tab:hover {
-  background: #0f766e;
-  border-color: #0f766e;
-  color: #fff;
+  background: var(--brand-teal-dark);
+  border-color: var(--brand-teal-dark);
+  color: var(--brand-white);
 }
 
 .payment-card-list {
@@ -53,8 +53,8 @@
 }
 
 .payment-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
   border-radius: 12px;
   display: grid;
   gap: 18px;
@@ -69,7 +69,7 @@
 }
 
 .booking-reference {
-  color: #0f766e;
+  color: var(--brand-teal-dark);
   display: block;
   font-size: 0.78rem;
   font-weight: 900;
@@ -78,7 +78,7 @@
 }
 
 .payment-card h3 {
-  color: #0f172a;
+  color: var(--brand-text);
   margin: 0;
 }
 
@@ -91,8 +91,8 @@
 
 .payment-card-grid div,
 .split-summary div {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
   border-radius: 10px;
   display: grid;
   gap: 6px;
@@ -102,7 +102,7 @@
 .payment-card-grid span,
 .split-summary span,
 .split-form label span {
-  color: #64748b;
+  color: var(--brand-text-muted);
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -110,7 +110,7 @@
 
 .payment-card-grid strong,
 .split-summary strong {
-  color: #0f172a;
+  color: var(--brand-text);
   overflow-wrap: anywhere;
 }
 
@@ -127,33 +127,33 @@
 }
 
 .payment-status-badge.pending_collection {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--brand-surface);
+  color: var(--brand-text-muted);
 }
 
 .payment-status-badge.collected {
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
 }
 
 .payment-status-badge.split_done {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
 }
 
 .payment-type-badge.cash {
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
 }
 
 .payment-type-badge.upi {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
 }
 
 .payment-type-badge.muted {
-  background: #f1f5f9;
-  color: #64748b;
+  background: var(--brand-surface);
+  color: var(--brand-text-muted);
 }
 
 .handover-badge.pending {
@@ -162,14 +162,14 @@
 }
 
 .handover-badge.settled {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
 }
 
 .split-form {
   align-items: end;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
+  background: var(--brand-teal-soft);
+  border: 1px solid var(--brand-teal-border);
   border-radius: 12px;
   display: grid;
   gap: 14px;
@@ -183,16 +183,16 @@
 }
 
 .split-form input {
-  background: #fff;
-  border: 1px solid #cbd5e1;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border-strong);
   border-radius: 10px;
-  color: #0f172a;
+  color: var(--brand-text);
   padding: 11px 12px;
 }
 
 .split-form input[readonly] {
-  background: #f8fafc;
-  color: #475569;
+  background: var(--brand-surface);
+  color: var(--brand-text-muted);
 }
 
 .field-error {
@@ -203,10 +203,10 @@
 }
 
 .confirm-split-btn {
-  background: #0f766e;
+  background: var(--brand-teal-dark);
   border: 0;
   border-radius: 10px;
-  color: #fff;
+  color: var(--brand-white);
   cursor: pointer;
   font-weight: 900;
   min-height: 42px;
@@ -218,10 +218,10 @@
 }
 
 .mark-admin-collected-btn {
-  background: #1d4ed8;
+  background: var(--brand-teal-dark);
   border: 0;
   border-radius: 10px;
-  color: #fff;
+  color: var(--brand-white);
   cursor: pointer;
   font-weight: 900;
   padding: 11px 14px;
@@ -248,10 +248,10 @@
 .loading-state,
 .empty-state {
   align-items: center;
-  background: #fff;
-  border: 1px solid #e2e8f0;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
   border-radius: 12px;
-  color: #64748b;
+  color: var(--brand-text-muted);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -262,9 +262,9 @@
 
 .loading-spinner {
   animation: spin 0.75s linear infinite;
-  border: 4px solid #e5e7eb;
+  border: 4px solid var(--brand-border);
   border-radius: 50%;
-  border-top-color: #0f766e;
+  border-top-color: var(--brand-teal-dark);
   height: 40px;
   width: 40px;
 }

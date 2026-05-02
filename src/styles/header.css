@@ -39,7 +39,7 @@
 .logo-text {
   font-size: 26px;
   font-weight: 700;
-  color: #0369a1;
+  color: var(--brand-teal-dark);
   white-space: nowrap;
 }
 
@@ -52,7 +52,7 @@
 .header-nav button {
   border: none;
   background: transparent;
-  color: #0369a1;
+  color: var(--brand-teal-dark);
   font-weight: 700;
   font-size: 0.98rem;
   padding: 12px 14px;
@@ -60,12 +60,12 @@
 }
 
 .header-nav button:hover {
-  background: #e0f7ff;
+  background: var(--brand-teal-soft);
 }
 
 /* Desktop CTA Button */
 .header-nav .auth-button {
-  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  background: linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dark));
   color: white;
   border: none;
   padding: 14px 26px;
@@ -75,11 +75,11 @@
   width: 180px;
   min-height: 56px;
   transition: all 0.3s ease;
-  box-shadow: 0 10px 20px rgba(14, 165, 233, 0.2);
+  box-shadow: 0 10px 20px rgba(var(--brand-teal-rgb), 0.2);
 }
 
 .header-nav .auth-button:hover {
-  background: linear-gradient(135deg, #0284c7, #0369a1);
+  background: linear-gradient(135deg, var(--brand-teal-dark), var(--brand-teal-deep));
   cursor: pointer;
   transform: translateY(-2px);
 }
@@ -95,7 +95,7 @@
 .menu-toggle span {
   width: 28px;
   height: 3px;
-  background: #0369a1;
+  background: var(--brand-teal-dark);
   border-radius: 4px;
 }
 

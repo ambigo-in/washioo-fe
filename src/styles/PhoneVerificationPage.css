@@ -5,7 +5,7 @@
   display: grid;
   place-items: center;
   padding: 40px 20px;
-  background: linear-gradient(135deg, #e0f7ff 0%, #ffffff 50%, #cceeff 100%);
+  background: linear-gradient(135deg, var(--brand-teal-soft) 0%, var(--brand-white) 50%, var(--brand-teal-soft) 100%);
 }
 
 .auth-container {
@@ -16,7 +16,7 @@
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(14px);
   border-radius: 28px;
-  box-shadow: 0 20px 50px rgba(14, 165, 233, 0.15);
+  box-shadow: 0 20px 50px rgba(var(--brand-teal-rgb), 0.15);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -26,13 +26,13 @@
 .auth-container h2 {
   font-size: 32px;
   font-weight: 700;
-  color: #0369a1;
+  color: var(--brand-teal-dark);
   margin-bottom: 10px;
   line-height: 1.3;
 }
 
 .signin-subtitle {
-  color: #64748b;
+  color: var(--brand-text-muted);
   font-size: 0.95rem;
   line-height: 1.5;
   margin-bottom: 24px;
@@ -51,57 +51,57 @@
 .auth-container select {
   width: 100%;
   padding: 16px 18px;
-  border: 2px solid #bae6fd;
+  border: 2px solid var(--brand-teal-border);
   border-radius: 16px;
   font-size: 16px;
   outline: none;
   margin-bottom: 20px;
   transition: all 0.3s ease;
-  background: #f8fcff;
+  background: var(--brand-white);
 }
 
 .auth-container select {
   appearance: none;
   background-image:
-    linear-gradient(45deg, transparent 50%, #0284c7 50%),
-    linear-gradient(135deg, #0284c7 50%, transparent 50%);
+    linear-gradient(45deg, transparent 50%, var(--brand-teal-dark) 50%),
+    linear-gradient(135deg, var(--brand-teal-dark) 50%, transparent 50%);
   background-position:
     calc(100% - 22px) 50%,
     calc(100% - 16px) 50%;
   background-repeat: no-repeat;
   background-size: 6px 6px, 6px 6px;
-  color: #0f172a;
+  color: var(--brand-text);
   cursor: pointer;
   font-weight: 700;
 }
 
 .auth-container input:focus,
 .auth-container select:focus {
-  border-color: #0ea5e9;
-  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+  border-color: var(--brand-teal);
+  box-shadow: 0 0 0 4px rgba(var(--brand-teal-rgb), 0.12);
 }
 
 .auth-container input::placeholder {
-  color: #94a3b8;
+  color: var(--brand-text-soft);
 }
 
 .auth-container button {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  background: linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dark));
   color: white;
   border: none;
   border-radius: 999px;
   font-size: 17px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 12px 24px rgba(14, 165, 233, 0.25);
+  box-shadow: 0 12px 24px rgba(var(--brand-teal-rgb), 0.25);
   transition: all 0.3s ease;
 }
 
 .auth-container button:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 16px 30px rgba(14, 165, 233, 0.3);
+  box-shadow: 0 16px 30px rgba(var(--brand-teal-rgb), 0.3);
 }
 
 .auth-container button:active {

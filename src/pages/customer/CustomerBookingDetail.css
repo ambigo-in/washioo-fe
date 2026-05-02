@@ -6,8 +6,8 @@
 
 .customer-detail-hero {
   align-items: flex-start;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
   border-radius: 12px;
   display: flex;
   gap: 18px;
@@ -16,17 +16,17 @@
 }
 
 .customer-detail-hero h2 {
-  color: #0f172a;
+  color: var(--brand-text);
   margin: 0 0 8px;
 }
 
 .customer-detail-hero p {
-  color: #64748b;
+  color: var(--brand-text-muted);
   margin: 0;
 }
 
 .booking-reference {
-  color: #0f766e;
+  color: var(--brand-teal-dark);
   display: block;
   font-size: 0.78rem;
   font-weight: 900;
@@ -46,24 +46,24 @@
 
 .booking-status.completed,
 .customer-paid-pill {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
 }
 
 .booking-status.pending {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--brand-surface);
+  color: var(--brand-text-muted);
 }
 
 .booking-status.assigned,
 .booking-status.accepted {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
 }
 
 .booking-status.in_progress {
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
 }
 
 .booking-status.cancelled {
@@ -78,14 +78,14 @@
 }
 
 .customer-detail-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
   border-radius: 12px;
   padding: 18px;
 }
 
 .customer-detail-card h3 {
-  color: #0f172a;
+  color: var(--brand-text);
   margin: 0 0 14px;
 }
 
@@ -96,7 +96,7 @@
 }
 
 .customer-detail-card dt {
-  color: #64748b;
+  color: var(--brand-text-muted);
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -104,13 +104,13 @@
 
 .customer-detail-card dd,
 .customer-detail-card p {
-  color: #1e293b;
+  color: var(--brand-text);
   font-weight: 700;
   margin: 0;
 }
 
 .payment-pending {
-  color: #64748b !important;
+  color: var(--brand-text-muted) !important;
 }
 
 .notes-card {
@@ -118,10 +118,10 @@
 }
 
 .customer-detail-state {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
   border-radius: 12px;
-  color: #64748b;
+  color: var(--brand-text-muted);
   padding: 28px;
   text-align: center;
 }
@@ -131,7 +131,7 @@
 }
 
 .customer-detail-state a {
-  color: #0f766e;
+  color: var(--brand-teal-dark);
   font-weight: 900;
 }
 

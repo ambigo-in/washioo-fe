@@ -1,9 +1,9 @@
 .maps-button {
   align-items: center;
-  background: #0f766e;
+  background: var(--brand-teal-dark);
   border: 0;
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--brand-white);
   display: inline-flex;
   font-weight: 700;
   justify-content: center;
@@ -16,14 +16,14 @@
 }
 
 .maps-button:hover {
-  background: #115e59;
+  background: var(--brand-teal-deep);
   transform: translateY(-1px);
 }
 
 .maps-button.disabled,
 .maps-button:disabled {
-  background: #cbd5e1;
-  color: #64748b;
+  background: var(--brand-border-strong);
+  color: var(--brand-text-muted);
   cursor: not-allowed;
   transform: none;
 }

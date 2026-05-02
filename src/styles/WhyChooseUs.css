@@ -1,7 +1,7 @@
 .why-section {
   width: 100%;
   padding: 100px 20px;
-  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 50%, #e0f7ff 100%);
+  background: linear-gradient(180deg, var(--brand-teal-soft) 0%, var(--brand-white) 50%, var(--brand-teal-soft) 100%);
 }
 
 .why-container {
@@ -16,7 +16,7 @@
 }
 
 .section-heading span {
-  color: #0ea5e9;
+  color: var(--brand-teal);
   font-size: 34px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -27,14 +27,14 @@
 .section-heading h2 {
   font-size: 52px;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--brand-text);
   margin-top: 12px;
 }
 
 .section-heading p {
   margin-top: 14px;
   font-size: 20px;
-  color: #64748b;
+  color: var(--brand-text-muted);
 }
 
 /* Steps Grid */
@@ -49,7 +49,7 @@
   background: rgba(255, 255, 255, 0.92);
   border-radius: 28px;
   padding: 38px;
-  box-shadow: 0 20px 50px rgba(14, 165, 233, 0.08);
+  box-shadow: 0 20px 50px rgba(var(--brand-teal-rgb), 0.08);
   transition: all 0.35s ease;
   position: relative;
   overflow: hidden;
@@ -57,7 +57,7 @@
 
 .step-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 28px 60px rgba(14, 165, 233, 0.14);
+  box-shadow: 0 28px 60px rgba(var(--brand-teal-rgb), 0.14);
 }
 
 .step-top {
@@ -74,31 +74,31 @@
 .step-number {
   font-size: 28px;
   font-weight: 800;
-  color: #0ea5e9;
+  color: var(--brand-teal);
 }
 
 .step-card h3 {
   font-size: 28px;
   font-weight: 700;
   margin-bottom: 16px;
-  color: #0f172a;
+  color: var(--brand-text);
 }
 
 .step-card p {
-  color: #64748b;
+  color: var(--brand-text-muted);
   line-height: 1.8;
   font-size: 17px;
 }
 
 /* Why Highlight */
 .why-highlight {
-  /* background: linear-gradient(135deg, #0ea5e9, #036ea8df); */
+  /* background: linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dark)); */
   border-radius: 34px;
   padding: 70px 50px;
   text-align: center;
-  color: #036ea8df;
+  color: var(--brand-teal-dark);
   margin-bottom: 60px;
-  /* box-shadow: 0 25px 60px rgba(14, 165, 233, 0.2); */
+  /* box-shadow: 0 25px 60px rgba(var(--brand-teal-rgb), 0.2); */
 }
 
 .why-highlight h2 {
@@ -138,7 +138,7 @@
   border-radius: 26px;
   padding: 34px;
   text-align: center;
-  box-shadow: 0 18px 45px rgba(14, 165, 233, 0.08);
+  box-shadow: 0 18px 45px rgba(var(--brand-teal-rgb), 0.08);
   transition: all 0.35s ease;
 }
 
@@ -148,20 +148,20 @@
 
 .testimonial-card p {
   font-size: 20px;
-  color: #0f172a;
+  color: var(--brand-text);
   font-weight: 500;
   line-height: 1.7;
   margin-bottom: 18px;
 }
 
 .stars {
-  color: #facc15;
+  color: var(--brand-teal);
   font-size: 24px;
   margin-bottom: 14px;
 }
 
 .testimonial-card span {
-  color: #64748b;
+  color: var(--brand-text-muted);
   font-weight: 600;
 }
 /* Tablet */

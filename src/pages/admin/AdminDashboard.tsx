@@ -31,14 +31,14 @@ export default function AdminDashboard() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      pending: "#ffc107",
-      assigned: "#17a2b8",
-      accepted: "#6f42c1",
-      in_progress: "#007bff",
-      completed: "#28a745",
+      pending: "var(--brand-teal)",
+      assigned: "var(--brand-teal)",
+      accepted: "var(--brand-teal-dark)",
+      in_progress: "var(--brand-teal)",
+      completed: "var(--brand-teal)",
       cancelled: "#dc3545",
     };
-    return colors[status] || "#6c757d";
+    return colors[status] || "var(--brand-text-muted)";
   };
 
   // Calculate stats

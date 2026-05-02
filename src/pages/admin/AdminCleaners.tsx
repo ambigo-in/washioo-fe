@@ -66,15 +66,15 @@ export default function AdminCleaners() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      pending: "#ffc107",
-      approved: "#28a745",
+      pending: "var(--brand-teal)",
+      approved: "var(--brand-teal)",
       rejected: "#dc3545",
-      suspended: "#6c757d",
-      offline: "#6c757d",
-      available: "#28a745",
-      busy: "#007bff",
+      suspended: "var(--brand-text-muted)",
+      offline: "var(--brand-text-muted)",
+      available: "var(--brand-teal)",
+      busy: "var(--brand-teal)",
     };
-    return colors[status] || "#6c757d";
+    return colors[status] || "var(--brand-text-muted)";
   };
 
   const filters: FilterStatus[] = [

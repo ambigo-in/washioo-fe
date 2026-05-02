@@ -1,7 +1,7 @@
 .checkout-page {
   min-height: 100vh;
   padding: 60px 20px 90px;
-  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 45%, #e0f7ff 100%);
+  background: linear-gradient(180deg, var(--brand-teal-soft) 0%, var(--brand-white) 45%, var(--brand-teal-soft) 100%);
 }
 
 .checkout-heading {
@@ -10,14 +10,14 @@
 }
 
 .checkout-heading span {
-  color: #0ea5e9;
+  color: var(--brand-teal);
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 2px;
 }
 
 .checkout-page h1 {
-  color: #0f172a;
+  color: var(--brand-text);
   font-size: 56px;
   font-weight: 800;
   margin-top: 10px;
@@ -36,13 +36,13 @@
 .booking-summary {
   background: rgba(255, 255, 255, 0.96);
   border-radius: 30px;
-  box-shadow: 0 20px 55px rgba(14, 165, 233, 0.08);
+  box-shadow: 0 20px 55px rgba(var(--brand-teal-rgb), 0.08);
   padding: 35px;
 }
 
 .address-section h2,
 .booking-summary h2 {
-  color: #0f172a;
+  color: var(--brand-text);
   font-size: 34px;
   font-weight: 800;
   margin-bottom: 24px;
@@ -59,8 +59,8 @@
 }
 
 .address-card {
-  background: #f8fcff;
-  border: 2px solid #dbeafe;
+  background: var(--brand-white);
+  border: 2px solid var(--brand-teal-soft);
   border-radius: 20px;
   cursor: pointer;
   display: block;
@@ -72,32 +72,32 @@
 }
 
 .address-card:hover {
-  border-color: #0ea5e9;
+  border-color: var(--brand-teal);
   transform: translateY(-2px);
 }
 
 .address-card.selected {
-  background: linear-gradient(135deg, #e0f7ff, #f0f9ff);
-  border-color: #0284c7;
-  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.1);
+  background: linear-gradient(135deg, var(--brand-teal-soft), var(--brand-teal-soft));
+  border-color: var(--brand-teal-dark);
+  box-shadow: 0 10px 25px rgba(var(--brand-teal-rgb), 0.1);
 }
 
 .address-card h3 {
-  color: #0369a1;
+  color: var(--brand-teal-dark);
   font-size: 20px;
   margin-bottom: 8px;
 }
 
 .address-card p,
 .address-section p {
-  color: #64748b;
+  color: var(--brand-text-muted);
   font-size: 15px;
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
 
 .address-card span {
-  color: #0369a1;
+  color: var(--brand-teal-dark);
   display: block;
   font-size: 13px;
   font-weight: 700;
@@ -105,7 +105,7 @@
 }
 
 .address-section > button {
-  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  background: linear-gradient(135deg, var(--brand-teal-light), var(--brand-teal-dark));
   border: none;
   border-radius: 999px;
   color: white;
@@ -119,7 +119,7 @@
 }
 
 .address-section > button:hover:not(:disabled) {
-  box-shadow: 0 14px 28px rgba(14, 165, 233, 0.2);
+  box-shadow: 0 14px 28px rgba(var(--brand-teal-rgb), 0.2);
   transform: translateY(-2px);
 }
 
@@ -132,8 +132,8 @@
 .address-form input,
 .booking-summary input,
 .booking-summary textarea {
-  background: #f8fcff;
-  border: 2px solid #dbeafe;
+  background: var(--brand-white);
+  border: 2px solid var(--brand-teal-soft);
   border-radius: 16px;
   font-size: 15px;
   outline: none;
@@ -145,8 +145,8 @@
 .address-form input:focus,
 .booking-summary input:focus,
 .booking-summary textarea:focus {
-  border-color: #0ea5e9;
-  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.08);
+  border-color: var(--brand-teal);
+  box-shadow: 0 0 0 4px rgba(var(--brand-teal-rgb), 0.08);
 }
 
 .form-row {
@@ -157,10 +157,10 @@
 
 .checkbox-row {
   align-items: center;
-  background: #f8fcff;
-  border: 2px solid #dbeafe;
+  background: var(--brand-white);
+  border: 2px solid var(--brand-teal-soft);
   border-radius: 16px;
-  color: #0369a1;
+  color: var(--brand-teal-dark);
   display: flex;
   font-weight: 700;
   gap: 10px;
@@ -174,7 +174,7 @@
 }
 
 .address-form button {
-  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  background: linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dark));
   border: none;
   border-radius: 16px;
   color: white;
@@ -190,10 +190,10 @@
 }
 
 .location-captured {
-  background: #f0fdfa;
-  border: 1px solid #ccfbf1;
+  background: var(--brand-teal-soft);
+  border: 1px solid var(--brand-teal-border);
   border-radius: 12px;
-  color: #0f766e !important;
+  color: var(--brand-teal-dark) !important;
   font-size: 0.9rem !important;
   font-weight: 800;
   margin: 0;
@@ -210,21 +210,21 @@
 }
 
 .summary-price {
-  color: #0284c7;
+  color: var(--brand-teal-dark);
   font-size: 30px;
   font-weight: 800;
   margin-bottom: 4px;
 }
 
 .booking-summary p {
-  color: #0369a1;
+  color: var(--brand-teal-dark);
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 10px;
 }
 
 .booking-summary label {
-  color: #0369a1;
+  color: var(--brand-teal-dark);
   display: block;
   font-size: 14px;
   font-weight: 800;
@@ -242,15 +242,15 @@
 }
 
 .selected-address-summary {
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
+  background: var(--brand-teal-soft);
+  border: 1px solid var(--brand-teal-border);
   border-radius: 18px;
   margin: 20px 0;
   padding: 16px;
 }
 
 .selected-address-summary span {
-  color: #0284c7;
+  color: var(--brand-teal-dark);
   display: block;
   font-size: 12px;
   font-weight: 800;
@@ -260,7 +260,7 @@
 }
 
 .selected-address-summary strong {
-  color: #0f172a;
+  color: var(--brand-text);
   display: block;
   margin-bottom: 4px;
 }
@@ -272,10 +272,10 @@
 }
 
 .booking-summary button {
-  background: linear-gradient(135deg, #0ea5e9, #0369a1);
+  background: linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dark));
   border: none;
   border-radius: 999px;
-  box-shadow: 0 15px 32px rgba(14, 165, 233, 0.2);
+  box-shadow: 0 15px 32px rgba(var(--brand-teal-rgb), 0.2);
   color: white;
   cursor: pointer;
   font-size: 18px;
@@ -287,7 +287,7 @@
 }
 
 .booking-summary button:hover:not(:disabled) {
-  box-shadow: 0 18px 38px rgba(14, 165, 233, 0.28);
+  box-shadow: 0 18px 38px rgba(var(--brand-teal-rgb), 0.28);
   transform: translateY(-3px);
 }
 

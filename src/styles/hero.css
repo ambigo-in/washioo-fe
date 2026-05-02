@@ -13,8 +13,8 @@
 
 .hero-badge {
   display: inline-block;
-  background: #e0f2fe;
-  color: #11AAB1;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal);
   padding: 10px 18px;
   border-radius: 999px;
   font-size: 14px;
@@ -29,13 +29,13 @@
 }
 
 .hero-title span {
-  color: #0ea5e9;
+  color: var(--brand-teal);
 }
 
 .hero-description {
   margin-top: 22px;
   font-size: 20px;
-  color: #475569;
+  color: var(--brand-text-muted);
   line-height: 1.8;
 }
 
@@ -44,7 +44,7 @@
 }
 
 .primary-btn {
-  background: #0ea5e9;
+  background: var(--brand-teal);
   color: white;
   border: none;
   padding: 16px 30px;

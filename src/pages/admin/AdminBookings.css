@@ -22,12 +22,12 @@
 
 .filter-tab {
   padding: 10px 16px;
-  background: #ffffff;
-  border: 1px solid #e9ecef;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.85rem;
-  color: #495057;
+  color: var(--brand-text-muted);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -35,13 +35,13 @@
 }
 
 .filter-tab:hover {
-  background: #f8f9fa;
+  background: var(--brand-surface);
 }
 
 .filter-tab.active {
-  background: #1976d2;
-  color: #ffffff;
-  border-color: #1976d2;
+  background: var(--brand-teal);
+  color: var(--brand-white);
+  border-color: var(--brand-teal);
 }
 
 .filter-tab .count {
@@ -59,9 +59,9 @@
 }
 
 .booking-card {
-  background: #ffffff;
+  background: var(--brand-white);
   border-radius: 12px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--brand-border);
   padding: 20px;
 }
 
@@ -81,13 +81,13 @@
 .booking-ref h3 {
   margin: 0;
   font-size: 1.1rem;
-  color: #2c3e50;
+  color: var(--brand-text);
 }
 
 .booking-price {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #28a745;
+  color: var(--brand-teal);
 }
 
 .status-badge {
@@ -95,7 +95,7 @@
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--brand-white);
   text-transform: capitalize;
 }
 
@@ -105,7 +105,7 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   padding: 16px;
-  background: #f8f9fa;
+  background: var(--brand-surface);
   border-radius: 8px;
   margin-bottom: 16px;
 }
@@ -117,14 +117,14 @@
 
 .detail-item .label {
   font-size: 0.75rem;
-  color: #6c757d;
+  color: var(--brand-text-muted);
   margin-bottom: 4px;
   text-transform: uppercase;
 }
 
 .detail-item .value {
   font-size: 0.9rem;
-  color: #2c3e50;
+  color: var(--brand-text);
   font-weight: 500;
 }
 
@@ -141,17 +141,17 @@
   max-width: 300px;
   min-width: 220px;
   padding: 10px 12px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--brand-border);
   border-radius: 8px;
   font-size: 0.9rem;
-  color: #2c3e50;
-  background: #ffffff;
+  color: var(--brand-text);
+  background: var(--brand-white);
 }
 
 .btn-assign {
   padding: 10px 20px;
-  background: #1976d2;
-  color: #ffffff;
+  background: var(--brand-teal);
+  color: var(--brand-white);
   border: none;
   border-radius: 8px;
   font-size: 0.9rem;
@@ -161,7 +161,7 @@
 }
 
 .btn-assign:hover:not(:disabled) {
-  background: #1565c0;
+  background: var(--brand-teal-dark);
 }
 
 .btn-assign:disabled {
@@ -188,14 +188,14 @@
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  background: #ffffff;
+  background: var(--brand-white);
   border-radius: 12px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--brand-border);
 }
 
 .empty-state p {
   margin: 0;
-  color: #6c757d;
+  color: var(--brand-text-muted);
 }
 
 /* Loading */
@@ -210,8 +210,8 @@
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #e9ecef;
-  border-top-color: #1976d2;
+  border: 3px solid var(--brand-border);
+  border-top-color: var(--brand-teal);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -224,5 +224,5 @@
 
 .loading-container p {
   margin: 16px 0 0;
-  color: #6c757d;
+  color: var(--brand-text-muted);
 }

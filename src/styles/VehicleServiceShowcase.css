@@ -1,20 +1,19 @@
 .vehicle-services-section {
   width: 100%;
-  min-height: 100vh;
-  padding: 40px;
-  background: linear-gradient(135deg, #e0f7ff 0%, #ffffff 50%, #cceeff 100%);
+  padding: 56px 40px;
+  background: linear-gradient(135deg, var(--brand-teal-soft) 0%, var(--brand-white) 50%, var(--brand-teal-soft) 100%);
 }
 
 .vehicle-services-overlay {
   width: 100%;
-  min-height: 130vh;
-  border-radius: 32px;
-  padding: 50px;
+  min-height: clamp(620px, 76vh, 860px);
+  border-radius: 28px;
+  padding: clamp(28px, 5vw, 56px);
   position: relative;
   background: linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0.18),
-      rgba(0, 0, 0, 0.65)
+      rgba(0, 0, 0, 0.16),
+      rgba(0, 0, 0, 0.66)
     ),
     url("/p9.png")
       center/cover no-repeat;
@@ -22,7 +21,7 @@
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  object-fit: cover;
+  box-shadow: 0 28px 70px rgba(var(--brand-teal-dark-rgb), 0.18);
 }
 
 /* Header */
@@ -30,107 +29,153 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  color: white;
-  margin-bottom: 50px;
-  gap: 20px;
+  color: var(--brand-white);
+  gap: 24px;
+  margin-bottom: 48px;
 }
 
 .section-label {
   font-size: 14px;
   letter-spacing: 2px;
-  font-weight: 600;
+  font-weight: 800;
   margin-bottom: 14px;
   color: rgba(255, 255, 255, 0.85);
 }
 
 .vehicle-services-header h2 {
-  font-size: 58px;
-  font-weight: 700;
+  font-size: clamp(34px, 5vw, 58px);
+  font-weight: 800;
   line-height: 1.15;
   max-width: 680px;
 }
 
 .view-all-btn {
-  background: transparent;
-  color: white;
-  border: none;
-  font-size: 22px;
-  font-weight: 600;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  color: var(--brand-white);
+  font-size: 1rem;
+  font-weight: 800;
   display: flex;
   align-items: center;
-  gap: 12px;
+  min-height: 48px;
+  padding: 0 22px;
   cursor: pointer;
+  transition: background 0.25s ease, transform 0.25s ease;
+  white-space: nowrap;
 }
 
-.view-all-btn span {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: white;
-  color: #0284c7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
+.view-all-btn:hover {
+  background: rgba(255, 255, 255, 0.24);
+  transform: translateY(-2px);
 }
 
 /* Cards Row */
 .services-card-row {
-  display: flex;
-  gap: 18px;
-  overflow-x: auto;
-  padding-bottom: 10px;
-  scrollbar-width: none;
-}
-
-.services-card-row::-webkit-scrollbar {
-  display: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 22px;
+  margin-top: auto;
 }
 
 .service-card {
-  min-width: 210px;
-  height: 210px;
+  min-height: 360px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
   border-radius: 24px;
-  background-size: cover;
-  background-position: center;
   display: flex;
   align-items: flex-end;
-  padding: 18px;
-  flex-shrink: 0;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
-  transition: transform 0.35s ease;
+  justify-content: flex-end;
+  overflow: hidden;
+  padding: 18px 18px 24px;
+  position: relative;
+  background: var(--brand-teal-deep);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24);
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
+}
+
+.service-card::after {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.04) 0%,
+    rgba(0, 0, 0, 0.16) 42%,
+    rgba(0, 0, 0, 0.62) 100%
+  );
+  content: "";
+  inset: 0;
+  position: absolute;
+  z-index: 1;
 }
 
 .service-card:hover {
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.32);
   transform: translateY(-8px);
+}
+
+.service-card-media {
+  inset: 0;
+  position: absolute;
+  z-index: 0;
+}
+
+.service-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .service-card-content {
   width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  color: white;
+  align-items: center;
+  gap: 16px;
+  color: var(--brand-white);
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(var(--brand-teal-rgb), 0.94), rgba(var(--brand-teal-dark-rgb), 0.94));
+  backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 2;
+}
+
+.service-card-content span {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  opacity: 0.82;
+  text-transform: uppercase;
 }
 
 .service-card h3 {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 800;
   line-height: 1.2;
-  max-width: 130px;
+  margin: 0;
 }
 
 .service-arrow {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
+  min-width: 78px;
+  min-height: 46px;
+  border-radius: 999px;
   border: none;
-  background: white;
-  color: #0284c7;
-  font-size: 20px;
-  font-weight: bold;
+  background: var(--brand-white);
+  color: var(--brand-teal-dark);
+  font-size: 0.96rem;
+  font-weight: 800;
   cursor: pointer;
   flex-shrink: 0;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.service-arrow:hover {
+  background: var(--brand-teal);
+  color: var(--brand-white);
+  transform: translateY(-2px);
 }
 
 /* Tablet */
@@ -139,23 +184,19 @@
     padding: 25px;
   }
 
-  .vehicle-services-overlay {
-    padding: 35px;
-  }
-
-  .vehicle-services-header h2 {
-    font-size: 42px;
+  .services-card-row {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
   }
 
   .service-card {
-    min-width: 190px;
-    height: 190px;
+    min-height: 320px;
   }
 }
 
 /* Mobile */
 @media (max-width: 768px) {
   .vehicle-services-overlay {
+    min-height: auto;
     padding: 28px 20px;
     border-radius: 24px;
   }
@@ -165,36 +206,21 @@
     align-items: flex-start;
   }
 
-  .vehicle-services-header h2 {
-    font-size: 32px;
-    max-width: 100%;
+  .services-card-row {
+    grid-template-columns: 1fr;
   }
 
   .view-all-btn {
-    font-size: 18px;
-  }
-
-  .view-all-btn span {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
+    min-height: 44px;
   }
 
   .service-card {
-    min-width: 170px;
-    height: 180px;
+    min-height: 300px;
     border-radius: 20px;
   }
 
-  .service-card h3 {
-    font-size: 18px;
-    max-width: 110px;
-  }
-
-  .service-arrow {
-    width: 36px;
-    height: 36px;
-    font-size: 18px;
+  .service-card-content {
+    padding: 16px;
   }
 }
 
@@ -208,20 +234,21 @@
     padding: 22px 16px;
   }
 
-  .vehicle-services-header h2 {
-    font-size: 26px;
-  }
-
   .section-label {
     font-size: 12px;
   }
 
   .service-card {
-    min-width: 155px;
-    height: 165px;
+    min-height: 280px;
+    padding: 12px 12px 16px;
   }
 
-  .service-card h3 {
-    font-size: 16px;
+  .service-card-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .service-arrow {
+    width: 100%;
   }
 }

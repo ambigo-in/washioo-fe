@@ -4,7 +4,7 @@
   justify-content: center;
   align-items: center;
   padding: 40px 20px;
-  background: linear-gradient(135deg, #e0f7ff 0%, #ffffff 50%, #cceeff 100%);
+  background: linear-gradient(135deg, var(--brand-teal-soft) 0%, var(--brand-white) 50%, var(--brand-teal-soft) 100%);
 }
 
 .auth-container {
@@ -13,7 +13,7 @@
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(18px);
   border-radius: 30px;
-  box-shadow: 0 22px 60px rgba(14, 165, 233, 0.16);
+  box-shadow: 0 22px 60px rgba(var(--brand-teal-rgb), 0.16);
   padding: 44px 36px;
   display: flex;
   flex-direction: column;
@@ -24,13 +24,13 @@
 .auth-container h2 {
   font-size: 2.1rem;
   font-weight: 700;
-  color: #0369a1;
+  color: var(--brand-teal-dark);
   margin-bottom: 10px;
 }
 
 .signup-subtitle {
   font-size: 0.96rem;
-  color: #64748b;
+  color: var(--brand-text-muted);
   margin-bottom: 28px;
   line-height: 1.5;
 }
@@ -40,10 +40,10 @@
   width: 100%;
   padding: 16px 18px;
   margin-bottom: 18px;
-  border: 2px solid #bae6fd;
+  border: 2px solid var(--brand-teal-border);
   border-radius: 16px;
   font-size: 1rem;
-  background: #f8fcff;
+  background: var(--brand-white);
   transition: all 0.3s ease;
   outline: none;
 }
@@ -51,52 +51,52 @@
 .auth-container select {
   appearance: none;
   background-image:
-    linear-gradient(45deg, transparent 50%, #0284c7 50%),
-    linear-gradient(135deg, #0284c7 50%, transparent 50%);
+    linear-gradient(45deg, transparent 50%, var(--brand-teal-dark) 50%),
+    linear-gradient(135deg, var(--brand-teal-dark) 50%, transparent 50%);
   background-position:
     calc(100% - 22px) 50%,
     calc(100% - 16px) 50%;
   background-repeat: no-repeat;
   background-size: 6px 6px, 6px 6px;
-  color: #0f172a;
+  color: var(--brand-text);
   cursor: pointer;
   font-weight: 600;
 }
 
 .auth-container input:focus,
 .auth-container select:focus {
-  border-color: #0ea5e9;
-  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+  border-color: var(--brand-teal);
+  box-shadow: 0 0 0 4px rgba(var(--brand-teal-rgb), 0.12);
 }
 
 .auth-container input:disabled {
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--brand-surface);
+  color: var(--brand-text-muted);
   font-weight: 500;
   cursor: not-allowed;
 }
 
 .auth-container input::placeholder {
-  color: #94a3b8;
+  color: var(--brand-text-soft);
 }
 
 .auth-container button {
   width: 100%;
   padding: 16px;
   margin-top: 8px;
-  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  background: linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dark));
   color: white;
   border: none;
   border-radius: 999px;
   font-size: 1rem;
   font-weight: 600;
-  box-shadow: 0 12px 28px rgba(14, 165, 233, 0.26);
+  box-shadow: 0 12px 28px rgba(var(--brand-teal-rgb), 0.26);
   transition: all 0.3s ease;
 }
 
 .auth-container button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 16px 34px rgba(14, 165, 233, 0.32);
+  box-shadow: 0 16px 34px rgba(var(--brand-teal-rgb), 0.32);
 }
 
 .auth-container button:active {
@@ -106,11 +106,11 @@
 .signup-footer-text {
   margin-top: 22px;
   font-size: 0.92rem;
-  color: #64748b;
+  color: var(--brand-text-muted);
 }
 
 .signup-footer-link {
-  color: #0284c7;
+  color: var(--brand-teal-dark);
   font-weight: 600;
   cursor: pointer;
 }
