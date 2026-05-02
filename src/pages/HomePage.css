@@ -1,0 +1,10 @@
+.home-page {
+  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 46%, #e0f7ff 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.home-page__content {
+  display: flex;
+  flex-direction: column;
+}

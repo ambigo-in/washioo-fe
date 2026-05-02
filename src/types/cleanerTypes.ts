@@ -65,6 +65,9 @@ export interface Assignment {
       payment_type?: PaymentType | null;
       amount: number;
       collected_amount?: number | null;
+      cleaner_share?: number | null;
+      admin_share?: number | null;
+      cleaner_handover_status?: "pending" | "settled";
       payment_method?: string | null;
       transaction_reference?: string | null;
       collected_by_cleaner?: boolean;
@@ -103,6 +106,9 @@ export interface CleanerBookingDetail {
     payment_type?: PaymentType | null;
     amount: number;
     collected_amount?: number | null;
+    cleaner_share?: number | null;
+    admin_share?: number | null;
+    cleaner_handover_status?: "pending" | "settled";
     payment_method?: string | null;
     transaction_reference?: string | null;
     collected_by_cleaner?: boolean;

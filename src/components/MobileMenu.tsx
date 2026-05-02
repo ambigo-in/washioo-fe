@@ -1,4 +1,5 @@
 import React from "react";
+import "./MobileMenu.css";
 
 interface MobileMenuProps {
   isOpen: boolean;

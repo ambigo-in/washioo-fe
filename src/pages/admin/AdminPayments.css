@@ -115,7 +115,8 @@
 }
 
 .payment-status-badge,
-.payment-type-badge {
+.payment-type-badge,
+.handover-badge {
   border-radius: 999px;
   display: inline-flex;
   font-size: 0.78rem;
@@ -153,6 +154,16 @@
 .payment-type-badge.muted {
   background: #f1f5f9;
   color: #64748b;
+}
+
+.handover-badge.pending {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.handover-badge.settled {
+  background: #dcfce7;
+  color: #166534;
 }
 
 .split-form {
@@ -200,6 +211,25 @@
   font-weight: 900;
   min-height: 42px;
   padding: 11px 14px;
+}
+
+.handover-action {
+  align-content: start;
+}
+
+.mark-admin-collected-btn {
+  background: #1d4ed8;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 900;
+  padding: 11px 14px;
+}
+
+.mark-admin-collected-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .confirm-split-btn:disabled {

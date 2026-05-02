@@ -65,6 +65,8 @@ export type PaymentType = "cash" | "upi";
 
 export type PaymentStatus = "pending_collection" | "collected" | "split_done";
 
+export type CleanerHandoverStatus = "pending" | "settled";
+
 export type CustomerBookingPaymentStatus = "pending" | "done" | "failed";
 
 export interface PaymentRecord {
@@ -94,6 +96,7 @@ export interface Payment {
   split_updated_by: string | null;
   split_updated_at: string | null;
   status: PaymentStatus;
+  cleaner_handover_status?: CleanerHandoverStatus;
   created_at?: string;
   updated_at?: string;
 }
@@ -111,7 +114,10 @@ export interface AdminPaymentSplitRequest {
 export interface CleanerEarningsSummary {
   cleaner_id?: string;
   total_earned: number;
-  pending_payout: number;
+  admin_due: number;
+  settled: number;
+  admin_total?: number;
+  pending_payout?: number;
   last_updated: string | null;
 }
 
@@ -158,6 +164,9 @@ export interface CustomerBooking {
     payment_type?: PaymentType | null;
     amount: number;
     collected_amount?: number | null;
+    cleaner_share?: number | null;
+    admin_share?: number | null;
+    cleaner_handover_status?: "pending" | "settled";
     payment_method?: string | null;
     transaction_reference?: string | null;
     paid_at?: string | null;

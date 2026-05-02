@@ -99,39 +99,6 @@
   border-radius: 4px;
 }
 
-/* Mobile Menu */
-.mobile-menu {
-  display: none;
-}
-
-.mobile-menu.active {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  position: absolute;
-  top: 85px;
-  right: 4%;
-  background: white;
-  padding: 18px;
-  border-radius: 18px;
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
-  min-width: 180px;
-}
-
-.mobile-menu button {
-  background: #0ea5e9;
-  color: white;
-  border: none;
-  padding: 14px;
-  border-radius: 14px;
-  font-weight: 600;
-  width: 100%;
-}
-
-.mobile-menu button:hover {
-  background: #0284c7;
-}
-
 /* Large Tablet */
 @media (max-width: 1024px) {
   .logo-icon img {
@@ -201,17 +168,6 @@
     height: 3px;
   }
 
-  .mobile-menu.active {
-    top: 72px;
-    right: 4%;
-    min-width: 160px;
-    padding: 14px;
-  }
-
-  .mobile-menu button {
-    padding: 12px;
-    font-size: 0.95rem;
-  }
 }
 
 /* Extra Small Devices */
@@ -224,7 +180,4 @@
     font-size: 15px;
   }
 
-  .mobile-menu.active {
-    min-width: 145px;
-  }
 }

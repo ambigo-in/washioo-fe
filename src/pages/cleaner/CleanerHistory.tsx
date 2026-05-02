@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { fetchCleanerAssignments } from "../../api/cleanerApi";
 import type { Assignment } from "../../types/cleanerTypes";
@@ -13,39 +13,42 @@ export default function CleanerHistory() {
   );
 
   useEffect(() => {
-    loadHistory();
+    let active = true;
+    fetchCleanerAssignments()
+      .then((data) => {
+        if (!active) return;
+
+        let filtered = data.assignments.filter(
+          (a: Assignment) =>
+            a.assignment_status === "completed" ||
+            a.assignment_status === "rejected",
+        );
+
+        if (filter === "completed") {
+          filtered = filtered.filter(
+            (a: Assignment) => a.assignment_status === "completed",
+          );
+        } else if (filter === "cancelled") {
+          filtered = filtered.filter(
+            (a: Assignment) => a.assignment_status === "rejected",
+          );
+        }
+
+        setAssignments(filtered);
+      })
+      .catch((err) => {
+        if (!active) return;
+        setError("Failed to load work history");
+        console.error(err);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [filter]);
-
-  const loadHistory = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchCleanerAssignments();
-
-      // Filter based on assignment_status
-      let filtered = data.assignments.filter(
-        (a: Assignment) =>
-          a.assignment_status === "completed" ||
-          a.assignment_status === "rejected",
-      );
-
-      if (filter === "completed") {
-        filtered = filtered.filter(
-          (a: Assignment) => a.assignment_status === "completed",
-        );
-      } else if (filter === "cancelled") {
-        filtered = filtered.filter(
-          (a: Assignment) => a.assignment_status === "rejected",
-        );
-      }
-
-      setAssignments(filtered);
-    } catch (err) {
-      setError("Failed to load work history");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -67,6 +70,34 @@ export default function CleanerHistory() {
     });
   };
 
+  const formatMoney = (value: number) =>
+    `Rs. ${value.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+
+  const formatPaymentStatus = (status?: string | null) =>
+    status ? status.replace("_", " ") : "Payment not collected";
+
+  const renderEarningValue = (assignment: Assignment) => {
+    const payment = assignment.booking?.payment;
+    if (!payment || payment.payment_status === "pending_collection") {
+      return <span className="earning-state muted">Payment not collected</span>;
+    }
+    if (payment.payment_status === "collected") {
+      return <span className="earning-state pending">Split pending</span>;
+    }
+    if (payment.payment_status === "split_done" && payment.cleaner_share != null) {
+      return (
+        <span className="earning-confirmed">
+          <strong>{formatMoney(payment.cleaner_share)}</strong>
+          <small>Your share</small>
+        </span>
+      );
+    }
+    return <span className="earning-state pending">Split pending</span>;
+  };
+
   // Calculate stats
   const totalJobs = assignments.length;
   const completedJobs = assignments.filter(
@@ -78,7 +109,7 @@ export default function CleanerHistory() {
   const totalEarnings = assignments.reduce((sum, assignment) => {
     if (assignment.assignment_status !== "completed") return sum;
     if (assignment.booking?.payment?.payment_status === "split_done") {
-      return sum + assignment.booking.payment.amount;
+      return sum + (assignment.booking.payment.cleaner_share ?? 0);
     }
     return sum;
   }, 0);
@@ -101,10 +132,7 @@ export default function CleanerHistory() {
           </div>
           <div className="stat-card revenue">
             <span className="stat-value">
-              Rs. {totalEarnings.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
+              {formatMoney(totalEarnings)}
             </span>
             <span className="stat-label">Total Earnings</span>
           </div>
@@ -178,19 +206,24 @@ export default function CleanerHistory() {
                   <div className="detail-row">
                     <span className="detail-label">Amount Earned</span>
                     <span className="detail-value price">
-                      {assignment.booking?.payment?.payment_status === "split_done"
-                        ? `Rs. ${assignment.booking.payment.amount.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}`
-                        : "Pending"}
+                      {renderEarningValue(assignment)}
                     </span>
                   </div>
                   {assignment.booking?.payment?.payment_status && (
                     <div className="detail-row">
                       <span className="detail-label">Payment Status</span>
                       <span className="detail-value">
-                        {assignment.booking.payment.payment_status}
+                        {formatPaymentStatus(
+                          assignment.booking.payment.payment_status,
+                        )}
+                      </span>
+                    </div>
+                  )}
+                  {assignment.booking?.payment?.admin_share != null && (
+                    <div className="detail-row">
+                      <span className="detail-label">Admin Share</span>
+                      <span className="detail-value">
+                        {formatMoney(assignment.booking.payment.admin_share)}
                       </span>
                     </div>
                   )}

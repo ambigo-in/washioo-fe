@@ -8,17 +8,20 @@ import {
 } from "../../store/slices/adminSlice";
 import {
   loadAdminPayments,
+  markAdminShareCollected,
   submitAdminSplit,
 } from "../../store/slices/paymentSlice";
-import type { Payment, PaymentStatus } from "../../types/apiTypes";
+import type { CleanerHandoverStatus, Payment, PaymentStatus } from "../../types/apiTypes";
 import "./AdminPayments.css";
 
-type FilterStatus = "all" | "collected" | "split_done";
+type FilterStatus = "all" | "collected" | "split_done" | "admin_due" | "admin_collected";
 
 const filterTabs: { label: string; value: FilterStatus }[] = [
   { label: "All", value: "all" },
   { label: "Collected", value: "collected" },
   { label: "Split Done", value: "split_done" },
+  { label: "Admin Due", value: "admin_due" },
+  { label: "Admin Collected", value: "admin_collected" },
 ];
 
 const formatMoney = (value?: number | null) =>
@@ -41,6 +44,19 @@ function PaymentTypeBadge({ type }: { type: Payment["payment_type"] }) {
 
 function StatusBadge({ status }: { status: PaymentStatus }) {
   return <span className={`payment-status-badge ${status}`}>{formatLabel(status)}</span>;
+}
+
+function HandoverBadge({
+  status,
+}: {
+  status?: CleanerHandoverStatus;
+}) {
+  const value = status ?? "pending";
+  return (
+    <span className={`handover-badge ${value}`}>
+      {value === "settled" ? "Admin Collected" : "Admin Due"}
+    </span>
+  );
 }
 
 function SplitForm({
@@ -114,12 +130,29 @@ export default function AdminPayments() {
   const { payments, loading, error } = useAppSelector((state) => state.payments);
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [submittingId, setSubmittingId] = useState<string | null>(null);
+  const [collectingId, setCollectingId] = useState<string | null>(null);
   const [localError, setLocalError] = useState("");
 
+  const paymentFilter = useMemo(() => {
+    if (filter === "all") return undefined;
+    if (filter === "admin_due") {
+      return {
+        status: "split_done" as PaymentStatus,
+        cleaner_handover_status: "pending" as CleanerHandoverStatus,
+      };
+    }
+    if (filter === "admin_collected") {
+      return {
+        status: "split_done" as PaymentStatus,
+        cleaner_handover_status: "settled" as CleanerHandoverStatus,
+      };
+    }
+    return filter as PaymentStatus;
+  }, [filter]);
+
   useEffect(() => {
-    const status = filter === "all" ? undefined : filter;
-    dispatch(loadAdminPayments(status));
-  }, [dispatch, filter]);
+    dispatch(loadAdminPayments(paymentFilter));
+  }, [dispatch, paymentFilter]);
 
   useEffect(() => {
     dispatch(loadAdminBookings("all"));
@@ -158,11 +191,25 @@ export default function AdminPayments() {
           },
         }),
       ).unwrap();
-      dispatch(loadAdminPayments(filter === "all" ? undefined : filter));
+      dispatch(loadAdminPayments(paymentFilter));
     } catch (err) {
       setLocalError(String(err));
     } finally {
       setSubmittingId(null);
+    }
+  };
+
+  const handleAdminShareCollected = async (payment: Payment) => {
+    setCollectingId(payment.id);
+    setLocalError("");
+
+    try {
+      await dispatch(markAdminShareCollected(payment.id)).unwrap();
+      dispatch(loadAdminPayments(paymentFilter));
+    } catch (err) {
+      setLocalError(String(err));
+    } finally {
+      setCollectingId(null);
     }
   };
 
@@ -245,6 +292,14 @@ export default function AdminPayments() {
                       <span>Payment Type</span>
                       <PaymentTypeBadge type={payment.payment_type} />
                     </div>
+                    {payment.status === "split_done" && (
+                      <div>
+                        <span>Admin Collection</span>
+                        <HandoverBadge
+                          status={payment.cleaner_handover_status}
+                        />
+                      </div>
+                    )}
                   </div>
 
                   {payment.status === "collected" && (
@@ -268,6 +323,12 @@ export default function AdminPayments() {
                         <strong>{formatMoney(payment.admin_share)}</strong>
                       </div>
                       <div>
+                        <span>Admin Collection</span>
+                        <HandoverBadge
+                          status={payment.cleaner_handover_status}
+                        />
+                      </div>
+                      <div>
                         <span>Split By</span>
                         <strong>{splitAdmin?.full_name || payment.split_updated_by || "N/A"}</strong>
                       </div>
@@ -279,6 +340,21 @@ export default function AdminPayments() {
                             : "N/A"}
                         </strong>
                       </div>
+                      {payment.cleaner_handover_status !== "settled" && (
+                        <div className="handover-action">
+                          <span>Collect From Cleaner</span>
+                          <button
+                            type="button"
+                            className="mark-admin-collected-btn"
+                            disabled={collectingId === payment.id}
+                            onClick={() => handleAdminShareCollected(payment)}
+                          >
+                            {collectingId === payment.id
+                              ? "Marking..."
+                              : `Mark ${formatMoney(payment.admin_share)} Collected`}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </article>

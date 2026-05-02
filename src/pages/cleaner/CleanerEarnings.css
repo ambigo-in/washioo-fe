@@ -37,9 +37,14 @@
   padding: 16px;
 }
 
-.earnings-card.pending {
+.earnings-card.due {
   background: #fffbeb;
   border-color: #fde68a;
+}
+
+.earnings-card.settled {
+  background: #eff6ff;
+  border-color: #bfdbfe;
 }
 
 .earnings-card span {
@@ -55,7 +60,7 @@
 }
 
 .earnings-card small {
-  color: #78350f;
+  color: #475569;
   font-size: 0.85rem;
   line-height: 1.45;
 }

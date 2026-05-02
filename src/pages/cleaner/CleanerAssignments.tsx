@@ -107,7 +107,9 @@ export default function CleanerAssignments() {
     const type = paymentType[assignmentId] ?? "cash";
 
     if (!amount || amount <= 0) {
-      setActionError("Enter a valid collected amount before completing the job.");
+      setActionError(
+        "Enter a valid collected amount before completing the job.",
+      );
       return;
     }
 
@@ -183,165 +185,170 @@ export default function CleanerAssignments() {
           </div>
         ) : assignments.length > 0 ? (
           <>
-          {actionError && <p className="form-alert error">{actionError}</p>}
-          <div className="assignments-list">
-            {assignments.map((assignment) => (
-              <div key={assignment.id} className="assignment-card">
-                <div className="assignment-header">
-                  <div className="service-info">
-                    <h3>{assignment.booking.service_name}</h3>
-                    <span className="booking-ref">
-                      {assignment.booking.booking_reference}
+            {actionError && <p className="form-alert error">{actionError}</p>}
+            <div className="assignments-list">
+              {assignments.map((assignment) => (
+                <div key={assignment.id} className="assignment-card">
+                  <div className="assignment-header">
+                    <div className="service-info">
+                      <h3>{assignment.booking.service_name}</h3>
+                      <span className="booking-ref">
+                        {assignment.booking.booking_reference}
+                      </span>
+                    </div>
+                    <span
+                      className="status-badge"
+                      style={{
+                        backgroundColor: getStatusColor(
+                          assignment.assignment_status,
+                        ),
+                      }}
+                    >
+                      {assignment.assignment_status}
                     </span>
                   </div>
-                  <span
-                    className="status-badge"
-                    style={{
-                      backgroundColor: getStatusColor(
-                        assignment.assignment_status,
-                      ),
-                    }}
-                  >
-                    {assignment.assignment_status}
-                  </span>
-                </div>
 
-                <div className="assignment-details">
-                  <div className="detail-row">
-                    <span className="label">📅 Date:</span>
-                    <span>
-                      {new Date(
-                        assignment.booking.scheduled_date,
-                      ).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="label">⏰ Time:</span>
-                    <span>{assignment.booking.scheduled_time.slice(0, 5)}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="label">🚗 Vehicle:</span>
-                    <span>{assignment.booking.service_name}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="label">💰 Price:</span>
-                    <span>Rs. {formatMoney(assignment.booking.estimated_price)}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="label">📍 Location:</span>
-                    <span>
-                      {assignment.booking.address.address_line1},{" "}
-                      {assignment.booking.address.city}
-                    </span>
-                  </div>
-                  {assignment.booking.special_instructions && (
+                  <div className="assignment-details">
                     <div className="detail-row">
-                      <span className="label">📝 Notes:</span>
-                      <span>{assignment.booking.special_instructions}</span>
+                      <span className="label">📅 Date:</span>
+                      <span>
+                        {new Date(
+                          assignment.booking.scheduled_date,
+                        ).toLocaleDateString()}
+                      </span>
                     </div>
-                  )}
-                </div>
-
-                <div className="assignment-actions">
-                  <Link
-                    className="btn-details"
-                    to={`/cleaner/bookings/${assignment.booking_id}`}
-                  >
-                    View Details
-                  </Link>
-                  {assignment.assignment_status === "assigned" && (
-                    <>
-                      <button
-                        className="btn-accept"
-                        onClick={() => handleAccept(assignment.id)}
-                        disabled={actionLoading === assignment.id}
-                      >
-                        {actionLoading === assignment.id
-                          ? "Processing..."
-                          : "Accept"}
-                      </button>
-                      <button
-                        className="btn-reject"
-                        onClick={() => handleReject(assignment.id)}
-                        disabled={actionLoading === assignment.id}
-                      >
-                        Reject
-                      </button>
-                    </>
-                  )}
-                  {assignment.assignment_status === "accepted" &&
-                    !assignment.started_at && (
-                      <button
-                        className="btn-start"
-                        onClick={() => handleStart(assignment.id)}
-                        disabled={actionLoading === assignment.id}
-                      >
-                        {actionLoading === assignment.id
-                          ? "Starting..."
-                          : "Start Job"}
-                      </button>
-                    )}
-                  {assignment.assignment_status === "in_progress" && (
-                    <div className="complete-section">
-                      <div className="payment-collect-fields">
-                        <div className="field-row">
-                          <label>Amount Collected (Rs.)</label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={
-                              completeAmount[assignment.id] ??
-                              assignment.booking.final_price ??
-                              assignment.booking.estimated_price
-                            }
-                            onChange={(event) =>
-                              setCompleteAmount((current) => ({
-                                ...current,
-                                [assignment.id]: Number(event.target.value),
-                              }))
-                            }
-                          />
-                        </div>
-                        <div className="field-row">
-                          <label>Payment Type</label>
-                          <select
-                            value={paymentType[assignment.id] ?? "cash"}
-                            onChange={(event) =>
-                              setPaymentType((current) => ({
-                                ...current,
-                                [assignment.id]: event.target.value as PaymentType,
-                              }))
-                            }
-                          >
-                            <option value="cash">Cash</option>
-                            <option value="upi">UPI</option>
-                          </select>
-                        </div>
+                    <div className="detail-row">
+                      <span className="label">⏰ Time:</span>
+                      <span>
+                        {assignment.booking.scheduled_time.slice(0, 5)}
+                      </span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="label">🚗 Vehicle:</span>
+                      <span>{assignment.booking.service_name}</span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="label">💰 Price:</span>
+                      <span>
+                        Rs. {formatMoney(assignment.booking.estimated_price)}
+                      </span>
+                    </div>
+                    <div className="detail-row">
+                      <span className="label">📍 Location:</span>
+                      <span>
+                        {assignment.booking.address.address_line1},{" "}
+                        {assignment.booking.address.city}
+                      </span>
+                    </div>
+                    {assignment.booking.special_instructions && (
+                      <div className="detail-row">
+                        <span className="label">📝 Notes:</span>
+                        <span>{assignment.booking.special_instructions}</span>
                       </div>
-                      <button
-                        className="btn-complete"
-                        onClick={() =>
-                          handleComplete(assignment.id, assignment.booking_id)
-                        }
-                        disabled={actionLoading === assignment.id}
-                      >
-                        {actionLoading === assignment.id
-                          ? "Completing..."
-                          : "Complete Job"}
-                      </button>
-                    </div>
-                  )}
-                  {assignment.assignment_status === "completed" && (
-                    <span className="completed-badge">Job Completed ✅</span>
-                  )}
-                  {assignment.assignment_status === "rejected" && (
-                    <span className="rejected-badge">Job Rejected ❌</span>
-                  )}
+                    )}
+                  </div>
+
+                  <div className="assignment-actions">
+                    <Link
+                      className="btn-details"
+                      to={`/cleaner/bookings/${assignment.booking_id}`}
+                    >
+                      View Details
+                    </Link>
+                    {assignment.assignment_status === "assigned" && (
+                      <>
+                        <button
+                          className="btn-accept"
+                          onClick={() => handleAccept(assignment.id)}
+                          disabled={actionLoading === assignment.id}
+                        >
+                          {actionLoading === assignment.id
+                            ? "Processing..."
+                            : "Accept"}
+                        </button>
+                        <button
+                          className="btn-reject"
+                          onClick={() => handleReject(assignment.id)}
+                          disabled={actionLoading === assignment.id}
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                    {assignment.assignment_status === "accepted" &&
+                      !assignment.started_at && (
+                        <button
+                          className="btn-start"
+                          onClick={() => handleStart(assignment.id)}
+                          disabled={actionLoading === assignment.id}
+                        >
+                          {actionLoading === assignment.id
+                            ? "Starting..."
+                            : "Start Job"}
+                        </button>
+                      )}
+                    {assignment.assignment_status === "in_progress" && (
+                      <div className="complete-section">
+                        <div className="payment-collect-fields">
+                          <div className="field-row">
+                            <label>Amount Collected (Rs.)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={
+                                completeAmount[assignment.id] ??
+                                assignment.booking.final_price ??
+                                assignment.booking.estimated_price
+                              }
+                              onChange={(event) =>
+                                setCompleteAmount((current) => ({
+                                  ...current,
+                                  [assignment.id]: Number(event.target.value),
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="field-row">
+                            <label>Payment Type</label>
+                            <select
+                              value={paymentType[assignment.id] ?? "cash"}
+                              onChange={(event) =>
+                                setPaymentType((current) => ({
+                                  ...current,
+                                  [assignment.id]: event.target
+                                    .value as PaymentType,
+                                }))
+                              }
+                            >
+                              <option value="cash">Cash</option>
+                              <option value="upi">UPI</option>
+                            </select>
+                          </div>
+                        </div>
+                        <button
+                          className="btn-complete"
+                          onClick={() =>
+                            handleComplete(assignment.id, assignment.booking_id)
+                          }
+                          disabled={actionLoading === assignment.id}
+                        >
+                          {actionLoading === assignment.id
+                            ? "Completing..."
+                            : "Complete Job"}
+                        </button>
+                      </div>
+                    )}
+                    {assignment.assignment_status === "completed" && (
+                      <span className="completed-badge">Job Completed ✅</span>
+                    )}
+                    {assignment.assignment_status === "rejected" && (
+                      <span className="rejected-badge">Job Rejected ❌</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
           </>
         ) : (
           <div className="empty-state">

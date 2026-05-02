@@ -33,11 +33,17 @@ export default function CleanerEarnings() {
         <article className="earnings-card">
           <span>Total Earned</span>
           <strong>{formatMoney(earnings?.total_earned)}</strong>
+          <small>Your share after admin split.</small>
         </article>
-        <article className="earnings-card pending">
-          <span>Pending Payout</span>
-          <strong>{formatMoney(earnings?.pending_payout)}</strong>
-          <small>Amount earned but not yet transferred to you by admin.</small>
+        <article className="earnings-card due">
+          <span>Due to Admin</span>
+          <strong>{formatMoney(earnings?.admin_due)}</strong>
+          <small>Cash/UPI you need to hand over to admin.</small>
+        </article>
+        <article className="earnings-card settled">
+          <span>Settled</span>
+          <strong>{formatMoney(earnings?.settled)}</strong>
+          <small>Admin share already handed over.</small>
         </article>
       </div>
 

@@ -4,6 +4,7 @@ import type {
   AdminPaymentSplitRequest,
   CleanerEarningsSummary,
   CleanerPaymentCollectRequest,
+  CleanerHandoverStatus,
   CustomerPaymentStatus,
   Payment,
   PaymentStatus,
@@ -69,13 +70,46 @@ export const submitAdminSplit = createAsyncThunk(
 
 export const loadAdminPayments = createAsyncThunk(
   "payments/loadAdminPayments",
-  async (status: PaymentStatus | undefined, { rejectWithValue }) => {
+  async (
+    filter:
+      | PaymentStatus
+      | {
+          status?: PaymentStatus;
+          cleaner_handover_status?: CleanerHandoverStatus;
+        }
+      | undefined,
+    { rejectWithValue },
+  ) => {
     try {
+      const params =
+        typeof filter === "string"
+          ? { status: filter }
+          : {
+              status: filter?.status,
+              cleaner_handover_status: filter?.cleaner_handover_status,
+            };
       return await apiRequest<{
         message: string;
         payments: Payment[];
         total: number;
-      }>(withQuery("/admin/payments", { status }), { auth: true });
+      }>(withQuery("/admin/payments", params), { auth: true });
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error));
+    }
+  },
+);
+
+export const markAdminShareCollected = createAsyncThunk(
+  "payments/markAdminShareCollected",
+  async (paymentId: string, { rejectWithValue }) => {
+    try {
+      return await apiRequest<{ message: string; payment: Payment }>(
+        `/admin/payments/${paymentId}/handover/collect`,
+        {
+          method: "PATCH",
+          auth: true,
+        },
+      );
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error));
     }
@@ -149,6 +183,9 @@ const paymentSlice = createSlice({
       .addCase(submitAdminSplit.fulfilled, (state, action) => {
         upsertPayment(state.payments, action.payload.payment);
         state.loading = false;
+      })
+      .addCase(markAdminShareCollected.fulfilled, (state, action) => {
+        upsertPayment(state.payments, action.payload.payment);
       })
       .addCase(loadCleanerEarnings.fulfilled, (state, action) => {
         state.earnings = action.payload.earnings;

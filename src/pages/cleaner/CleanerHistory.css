@@ -197,6 +197,40 @@
   font-size: 1rem;
 }
 
+.earning-confirmed {
+  align-items: flex-end;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.earning-confirmed strong {
+  color: #15803d;
+}
+
+.earning-confirmed small {
+  color: #64748b;
+  font-size: 0.78rem;
+}
+
+.earning-state {
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 5px 10px;
+}
+
+.earning-state.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.earning-state.muted {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .stats-row {
