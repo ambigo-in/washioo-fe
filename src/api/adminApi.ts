@@ -61,7 +61,11 @@ export const deleteServiceCategory = (serviceId: string) =>
 // Booking APIs
 export const fetchAllBookings = (params: PaginationParams = {}) =>
   apiRequest<{ message: string; bookings: AdminBooking[]; total: number }>(
-    withQuery("/services/admin/all-bookings", { limit: 50, offset: 0, ...params }),
+    withQuery("/services/admin/all-bookings", {
+      limit: 50,
+      offset: 0,
+      ...params,
+    }),
     { auth: true },
   );
 
@@ -235,7 +239,7 @@ export const fetchPaymentStats = () =>
       total_amount_paid: number;
       total_amount_pending: number;
     };
-  }>('/payments/stats', { auth: true });
+  }>("/payments/stats", { auth: true });
 
 export const fetchPayments = (params: PaginationParams = {}) =>
   apiRequest<{
@@ -245,10 +249,9 @@ export const fetchPayments = (params: PaginationParams = {}) =>
     pending_count: number;
     paid_count: number;
     failed_count: number;
-  }>(
-    withQuery("/payments/", { limit: 50, offset: 0, ...params }),
-    { auth: true },
-  );
+  }>(withQuery("/payments/", { limit: 50, offset: 0, ...params }), {
+    auth: true,
+  });
 
 export const fetchPaymentByBooking = (bookingId: string) =>
   apiRequest<{ message: string; payment: AdminPayment }>(
@@ -266,7 +269,11 @@ export const fetchPaymentsByCustomer = (
     payments: AdminPayment[];
     total: number;
   }>(
-    withQuery(`/payments/customer/${customerId}`, { limit: 50, offset: 0, ...params }),
+    withQuery(`/payments/customer/${customerId}`, {
+      limit: 50,
+      offset: 0,
+      ...params,
+    }),
     { auth: true },
   );
 
@@ -322,13 +329,10 @@ export const markPaymentFailed = (paymentId: string) =>
   );
 
 export const deletePayment = (paymentId: string) =>
-  apiRequest<{ message: string }>(
-    `/payments/${paymentId}`,
-    {
-      method: "DELETE",
-      auth: true,
-    },
-  );
+  apiRequest<{ message: string }>(`/payments/${paymentId}`, {
+    method: "DELETE",
+    auth: true,
+  });
 
 // User Management APIs
 export const fetchUsers = (
@@ -340,10 +344,9 @@ export const fetchUsers = (
   );
 
 export const fetchUser = (userId: string) =>
-  apiRequest<{ message: string; user: AdminUser }>(
-    `/users/${userId}`,
-    { auth: true },
-  );
+  apiRequest<{ message: string; user: AdminUser }>(`/users/${userId}`, {
+    auth: true,
+  });
 
 export const updateUser = (
   userId: string,

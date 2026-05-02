@@ -25,9 +25,11 @@ const canEdit = (status: BookingStatus) => status === "pending";
 
 const MyBookingsPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { bookings, loading, error: storeError } = useAppSelector(
-    (state) => state.customer,
-  );
+  const {
+    bookings,
+    loading,
+    error: storeError,
+  } = useAppSelector((state) => state.customer);
   const [workingId, setWorkingId] = useState("");
   const [editingId, setEditingId] = useState("");
   const [editDate, setEditDate] = useState("");
@@ -143,7 +145,9 @@ const MyBookingsPage: React.FC = () => {
                       </div>
                       <div>
                         <span>Payment Method</span>
-                        <strong>{booking.payment.payment_method || "N/A"}</strong>
+                        <strong>
+                          {booking.payment.payment_method || "N/A"}
+                        </strong>
                       </div>
                     </>
                   )}
@@ -179,7 +183,9 @@ const MyBookingsPage: React.FC = () => {
                     <textarea
                       placeholder="Special instructions"
                       value={editInstructions}
-                      onChange={(event) => setEditInstructions(event.target.value)}
+                      onChange={(event) =>
+                        setEditInstructions(event.target.value)
+                      }
                     />
                     <div className="booking-actions">
                       <button
@@ -227,4 +233,3 @@ const MyBookingsPage: React.FC = () => {
 };
 
 export default MyBookingsPage;
-

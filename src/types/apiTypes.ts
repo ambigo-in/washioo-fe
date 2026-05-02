@@ -133,4 +133,3 @@ export interface BookingPayload {
   address_id?: string;
   address?: AddressPayload;
 }
-

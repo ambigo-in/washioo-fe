@@ -59,7 +59,10 @@ export default function AdminPayments() {
     setActionLoading(payment.id);
     setError("");
     try {
-      await markPaymentPaid(payment.id, payment.transaction_reference ?? undefined);
+      await markPaymentPaid(
+        payment.id,
+        payment.transaction_reference ?? undefined,
+      );
       await loadPayments();
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -131,11 +134,15 @@ export default function AdminPayments() {
               <div className="stat-label">Failed</div>
             </div>
             <div className="stat-card revenue">
-              <div className="stat-value">₹{stats.total_amount_paid.toLocaleString()}</div>
+              <div className="stat-value">
+                ₹{stats.total_amount_paid.toLocaleString()}
+              </div>
               <div className="stat-label">Amount Paid</div>
             </div>
             <div className="stat-card pending-total">
-              <div className="stat-value">₹{stats.total_amount_pending.toLocaleString()}</div>
+              <div className="stat-value">
+                ₹{stats.total_amount_pending.toLocaleString()}
+              </div>
               <div className="stat-label">Amount Pending</div>
             </div>
           </div>
@@ -195,14 +202,22 @@ export default function AdminPayments() {
                       <td>
                         <span
                           className="status-pill"
-                          style={{ backgroundColor: statusColor(payment.payment_status) }}
+                          style={{
+                            backgroundColor: statusColor(
+                              payment.payment_status,
+                            ),
+                          }}
                         >
                           {payment.payment_status}
                         </span>
                       </td>
                       <td>{payment.collected_by_cleaner ? "Yes" : "No"}</td>
                       <td>{payment.transaction_reference || "—"}</td>
-                      <td>{payment.paid_at ? new Date(payment.paid_at).toLocaleString() : "—"}</td>
+                      <td>
+                        {payment.paid_at
+                          ? new Date(payment.paid_at).toLocaleString()
+                          : "—"}
+                      </td>
                       <td>
                         <div className="row-actions">
                           {payment.payment_status === "pending" && (
@@ -212,21 +227,27 @@ export default function AdminPayments() {
                                 onClick={() => handleMarkPaid(payment)}
                                 disabled={actionLoading === payment.id}
                               >
-                                {actionLoading === payment.id ? "Processing..." : "Mark Paid"}
+                                {actionLoading === payment.id
+                                  ? "Processing..."
+                                  : "Mark Paid"}
                               </button>
                               <button
                                 className="btn-action danger"
                                 onClick={() => handleMarkFailed(payment)}
                                 disabled={actionLoading === payment.id}
                               >
-                                {actionLoading === payment.id ? "Processing..." : "Mark Failed"}
+                                {actionLoading === payment.id
+                                  ? "Processing..."
+                                  : "Mark Failed"}
                               </button>
                               <button
                                 className="btn-action delete"
                                 onClick={() => handleDelete(payment)}
                                 disabled={actionLoading === payment.id}
                               >
-                                {actionLoading === payment.id ? "Processing..." : "Delete"}
+                                {actionLoading === payment.id
+                                  ? "Processing..."
+                                  : "Delete"}
                               </button>
                             </>
                           )}
@@ -236,7 +257,9 @@ export default function AdminPayments() {
                               onClick={() => handleMarkPaid(payment)}
                               disabled={actionLoading === payment.id}
                             >
-                              {actionLoading === payment.id ? "Processing..." : "Mark Paid"}
+                              {actionLoading === payment.id
+                                ? "Processing..."
+                                : "Mark Paid"}
                             </button>
                           )}
                         </div>

@@ -40,7 +40,8 @@ export default function CleanerBookingDetails() {
   }, [bookingId]);
 
   const address = booking?.address;
-  const amount = booking?.payment.amount ?? booking?.final_price ?? booking?.estimated_price;
+  const amount =
+    booking?.payment.amount ?? booking?.final_price ?? booking?.estimated_price;
 
   return (
     <DashboardLayout title="Booking Details">
@@ -184,13 +185,17 @@ export default function CleanerBookingDetails() {
                 {booking.payment.collected_by_cleaner !== undefined && (
                   <div>
                     <dt>Collected by Cleaner</dt>
-                    <dd>{booking.payment.collected_by_cleaner ? "Yes" : "No"}</dd>
+                    <dd>
+                      {booking.payment.collected_by_cleaner ? "Yes" : "No"}
+                    </dd>
                   </div>
                 )}
                 {booking.payment.paid_at && (
                   <div>
                     <dt>Paid At</dt>
-                    <dd>{new Date(booking.payment.paid_at).toLocaleString()}</dd>
+                    <dd>
+                      {new Date(booking.payment.paid_at).toLocaleString()}
+                    </dd>
                   </div>
                 )}
               </dl>

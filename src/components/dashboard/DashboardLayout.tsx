@@ -21,13 +21,13 @@ const navItems: NavItem[] = [
     icon: "📋",
     roles: ["customer"],
   },
-    {
-      path: "/addresses",
-      label: "My Addresses",
-      icon: "📍",
-      roles: ["customer"],
-    },
-    { path: "/profile", label: "Profile", icon: "👤", roles: ["customer"] },
+  {
+    path: "/addresses",
+    label: "My Addresses",
+    icon: "📍",
+    roles: ["customer"],
+  },
+  { path: "/profile", label: "Profile", icon: "👤", roles: ["customer"] },
 
   // Cleaner routes
   {
@@ -42,24 +42,24 @@ const navItems: NavItem[] = [
     icon: "📋",
     roles: ["cleaner"],
   },
-    {
-      path: "/cleaner/history",
-      label: "Work History",
-      icon: "📜",
-      roles: ["cleaner"],
-    },
+  {
+    path: "/cleaner/history",
+    label: "Work History",
+    icon: "📜",
+    roles: ["cleaner"],
+  },
   {
     path: "/cleaner/availability",
     label: "Availability",
     icon: "⏰",
     roles: ["cleaner"],
   },
-    {
-      path: "/cleaner/profile",
-      label: "Profile",
-      icon: "👤",
-      roles: ["cleaner"],
-    },
+  {
+    path: "/cleaner/profile",
+    label: "Profile",
+    icon: "👤",
+    roles: ["cleaner"],
+  },
 
   // Admin routes
   {
@@ -72,8 +72,8 @@ const navItems: NavItem[] = [
   { path: "/admin/payments", label: "Payments", icon: "💳", roles: ["admin"] },
   { path: "/admin/cleaners", label: "Cleaners", icon: "🧹", roles: ["admin"] },
   { path: "/admin/services", label: "Services", icon: "🔧", roles: ["admin"] },
-    { path: "/admin/users", label: "Users", icon: "👥", roles: ["admin"] },
-    { path: "/admin/settings", label: "Settings", icon: "⚙️", roles: ["admin"] },
+  { path: "/admin/users", label: "Users", icon: "👥", roles: ["admin"] },
+  { path: "/admin/settings", label: "Settings", icon: "⚙️", roles: ["admin"] },
 ];
 
 interface DashboardLayoutProps {
