@@ -6,14 +6,27 @@ import "../styles/header.css";
 
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isAuthenticated, logout, roles } = useAuth();
+  const { isAuthenticated, logout, activeRole } = useAuth();
   const navigate = useNavigate();
 
-  const dashboardPath = roles.includes("admin")
+  const dashboardPath = activeRole === "admin"
     ? "/admin/dashboard"
-    : roles.includes("cleaner")
+    : activeRole === "cleaner"
       ? "/cleaner/dashboard"
       : "/dashboard";
+
+  const navLinks =
+    activeRole === "admin"
+      ? [
+          { label: "Bookings", path: "/admin/bookings" },
+          { label: "Ratings", path: "/admin/ratings" },
+        ]
+      : activeRole === "cleaner"
+        ? [{ label: "My Jobs", path: "/cleaner/assignments" }]
+        : [
+            { label: "Services", path: "/bookings" },
+            { label: "My Bookings", path: "/my-bookings" },
+          ];
 
   const handlePrimaryAction = async () => {
     if (isAuthenticated) {
@@ -50,12 +63,15 @@ const Header: React.FC = () => {
             <button type="button" onClick={() => handleNavigate(dashboardPath)}>
               Dashboard
             </button>
-            <button type="button" onClick={() => handleNavigate("/bookings")}>
-              Services
-            </button>
-            <button type="button" onClick={() => handleNavigate("/my-bookings")}>
-              My Bookings
-            </button>
+            {navLinks.map((link) => (
+              <button
+                key={link.path}
+                type="button"
+                onClick={() => handleNavigate(link.path)}
+              >
+                {link.label}
+              </button>
+            ))}
           </>
         )}
 
@@ -74,6 +90,7 @@ const Header: React.FC = () => {
         isOpen={menuOpen}
         isAuthenticated={isAuthenticated}
         dashboardPath={dashboardPath}
+        navLinks={navLinks}
         onPrimaryAction={handlePrimaryAction}
         onNavigate={handleNavigate}
       />

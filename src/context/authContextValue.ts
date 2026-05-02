@@ -6,7 +6,9 @@ export interface AuthContextType {
   isLoading: boolean;
   user: UserProfile | null;
   roles: UserRole[];
+  activeRole: UserRole | null;
   hasRole: (role: UserRole) => boolean;
+  setActiveRole: (role: UserRole) => void;
   refreshUser: () => Promise<UserProfile | null>;
   login: () => Promise<UserProfile | null>;
   logout: () => Promise<void>;

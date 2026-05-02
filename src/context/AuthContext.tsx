@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./authContextValue";
 import type { UserProfile, UserRole } from "../types/apiTypes";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -9,12 +9,37 @@ import {
   setUser as setAuthUser,
 } from "../store/slices/authSlice";
 
+const ACTIVE_ROLE_KEY = "washioo.activeRole";
+
+const rolePriority: UserRole[] = ["customer", "cleaner", "admin"];
+
+const readSavedRole = () => {
+  const saved = localStorage.getItem(ACTIVE_ROLE_KEY);
+  return rolePriority.includes(saved as UserRole) ? (saved as UserRole) : null;
+};
+
+const chooseActiveRole = (
+  roles: UserRole[],
+  currentRole: UserRole | null,
+) => {
+  if (currentRole && roles.includes(currentRole)) return currentRole;
+
+  const savedRole = readSavedRole();
+  if (savedRole && roles.includes(savedRole)) return savedRole;
+
+  return rolePriority.find((role) => roles.includes(role)) ?? roles[0] ?? null;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const dispatch = useAppDispatch();
   const { user, isAuthenticated, isLoading } = useAppSelector(
     (state) => state.auth,
+  );
+  const roles = useMemo(() => user?.roles ?? [], [user?.roles]);
+  const [activeRole, setActiveRoleState] = useState<UserRole | null>(() =>
+    chooseActiveRole(roles, null),
   );
 
   useEffect(() => {
@@ -32,8 +57,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     await dispatch(logoutSession()).unwrap();
   };
 
-  const roles = user?.roles ?? [];
+  useEffect(() => {
+    const nextRole = chooseActiveRole(roles, activeRole);
+    setActiveRoleState(nextRole);
+    if (nextRole) {
+      localStorage.setItem(ACTIVE_ROLE_KEY, nextRole);
+    } else {
+      localStorage.removeItem(ACTIVE_ROLE_KEY);
+    }
+  }, [roles, activeRole]);
+
   const hasRole = (role: UserRole) => roles.includes(role);
+  const setActiveRole = (role: UserRole) => {
+    if (!roles.includes(role)) return;
+    localStorage.setItem(ACTIVE_ROLE_KEY, role);
+    setActiveRoleState(role);
+  };
 
   return (
     <AuthContext.Provider
@@ -42,7 +81,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isLoading,
         user,
         roles,
+        activeRole,
         hasRole,
+        setActiveRole,
         refreshUser,
         login,
         logout,

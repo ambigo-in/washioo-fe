@@ -5,6 +5,7 @@ interface MobileMenuProps {
   isOpen: boolean;
   isAuthenticated: boolean;
   dashboardPath: string;
+  navLinks: { label: string; path: string }[];
   onPrimaryAction: () => void;
   onNavigate: (path: string) => void;
 }
@@ -13,6 +14,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   isOpen,
   isAuthenticated,
   dashboardPath,
+  navLinks,
   onPrimaryAction,
   onNavigate,
 }) => {
@@ -21,8 +23,11 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       {isAuthenticated && (
         <>
           <button onClick={() => onNavigate(dashboardPath)}>Dashboard</button>
-          <button onClick={() => onNavigate("/bookings")}>Services</button>
-          <button onClick={() => onNavigate("/my-bookings")}>My Bookings</button>
+          {navLinks.map((link) => (
+            <button key={link.path} onClick={() => onNavigate(link.path)}>
+              {link.label}
+            </button>
+          ))}
         </>
       )}
       <button onClick={onPrimaryAction}>
