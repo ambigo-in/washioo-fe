@@ -1,13 +1,19 @@
 .admin-services {
   max-width: 1200px;
+  display: grid;
+  gap: 22px;
 }
 
 /* Page Header */
 .page-header {
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
+  border-radius: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  gap: 16px;
+  padding: 18px 20px;
 }
 
 .page-header h2 {
@@ -17,15 +23,17 @@
 }
 
 .btn-add {
-  padding: 10px 20px;
   background: var(--brand-teal);
-  color: var(--brand-white);
   border: none;
   border-radius: 8px;
+  color: var(--brand-white);
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 800;
+  min-height: 42px;
+  padding: 10px 18px;
   cursor: pointer;
   transition: background 0.2s ease;
+  white-space: nowrap;
 }
 
 .btn-add:hover {
@@ -38,7 +46,6 @@
   border-radius: 12px;
   border: 1px solid var(--brand-border);
   padding: 24px;
-  margin-bottom: 24px;
 }
 
 .service-form-card h3 {
@@ -121,119 +128,187 @@
 
 /* Services List */
 .services-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
-.service-card {
-  background: var(--brand-white);
+.admin-service-card {
+  background-image: url("/p2.png");
+  background-position: center;
+  background-size: cover;
   border-radius: 12px;
-  border: 1px solid var(--brand-border);
-  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  box-shadow: 0 18px 40px rgba(8, 101, 107, 0.16);
+  min-height: 280px;
+  overflow: hidden;
+  padding: 0;
+  position: relative;
 }
 
-.service-card.inactive {
-  opacity: 0.6;
+.admin-service-card:nth-child(even) {
+  background-image: url("/p1.png");
+}
+
+.admin-service-card::before {
+  background: rgba(8, 12, 14, 0.48);
+  content: "";
+  inset: 0;
+  position: absolute;
+  z-index: 0;
+}
+
+.admin-service-card::after {
+  background: linear-gradient(
+    90deg,
+    rgba(8, 12, 14, 0.58) 0%,
+    rgba(8, 12, 14, 0.34) 58%,
+    rgba(8, 12, 14, 0.16) 100%
+  );
+  content: "";
+  inset: 0;
+  position: absolute;
+  z-index: 0;
+}
+
+.admin-service-card-content {
+  align-content: space-between;
+  display: grid;
+  gap: 18px;
+  min-height: 280px;
+  padding: 22px;
+  position: relative;
+  z-index: 1;
+}
+
+.admin-service-card.inactive {
+  filter: grayscale(0.35);
 }
 
 .service-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 12px;
+  gap: 16px;
 }
 
 .service-info {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-direction: column;
   gap: 12px;
+  min-width: 0;
 }
 
 .service-info h3 {
   margin: 0;
-  font-size: 1.1rem;
-  color: var(--brand-text);
+  color: var(--brand-white);
+  font-size: 1.35rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
-.status-badge {
+.admin-services .status-badge {
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 900;
   text-transform: capitalize;
 }
 
-.status-badge.active {
-  background: var(--brand-teal-soft);
-  color: var(--brand-teal-dark);
+.admin-services .status-badge.active {
+  background: rgba(234, 251, 252, 0.96);
+  color: var(--brand-teal-deep);
 }
 
-.status-badge.inactive {
-  background: #f8d7da;
-  color: #721c24;
+.admin-services .status-badge.inactive {
+  background: rgba(254, 226, 226, 0.96);
+  color: #991b1b;
 }
 
 .service-price {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--brand-teal);
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 10px;
+  color: var(--brand-teal-deep);
+  font-size: 1.1rem;
+  font-weight: 900;
+  padding: 9px 12px;
+  white-space: nowrap;
 }
 
 .service-description {
-  margin: 0 0 12px;
-  font-size: 0.9rem;
-  color: var(--brand-text-muted);
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 58ch;
 }
 
 .service-meta {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
-  font-size: 0.85rem;
-  color: var(--brand-text-muted);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 190px);
+}
+
+.service-meta span {
+  background: rgba(8, 12, 14, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: var(--brand-white);
+  display: grid;
+  gap: 3px;
+  padding: 11px 12px;
+}
+
+.service-meta strong {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .service-actions {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .service-actions button {
-  padding: 8px 16px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+  padding: 9px 14px;
   border-radius: 8px;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 900;
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
 }
 
 .btn-edit {
-  background: var(--brand-teal);
-  color: var(--brand-white);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--brand-teal-deep);
 }
 
 .btn-edit:hover {
-  background: var(--brand-teal-dark);
+  background: var(--brand-teal-soft);
 }
 
 .btn-toggle {
-  background: var(--brand-teal-soft);
-  color: var(--brand-teal-dark);
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--brand-teal-deep);
 }
 
 .btn-toggle:hover {
-  background: var(--brand-teal-border);
+  background: var(--brand-white);
 }
 
 .btn-delete {
-  background: #f8d7da;
-  color: #721c24;
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .btn-delete:hover {
-  background: var(--brand-teal-border);
+  background: #fecaca;
 }
 
 /* Empty State */
@@ -277,4 +352,26 @@
 .loading-container p {
   margin: 16px 0 0;
   color: var(--brand-text-muted);
+}
+
+@media (max-width: 720px) {
+  .page-header,
+  .service-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .services-list,
+  .service-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .service-price {
+    justify-self: start;
+  }
+
+  .service-actions button,
+  .btn-add {
+    width: 100%;
+  }
 }

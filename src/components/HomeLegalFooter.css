@@ -1,0 +1,18 @@
+.home-legal-footer {
+  align-items: center;
+  /* background: var(--brand-white); */
+  background: black;
+  border-top: 1px solid var(--brand-border);
+  /* color: var(--brand-text-muted); */
+  color: white;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  padding: 18px;
+}
+
+.home-legal-footer a {
+  color: var(--brand-teal-dark);
+  font-weight: 900;
+}

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { sendOtp } from "../api/authApi";
 import { getApiErrorMessage } from "../api/client";
 import type { AccountType } from "../types/authTypes";
@@ -8,9 +8,24 @@ import "../styles/PhoneVerificationPage.css";
 const normalizePhone = (value: string) => value.replace(/\s+/g, "");
 
 export default function PhoneVerificationPage() {
+  const location = useLocation();
+  const state = location.state as
+    | { accountType?: AccountType; authMode?: "signin" | "signup" }
+    | null;
+  const initialAccountType =
+    state?.accountType === "cleaner" || state?.accountType === "admin"
+      ? state.accountType
+      : "customer";
+  const initialAuthMode =
+    state?.authMode === "signup" && initialAccountType !== "admin"
+      ? "signup"
+      : "signin";
+
   const [phone, setPhone] = useState("");
-  const [accountType, setAccountType] = useState<AccountType>("customer");
-  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const [accountType, setAccountType] =
+    useState<AccountType>(initialAccountType);
+  const [authMode, setAuthMode] =
+    useState<"signin" | "signup">(initialAuthMode);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();

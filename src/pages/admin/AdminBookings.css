@@ -13,14 +13,14 @@
 }
 
 /* Filter Tabs */
-.filter-tabs {
+.admin-bookings .filter-tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
 
-.filter-tab {
+.admin-bookings .filter-tab {
   padding: 10px 16px;
   background: var(--brand-white);
   border: 1px solid var(--brand-border);
@@ -34,17 +34,18 @@
   gap: 8px;
 }
 
-.filter-tab:hover {
+.admin-bookings .filter-tab:hover {
   background: var(--brand-surface);
+  color: var(--brand-text);
 }
 
-.filter-tab.active {
+.admin-bookings .filter-tab.active {
   background: var(--brand-teal);
   color: var(--brand-white);
   border-color: var(--brand-teal);
 }
 
-.filter-tab .count {
+.admin-bookings .filter-tab .count {
   background: rgba(255, 255, 255, 0.2);
   padding: 2px 8px;
   border-radius: 10px;
@@ -90,7 +91,7 @@
   color: var(--brand-teal);
 }
 
-.status-badge {
+.admin-bookings .status-badge {
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 0.75rem;

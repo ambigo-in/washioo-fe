@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 
 import HomePage from "./pages/HomePage";
+import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
 import PhoneVerificationPage from "./pages/PhoneVerificationPage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -45,6 +46,10 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
+          <Route
+            path="/terms-and-conditions"
+            element={<TermsAndConditionsPage />}
+          />
 
           {/* Auth Routes */}
           <Route

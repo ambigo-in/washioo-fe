@@ -164,10 +164,6 @@ export default function CleanerBookingDetails() {
                   <dt>Phone</dt>
                   <dd>{booking.customer_phone || "Not available"}</dd>
                 </div>
-                <div>
-                  <dt>Email</dt>
-                  <dd>{booking.customer_email || "Not available"}</dd>
-                </div>
               </dl>
             </section>
 
@@ -183,16 +179,6 @@ export default function CleanerBookingDetails() {
                   .filter(Boolean)
                   .join(", ")}
               </p>
-              <dl>
-                <div>
-                  <dt>Latitude</dt>
-                  <dd>{address?.latitude ?? "Not shared"}</dd>
-                </div>
-                <div>
-                  <dt>Longitude</dt>
-                  <dd>{address?.longitude ?? "Not shared"}</dd>
-                </div>
-              </dl>
             </section>
 
             <section className="detail-card">

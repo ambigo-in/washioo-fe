@@ -27,9 +27,9 @@ const BookNowSection: React.FC = () => {
           Book Now
         </button>
       </section>
-      <footer className="footer">
+      {/* <footer className="footer">
         <p>Copyright 2026 Washioo. All rights reserved.</p>
-      </footer>
+      </footer> */}
     </>
   );
 };

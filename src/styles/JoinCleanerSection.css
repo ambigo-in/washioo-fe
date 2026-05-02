@@ -1,0 +1,113 @@
+.join-cleaner-section {
+  align-items: stretch;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(var(--brand-teal-dark-rgb), 0.12);
+  display: grid;
+  grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1fr);
+  margin: 28px auto;
+  max-width: 1180px;
+  overflow: hidden;
+  width: calc(100% - 32px);
+}
+
+.join-cleaner-media {
+  background-image: linear-gradient(
+      90deg,
+      rgba(8, 12, 14, 0.2),
+      rgba(8, 12, 14, 0.04)
+    ),
+    url("/p2.png");
+  background-position: center;
+  background-size: cover;
+  min-height: 330px;
+}
+
+.join-cleaner-content {
+  align-content: center;
+  display: grid;
+  gap: 16px;
+  padding: 44px;
+}
+
+.join-cleaner-label {
+  color: var(--brand-teal-dark);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.join-cleaner-content h2 {
+  color: var(--brand-text);
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  line-height: 1.05;
+  margin: 0;
+}
+
+.join-cleaner-content p {
+  color: var(--brand-text-muted);
+  font-size: 1rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: 560px;
+}
+
+.join-cleaner-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.join-cleaner-points span {
+  background: var(--brand-teal-soft);
+  border: 1px solid var(--brand-teal-border);
+  border-radius: 999px;
+  color: var(--brand-teal-deep);
+  font-size: 0.88rem;
+  font-weight: 800;
+  padding: 9px 13px;
+}
+
+.join-cleaner-content button {
+  background: var(--brand-teal-dark);
+  border: 0;
+  border-radius: 10px;
+  color: var(--brand-white);
+  cursor: pointer;
+  font-size: 0.98rem;
+  font-weight: 900;
+  justify-self: start;
+  min-height: 48px;
+  padding: 13px 18px;
+}
+
+.join-cleaner-content button:hover {
+  background: var(--brand-teal-deep);
+}
+
+@media (max-width: 820px) {
+  .join-cleaner-section {
+    grid-template-columns: 1fr;
+  }
+
+  .join-cleaner-media {
+    min-height: 240px;
+  }
+
+  .join-cleaner-content {
+    padding: 30px 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .join-cleaner-section {
+    border-radius: 14px;
+    width: calc(100% - 24px);
+  }
+
+  .join-cleaner-content button {
+    width: 100%;
+  }
+}

@@ -218,49 +218,58 @@ export default function AdminServices() {
             {services.map((service) => (
               <div
                 key={service.id}
-                className={`service-card ${!service.is_active ? "inactive" : ""}`}
+                className={`admin-service-card ${
+                  !service.is_active ? "inactive" : ""
+                }`}
               >
-                <div className="service-header">
-                  <div className="service-info">
-                    <h3>{service.service_name}</h3>
-                    <span
-                      className={`status-badge ${service.is_active ? "active" : "inactive"}`}
-                    >
-                      {service.is_active ? "Active" : "Inactive"}
+                <div className="admin-service-card-content">
+                  <div className="service-header">
+                    <div className="service-info">
+                      <h3>{service.service_name}</h3>
+                      <span
+                        className={`status-badge ${
+                          service.is_active ? "active" : "inactive"
+                        }`}
+                      >
+                        {service.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+                    <div className="service-price">
+                      Rs. {service.base_price.toLocaleString()}
+                    </div>
+                  </div>
+
+                  <p className="service-description">
+                    {service.description || "No description added yet."}
+                  </p>
+
+                  <div className="service-meta">
+                    <span>
+                      <strong>Duration</strong>
+                      {service.estimated_duration_minutes || 0} min
                     </span>
                   </div>
-                  <div className="service-price">₹{service.base_price}</div>
-                </div>
 
-                <p className="service-description">{service.description}</p>
-
-                <div className="service-meta">
-                  <span>⏱ {service.estimated_duration_minutes} min</span>
-                  <span>
-                    📅 Created:{" "}
-                    {new Date(service.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-
-                <div className="service-actions">
-                  <button
-                    className="btn-edit"
-                    onClick={() => handleEdit(service)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn-toggle"
-                    onClick={() => handleToggleActive(service)}
-                  >
-                    {service.is_active ? "Deactivate" : "Activate"}
-                  </button>
-                  <button
-                    className="btn-delete"
-                    onClick={() => handleDelete(service.id)}
-                  >
-                    Delete
-                  </button>
+                  <div className="service-actions">
+                    <button
+                      className="btn-edit"
+                      onClick={() => handleEdit(service)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn-toggle"
+                      onClick={() => handleToggleActive(service)}
+                    >
+                      {service.is_active ? "Deactivate" : "Activate"}
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => handleDelete(service.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
