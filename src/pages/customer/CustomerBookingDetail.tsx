@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchBooking } from "../../api/bookingApi";
 import { getApiErrorMessage } from "../../api/client";
+import BookingRatingPanel from "../../components/BookingRatingPanel";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -139,6 +140,13 @@ export default function CustomerBookingDetail() {
                 <p>{booking.special_instructions}</p>
               </section>
             )}
+
+            <BookingRatingPanel
+              bookingId={booking.id}
+              bookingStatus={booking.booking_status}
+              perspective="customer"
+              subjectName={booking.assignment?.cleaner_name}
+            />
           </div>
         </div>
       ) : null}

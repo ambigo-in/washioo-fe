@@ -6,8 +6,14 @@ import "../styles/header.css";
 
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, roles } = useAuth();
   const navigate = useNavigate();
+
+  const dashboardPath = roles.includes("admin")
+    ? "/admin/dashboard"
+    : roles.includes("cleaner")
+      ? "/cleaner/dashboard"
+      : "/dashboard";
 
   const handlePrimaryAction = async () => {
     if (isAuthenticated) {
@@ -41,6 +47,9 @@ const Header: React.FC = () => {
       <nav className="header-nav" aria-label="Primary navigation">
         {isAuthenticated && (
           <>
+            <button type="button" onClick={() => handleNavigate(dashboardPath)}>
+              Dashboard
+            </button>
             <button type="button" onClick={() => handleNavigate("/bookings")}>
               Services
             </button>
@@ -64,6 +73,7 @@ const Header: React.FC = () => {
       <MobileMenu
         isOpen={menuOpen}
         isAuthenticated={isAuthenticated}
+        dashboardPath={dashboardPath}
         onPrimaryAction={handlePrimaryAction}
         onNavigate={handleNavigate}
       />

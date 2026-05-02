@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchCleanerBooking } from "../../api/cleanerApi";
 import { getApiErrorMessage } from "../../api/client";
+import BookingRatingPanel from "../../components/BookingRatingPanel";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import OpenInMapsButton from "../../components/OpenInMapsButton";
 import { useAppDispatch } from "../../store/hooks";
@@ -317,6 +318,13 @@ export default function CleanerBookingDetails() {
                 <p>{booking.special_instructions}</p>
               </section>
             )}
+
+            <BookingRatingPanel
+              bookingId={booking.id}
+              bookingStatus={booking.booking_status}
+              perspective="cleaner"
+              subjectName={booking.customer_name}
+            />
           </div>
         </div>
       ) : null}

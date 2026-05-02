@@ -36,6 +36,7 @@ import AdminCleaners from "./pages/admin/AdminCleaners";
 import AdminServices from "./pages/admin/AdminServices";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminRatings from "./pages/admin/AdminRatings";
 
 function App() {
   return (
@@ -201,6 +202,14 @@ function App() {
             element={
               <ProtectedRoute roles={["admin"]}>
                 <AdminPayments />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/ratings"
+            element={
+              <ProtectedRoute roles={["admin"]}>
+                <AdminRatings />
               </ProtectedRoute>
             }
           />
