@@ -10,6 +10,7 @@ import type {
 import type { CleanerProfile } from "../types/cleanerTypes";
 import type { Assignment } from "../types/cleanerTypes";
 import type { BookingStatus, LegacyPaymentStatus } from "../types/apiTypes";
+import { normalizeIndianPhone } from "../utils/phoneUtils";
 
 // Admin Dashboard
 export const fetchAdminDashboard = () =>
@@ -182,7 +183,12 @@ export const createCleanerProfile = (payload: {
     {
       method: "POST",
       auth: true,
-      body: payload,
+      body: {
+        ...payload,
+        aadhaar_number: payload.aadhaar_number.replace(/\D/g, ""),
+        driving_license_number:
+          payload.driving_license_number?.trim() || undefined,
+      },
     },
   );
 
@@ -367,7 +373,9 @@ export const updateUser = (
   apiRequest<{ message: string; user: AdminUser }>(`/users/${userId}`, {
     method: "PUT",
     auth: true,
-    body: payload,
+    body: payload.phone
+      ? { ...payload, phone: normalizeIndianPhone(payload.phone) }
+      : payload,
   });
 
 export const deleteUser = (userId: string) =>

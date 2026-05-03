@@ -92,7 +92,10 @@ export const loadAdminPayments = createAsyncThunk(
         message: string;
         payments: Payment[];
         total: number;
-      }>(withQuery("/admin/payments", params), { auth: true });
+      }>(
+        withQuery("/admin/payments", { limit: 50, offset: 0, ...params }),
+        { auth: true },
+      );
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error));
     }

@@ -16,6 +16,9 @@ export interface CleanerProfile {
   vehicle_type: string | null;
   aadhaar_number_masked?: string | null;
   driving_license_number_masked?: string | null;
+  aadhaar_number?: string | null;
+  driving_license_number?: string | null;
+  identity_data_status?: "full_available" | "masked_legacy_data" | null;
   has_aadhaar?: boolean;
   has_driving_license?: boolean;
   service_radius_km: number | null;

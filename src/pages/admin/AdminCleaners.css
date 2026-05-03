@@ -121,6 +121,24 @@
   font-weight: 500;
 }
 
+.identity-chip {
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.identity-chip.full {
+  background: rgba(var(--brand-teal-rgb), 0.12);
+  color: var(--brand-teal-dark);
+}
+
+.identity-chip.legacy {
+  background: #fff7e6;
+  color: #946200;
+}
+
 /* Cleaner Actions */
 .cleaner-actions {
   display: flex;
@@ -299,6 +317,38 @@
   color: var(--brand-text);
   border-bottom: 1px solid var(--brand-border);
   padding-bottom: 8px;
+}
+
+.identity-status-note {
+  margin: -4px 0 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.identity-status-note.full {
+  background: rgba(var(--brand-teal-rgb), 0.1);
+  color: var(--brand-teal-dark);
+}
+
+.identity-status-note.legacy {
+  background: #fff7e6;
+  color: #946200;
+}
+
+.sensitive-detail {
+  padding: 12px;
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  background: var(--brand-surface);
+}
+
+.identity-number {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  letter-spacing: 0.04em;
+  word-break: break-word;
 }
 
 .detail-grid {

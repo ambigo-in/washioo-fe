@@ -2,9 +2,24 @@ import { useEffect, useState } from "react";
 import { fetchCleaners, updateCleanerProfile } from "../../api/adminApi";
 import type { CleanerProfile } from "../../types/cleanerTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { formatIndianPhoneForDisplay } from "../../utils/phoneUtils";
 import "./AdminCleaners.css";
 
 type FilterStatus = "all" | "pending" | "approved" | "rejected" | "suspended";
+
+const identityStatusLabel: Record<string, string> = {
+  full_available: "Full data available",
+  masked_legacy_data: "Masked legacy data",
+};
+
+const getIdentityValue = (
+  fullValue?: string | null,
+  maskedValue?: string | null,
+) => fullValue || maskedValue || "Not provided";
+
+const hasFullIdentityData = (cleaner: CleanerProfile) =>
+  cleaner.identity_data_status === "full_available" ||
+  Boolean(cleaner.aadhaar_number);
 
 export default function AdminCleaners() {
   const [cleaners, setCleaners] = useState<CleanerProfile[]>([]);
@@ -123,7 +138,9 @@ export default function AdminCleaners() {
                 <div className="cleaner-header">
                   <div className="cleaner-info">
                     <h3>{cleaner.full_name}</h3>
-                    <span className="phone">{cleaner.phone}</span>
+                    <span className="phone">
+                      {formatIndianPhoneForDisplay(cleaner.phone)}
+                    </span>
                   </div>
                   <div className="badges">
                     <span
@@ -172,6 +189,16 @@ export default function AdminCleaners() {
                     <span className="label">Rating</span>
                     <span className="value">
                       ⭐ {cleaner.rating?.toFixed(1) || "0.0"}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Identity</span>
+                    <span
+                      className={`value identity-chip ${
+                        hasFullIdentityData(cleaner) ? "full" : "legacy"
+                      }`}
+                    >
+                      {hasFullIdentityData(cleaner) ? "Full" : "Masked"}
                     </span>
                   </div>
                 </div>
@@ -295,7 +322,9 @@ export default function AdminCleaners() {
                     </div>
                     <div className="detail-item">
                       <span className="label">Phone</span>
-                      <span className="value">{selectedCleaner.phone}</span>
+                      <span className="value">
+                        {formatIndianPhoneForDisplay(selectedCleaner.phone)}
+                      </span>
                     </div>
                     <div className="detail-item">
                       <span className="label">Email</span>
@@ -316,6 +345,18 @@ export default function AdminCleaners() {
 
                 <div className="detail-section">
                   <h4>Identity Verification</h4>
+                  {selectedCleaner.identity_data_status && (
+                    <p
+                      className={`identity-status-note ${
+                        hasFullIdentityData(selectedCleaner) ? "full" : "legacy"
+                      }`}
+                    >
+                      {identityStatusLabel[selectedCleaner.identity_data_status] ||
+                        selectedCleaner.identity_data_status}
+                      {!hasFullIdentityData(selectedCleaner) &&
+                        ". Ask the cleaner to resubmit identity details before full verification."}
+                    </p>
+                  )}
                   <div className="detail-grid">
                     <div className="detail-item">
                       <span className="label">Aadhaar Card</span>
@@ -327,14 +368,19 @@ export default function AdminCleaners() {
                         )}
                       </span>
                     </div>
-                    {selectedCleaner.aadhaar_number_masked && (
-                      <div className="detail-item">
-                        <span className="label">Aadhaar Number</span>
-                        <span className="value">
-                          {selectedCleaner.aadhaar_number_masked}
-                        </span>
-                      </div>
-                    )}
+                    <div className="detail-item sensitive-detail">
+                      <span className="label">
+                        {selectedCleaner.aadhaar_number
+                          ? "Full Aadhaar Number"
+                          : "Masked Aadhaar Number"}
+                      </span>
+                      <span className="value identity-number">
+                        {getIdentityValue(
+                          selectedCleaner.aadhaar_number,
+                          selectedCleaner.aadhaar_number_masked,
+                        )}
+                      </span>
+                    </div>
                     <div className="detail-item">
                       <span className="label">Driving License</span>
                       <span className="value">
@@ -345,14 +391,19 @@ export default function AdminCleaners() {
                         )}
                       </span>
                     </div>
-                    {selectedCleaner.driving_license_number_masked && (
-                      <div className="detail-item">
-                        <span className="label">License Number</span>
-                        <span className="value">
-                          {selectedCleaner.driving_license_number_masked}
-                        </span>
-                      </div>
-                    )}
+                    <div className="detail-item sensitive-detail">
+                      <span className="label">
+                        {selectedCleaner.driving_license_number
+                          ? "Full License Number"
+                          : "Masked License Number"}
+                      </span>
+                      <span className="value identity-number">
+                        {getIdentityValue(
+                          selectedCleaner.driving_license_number,
+                          selectedCleaner.driving_license_number_masked,
+                        )}
+                      </span>
+                    </div>
                   </div>
                 </div>
 

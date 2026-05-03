@@ -89,7 +89,7 @@ const WhyChooseUs: React.FC = () => {
             <div key={index} className="testimonial-card">
               <p>"{testimonial.quote}"</p>
               <div className="stars" aria-label="5 out of 5 stars">
-                ★★★★★
+                ⭐⭐⭐⭐⭐
               </div>
               <span>{testimonial.name}</span>
             </div>

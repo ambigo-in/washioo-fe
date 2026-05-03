@@ -22,7 +22,7 @@ export default function JoinCleanerSection() {
       <div className="join-cleaner-media" aria-hidden="true" />
       <div className="join-cleaner-content">
         <span className="join-cleaner-label">For cleaners</span>
-        <h2>Join Washioo as a cleaner</h2>
+        <h2>Join as a cleaner</h2>
         <p>
           Get nearby wash jobs, manage your schedule, and track your earnings
           from one simple dashboard.

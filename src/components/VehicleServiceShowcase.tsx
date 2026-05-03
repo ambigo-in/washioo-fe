@@ -5,11 +5,11 @@ import "../styles/VehicleServiceShowcase.css";
 
 const services = [
   {
-    title: "Car Wash",
+    title: "Car Wash Just at  ₹199/-",
     image: "/p1.png",
   },
   {
-    title: "Bike Wash",
+    title: "Bike Wash at  ₹59/-",
     image: "/p2.png",
   },
 ];
