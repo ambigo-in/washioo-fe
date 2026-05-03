@@ -177,6 +177,17 @@
   font-weight: 500;
 }
 
+.profile-note {
+  background: var(--brand-teal-soft);
+  border: 1px solid var(--brand-teal-border);
+  border-radius: 8px;
+  color: var(--brand-teal-dark);
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 14px 0 0;
+  padding: 10px 12px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .profile-header {

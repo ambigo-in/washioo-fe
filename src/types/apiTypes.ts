@@ -51,6 +51,28 @@ export interface AddressPayload {
   is_default?: boolean;
 }
 
+export type CustomerVehicleType = "bike" | "car";
+
+export interface CustomerVehicle {
+  id: string;
+  customer_id: string;
+  vehicle_type: CustomerVehicleType;
+  make: string | null;
+  model: string | null;
+  license_plate: string | null;
+  is_default: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface CustomerVehiclePayload {
+  vehicle_type: CustomerVehicleType;
+  make?: string | null;
+  model?: string | null;
+  license_plate?: string | null;
+  is_default?: boolean;
+}
+
 export type BookingStatus =
   | "pending"
   | "assigned"
@@ -158,6 +180,12 @@ export interface CustomerBooking {
   special_instructions: string | null;
   address: Address;
   assignment: AssignmentSummary | null;
+  vehicle_details?: {
+    id?: string | null;
+    make: string | null;
+    model: string | null;
+    license_plate: string | null;
+  };
   payment?: {
     payment_status: CustomerBookingPaymentStatus;
     legacy_payment_status?: LegacyPaymentStatus;
@@ -192,4 +220,5 @@ export interface BookingPayload {
   special_instructions?: string | null;
   address_id?: string;
   address?: AddressPayload;
+  vehicle_id?: string | null;
 }

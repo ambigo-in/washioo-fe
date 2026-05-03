@@ -20,6 +20,7 @@ import CustomerDashboard from "./pages/customer/CustomerDashboard";
 import CustomerAddresses from "./pages/customer/CustomerAddresses";
 import CustomerBookingDetail from "./pages/customer/CustomerBookingDetail";
 import CustomerProfile from "./pages/customer/CustomerProfile";
+import CustomerVehicles from "./pages/customer/CustomerVehicles";
 
 // Cleaner Pages
 import CleanerDashboard from "./pages/cleaner/CleanerDashboard";
@@ -207,6 +208,14 @@ function App() {
             element={
               <ProtectedRoute roles={["admin"]}>
                 <AdminPayments />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/vehicles"
+            element={
+              <ProtectedRoute roles={["customer"]}>
+                <CustomerVehicles />
               </ProtectedRoute>
             }
           />

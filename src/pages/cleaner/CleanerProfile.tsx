@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { useAuth } from "../../context/useAuth";
 import { updateProfile } from "../../api/authApi";
+import { fetchCleanerProfile } from "../../api/cleanerApi";
+import type { CleanerProfile as CleanerProfileData } from "../../types/cleanerTypes";
 import "./CleanerProfile.css";
 
 interface ProfileFormData {
@@ -21,6 +23,15 @@ export default function CleanerProfile() {
     phone: user?.phone || "",
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [cleanerProfile, setCleanerProfile] = useState<CleanerProfileData | null>(
+    null,
+  );
+
+  React.useEffect(() => {
+    fetchCleanerProfile()
+      .then((response) => setCleanerProfile(response.cleaner))
+      .catch(() => setCleanerProfile(null));
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -131,6 +142,30 @@ export default function CleanerProfile() {
                   : "N/A"}
               </span>
             </div>
+          </div>
+
+          <div className="profile-section">
+            <h3>Identity Verification</h3>
+            <div className="info-row">
+              <span className="info-label">Aadhaar</span>
+              <span className="info-value">
+                {cleanerProfile?.has_aadhaar
+                  ? cleanerProfile.aadhaar_number_masked || "Provided"
+                  : "Not provided"}
+              </span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Driving License</span>
+              <span className="info-value">
+                {cleanerProfile?.has_driving_license
+                  ? cleanerProfile.driving_license_number_masked || "Provided"
+                  : "Not provided"}
+              </span>
+            </div>
+            <p className="profile-note">
+              Identity details are read-only and shown in masked format for
+              security.
+            </p>
           </div>
         </div>
       </div>

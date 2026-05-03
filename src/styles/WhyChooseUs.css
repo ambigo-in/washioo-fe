@@ -134,6 +134,8 @@
 }
 
 .testimonial-card {
+  display: flex;
+  flex-direction: column;
   background: white;
   border-radius: 26px;
   padding: 34px;
@@ -155,9 +157,19 @@
 }
 
 .stars {
-  color: var(--brand-teal);
-  font-size: 24px;
+  display: inline-block;
+  color: #ffc72c;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 3px;
   margin-bottom: 14px;
+  text-shadow:
+    0 1px 0 #d28a00,
+    0 2px 0 #9f6400,
+    0 3px 0 #744200,
+    0 5px 8px rgba(116, 66, 0, 0.32),
+    0 9px 18px rgba(255, 199, 44, 0.3);
 }
 
 .testimonial-card span {

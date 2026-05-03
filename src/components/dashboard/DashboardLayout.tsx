@@ -27,6 +27,12 @@ const navItems: NavItem[] = [
     icon: "📍",
     roles: ["customer"],
   },
+  {
+    path: "/vehicles",
+    label: "My Vehicles",
+    icon: "🚘",
+    roles: ["customer"],
+  },
   { path: "/profile", label: "Profile", icon: "👤", roles: ["customer"] },
 
   // Cleaner routes

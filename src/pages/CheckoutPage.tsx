@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import type { AddressPayload } from "../types/apiTypes";
+import { fetchCustomerVehicles } from "../api/vehicleApi";
+import type { AddressPayload, CustomerVehicle } from "../types/apiTypes";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
   bookService,
@@ -63,6 +64,8 @@ const CheckoutPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { addresses, loading } = useAppSelector((state) => state.customer);
   const [selectedAddressId, setSelectedAddressId] = useState("");
+  const [vehicles, setVehicles] = useState<CustomerVehicle[]>([]);
+  const [selectedVehicleId, setSelectedVehicleId] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [savingAddress, setSavingAddress] = useState(false);
   const [locating, setLocating] = useState(false);
@@ -86,6 +89,12 @@ const CheckoutPage: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    fetchCustomerVehicles()
+      .then((response) => setVehicles(response.vehicles))
+      .catch(() => setVehicles([]));
+  }, []);
+
+  useEffect(() => {
     const defaultAddress =
       addresses.find((address) => address.is_default) || addresses[0];
 
@@ -95,6 +104,14 @@ const CheckoutPage: React.FC = () => {
       setShowForm(true);
     }
   }, [addresses, loading, selectedAddressId]);
+
+  useEffect(() => {
+    const defaultVehicle =
+      vehicles.find((vehicle) => vehicle.is_default) || vehicles[0];
+    if (defaultVehicle && !selectedVehicleId) {
+      setSelectedVehicleId(defaultVehicle.id);
+    }
+  }, [vehicles, selectedVehicleId]);
 
   const updateForm = (field: keyof AddressPayload, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -189,6 +206,7 @@ const CheckoutPage: React.FC = () => {
         bookService({
           service_category_id: serviceData.serviceId,
           address_id: selectedAddressId,
+          vehicle_id: selectedVehicleId || null,
           scheduled_date: scheduledDate,
           scheduled_time: scheduledTime,
           special_instructions: instructions.trim() || null,
@@ -204,6 +222,9 @@ const CheckoutPage: React.FC = () => {
 
   const selectedAddress = addresses.find(
     (address) => address.id === selectedAddressId,
+  );
+  const selectedVehicle = vehicles.find(
+    (vehicle) => vehicle.id === selectedVehicleId,
   );
 
   return (
@@ -332,6 +353,37 @@ const CheckoutPage: React.FC = () => {
                 <span>Service address</span>
                 <strong>{selectedAddress.address_label || "Address"}</strong>
                 <p>{selectedAddress.address_line1}</p>
+              </div>
+            )}
+
+            {vehicles.length > 0 && (
+              <label>
+                Vehicle
+                <select
+                  value={selectedVehicleId}
+                  onChange={(event) => setSelectedVehicleId(event.target.value)}
+                >
+                  <option value="">No vehicle selected</option>
+                  {vehicles.map((vehicle) => (
+                    <option key={vehicle.id} value={vehicle.id}>
+                      {[vehicle.make, vehicle.model].filter(Boolean).join(" ") ||
+                        vehicle.vehicle_type}
+                      {vehicle.license_plate ? ` - ${vehicle.license_plate}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+
+            {selectedVehicle && (
+              <div className="selected-address-summary">
+                <span>Vehicle</span>
+                <strong>
+                  {[selectedVehicle.make, selectedVehicle.model]
+                    .filter(Boolean)
+                    .join(" ") || selectedVehicle.vehicle_type}
+                </strong>
+                <p>{selectedVehicle.license_plate || "No plate added"}</p>
               </div>
             )}
 

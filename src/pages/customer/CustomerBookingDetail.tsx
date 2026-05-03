@@ -108,6 +108,26 @@ export default function CustomerBookingDetail() {
             </section>
 
             <section className="customer-detail-card">
+              <h3>Vehicle</h3>
+              <dl>
+                <div>
+                  <dt>Make</dt>
+                  <dd>{booking.vehicle_details?.make || "Not provided"}</dd>
+                </div>
+                <div>
+                  <dt>Model</dt>
+                  <dd>{booking.vehicle_details?.model || "Not provided"}</dd>
+                </div>
+                <div>
+                  <dt>License Plate</dt>
+                  <dd>
+                    {booking.vehicle_details?.license_plate || "Not provided"}
+                  </dd>
+                </div>
+              </dl>
+            </section>
+
+            <section className="customer-detail-card">
               <h3>Address</h3>
               <p>
                 {[address?.address_line1, address?.address_line2, address?.city]

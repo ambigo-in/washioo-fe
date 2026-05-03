@@ -11,6 +11,9 @@ export default function AdminCleaners() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterStatus>("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [selectedCleaner, setSelectedCleaner] = useState<CleanerProfile | null>(
+    null,
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -174,6 +177,12 @@ export default function AdminCleaners() {
                 </div>
 
                 <div className="cleaner-actions">
+                  <button
+                    className="btn-view-details"
+                    onClick={() => setSelectedCleaner(cleaner)}
+                  >
+                    View Details
+                  </button>
                   {cleaner.approval_status === "pending" && (
                     <>
                       <button
@@ -256,6 +265,191 @@ export default function AdminCleaners() {
         ) : (
           <div className="empty-state">
             <p>No cleaners found.</p>
+          </div>
+        )}
+
+        {/* Cleaner Details Modal */}
+        {selectedCleaner && (
+          <div
+            className="modal-overlay"
+            onClick={() => setSelectedCleaner(null)}
+          >
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Cleaner Details - {selectedCleaner.full_name}</h3>
+                <button
+                  className="modal-close"
+                  onClick={() => setSelectedCleaner(null)}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="cleaner-details-modal">
+                <div className="detail-section">
+                  <h4>Personal Information</h4>
+                  <div className="detail-grid">
+                    <div className="detail-item">
+                      <span className="label">Full Name</span>
+                      <span className="value">{selectedCleaner.full_name}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Phone</span>
+                      <span className="value">{selectedCleaner.phone}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Email</span>
+                      <span className="value">
+                        {selectedCleaner.email || "Not provided"}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Joined Date</span>
+                      <span className="value">
+                        {new Date(
+                          selectedCleaner.created_at,
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="detail-section">
+                  <h4>Identity Verification</h4>
+                  <div className="detail-grid">
+                    <div className="detail-item">
+                      <span className="label">Aadhaar Card</span>
+                      <span className="value">
+                        {selectedCleaner.has_aadhaar ? (
+                          <span className="verified">✓ Verified</span>
+                        ) : (
+                          <span className="not-verified">✗ Not Verified</span>
+                        )}
+                      </span>
+                    </div>
+                    {selectedCleaner.aadhaar_number_masked && (
+                      <div className="detail-item">
+                        <span className="label">Aadhaar Number</span>
+                        <span className="value">
+                          {selectedCleaner.aadhaar_number_masked}
+                        </span>
+                      </div>
+                    )}
+                    <div className="detail-item">
+                      <span className="label">Driving License</span>
+                      <span className="value">
+                        {selectedCleaner.has_driving_license ? (
+                          <span className="verified">✓ Verified</span>
+                        ) : (
+                          <span className="not-verified">✗ Not Verified</span>
+                        )}
+                      </span>
+                    </div>
+                    {selectedCleaner.driving_license_number_masked && (
+                      <div className="detail-item">
+                        <span className="label">License Number</span>
+                        <span className="value">
+                          {selectedCleaner.driving_license_number_masked}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="detail-section">
+                  <h4>Service Information</h4>
+                  <div className="detail-grid">
+                    <div className="detail-item">
+                      <span className="label">Vehicle Type</span>
+                      <span className="value">
+                        {selectedCleaner.vehicle_type || "Not specified"}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Service Radius</span>
+                      <span className="value">
+                        {selectedCleaner.service_radius_km || 0} km
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Jobs Completed</span>
+                      <span className="value">
+                        {selectedCleaner.total_jobs_completed}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Rating</span>
+                      <span className="value">
+                        ⭐ {selectedCleaner.rating?.toFixed(1) || "0.0"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="detail-section">
+                  <h4>Status Information</h4>
+                  <div className="detail-grid">
+                    <div className="detail-item">
+                      <span className="label">Approval Status</span>
+                      <span
+                        className="value status-badge"
+                        style={{
+                          backgroundColor: getStatusColor(
+                            selectedCleaner.approval_status,
+                          ),
+                        }}
+                      >
+                        {selectedCleaner.approval_status}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Availability Status</span>
+                      <span
+                        className="value status-badge"
+                        style={{
+                          backgroundColor: getStatusColor(
+                            selectedCleaner.availability_status,
+                          ),
+                        }}
+                      >
+                        {selectedCleaner.availability_status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {selectedCleaner.approval_status === "pending" && (
+                <div className="modal-actions">
+                  <button
+                    className="btn-approve"
+                    onClick={() => {
+                      handleUpdateStatus(selectedCleaner.id, "approved");
+                      setSelectedCleaner(null);
+                    }}
+                    disabled={updatingId === selectedCleaner.id}
+                  >
+                    Approve Cleaner
+                  </button>
+                  <button
+                    className="btn-reject"
+                    onClick={() => {
+                      handleUpdateStatus(selectedCleaner.id, "rejected");
+                      setSelectedCleaner(null);
+                    }}
+                    disabled={updatingId === selectedCleaner.id}
+                  >
+                    Reject Cleaner
+                  </button>
+                  <button
+                    className="btn-secondary"
+                    onClick={() => setSelectedCleaner(null)}
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

@@ -131,6 +131,7 @@
 
 .address-form input,
 .booking-summary input,
+.booking-summary select,
 .booking-summary textarea {
   background: var(--brand-white);
   border: 2px solid var(--brand-teal-soft);
@@ -144,6 +145,7 @@
 
 .address-form input:focus,
 .booking-summary input:focus,
+.booking-summary select:focus,
 .booking-summary textarea:focus {
   border-color: var(--brand-teal);
   box-shadow: 0 0 0 4px rgba(var(--brand-teal-rgb), 0.08);
@@ -231,7 +233,8 @@
   margin-top: 18px;
 }
 
-.booking-summary label input {
+.booking-summary label input,
+.booking-summary label select {
   margin-top: 8px;
 }
 
@@ -359,6 +362,7 @@
 
   .address-form input,
   .booking-summary input,
+  .booking-summary select,
   .booking-summary textarea {
     font-size: 14px;
     padding: 13px;

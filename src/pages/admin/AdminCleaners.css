@@ -223,3 +223,139 @@
   margin: 16px 0 0;
   color: var(--brand-text-muted);
 }
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--brand-white);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 0 24px;
+  border-bottom: 1px solid var(--brand-border);
+  margin-bottom: 20px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--brand-text);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--brand-text-muted);
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: var(--brand-surface);
+  color: var(--brand-text);
+}
+
+.cleaner-details-modal {
+  padding: 0 24px 24px 24px;
+}
+
+.detail-section {
+  margin-bottom: 24px;
+}
+
+.detail-section h4 {
+  margin: 0 0 16px 0;
+  font-size: 1rem;
+  color: var(--brand-text);
+  border-bottom: 1px solid var(--brand-border);
+  padding-bottom: 8px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.detail-item .label {
+  font-size: 0.75rem;
+  color: var(--brand-text-muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.detail-item .value {
+  font-size: 0.9rem;
+  color: var(--brand-text);
+  font-weight: 500;
+}
+
+.verified {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.not-verified {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid var(--brand-border);
+  margin-top: 20px;
+}
+
+.btn-view-details {
+  background: var(--brand-surface);
+  color: var(--brand-text);
+  border: 1px solid var(--brand-border);
+}
+
+.btn-view-details:hover:not(:disabled) {
+  background: var(--brand-border);
+}
+
+.btn-secondary {
+  background: var(--brand-white);
+  color: var(--brand-text-muted);
+  border: 1px solid var(--brand-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--brand-surface);
+}
