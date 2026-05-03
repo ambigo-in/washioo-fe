@@ -1,56 +1,70 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import "./App.css";
-
-import HomePage from "./pages/HomePage";
-import TermsAndConditionsPage from "./pages/TermsAndConditionsPage";
-import PhoneVerificationPage from "./pages/PhoneVerificationPage";
-import SignInPage from "./pages/SignInPage";
-import SignUpPage from "./pages/SignUpPage";
-import BookingsPage from "./pages/BookingsPage";
-import CheckoutPage from "./pages/CheckoutPage";
-import MyBookingsPage from "./pages/MyBookingsPage";
 
 import { AuthProvider } from "./context/AuthContext";
 
 import PublicRoute from "./components/PublicRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// Customer Pages
-import CustomerDashboard from "./pages/customer/CustomerDashboard";
-import CustomerAddresses from "./pages/customer/CustomerAddresses";
-import CustomerBookingDetail from "./pages/customer/CustomerBookingDetail";
-import CustomerProfile from "./pages/customer/CustomerProfile";
-import CustomerVehicles from "./pages/customer/CustomerVehicles";
+const HomePage = lazy(() => import("./pages/HomePage"));
+const TermsAndConditionsPage = lazy(
+  () => import("./pages/TermsAndConditionsPage"),
+);
+const PhoneVerificationPage = lazy(
+  () => import("./pages/PhoneVerificationPage"),
+);
+const SignInPage = lazy(() => import("./pages/SignInPage"));
+const SignUpPage = lazy(() => import("./pages/SignUpPage"));
+const BookingsPage = lazy(() => import("./pages/BookingsPage"));
+const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
+const MyBookingsPage = lazy(() => import("./pages/MyBookingsPage"));
 
-// Cleaner Pages
-import CleanerDashboard from "./pages/cleaner/CleanerDashboard";
-import CleanerAssignments from "./pages/cleaner/CleanerAssignments";
-import CleanerAvailability from "./pages/cleaner/CleanerAvailability";
-import CleanerHistory from "./pages/cleaner/CleanerHistory";
-import CleanerProfile from "./pages/cleaner/CleanerProfile";
-import CleanerBookingDetails from "./pages/cleaner/CleanerBookingDetails";
+const CustomerDashboard = lazy(
+  () => import("./pages/customer/CustomerDashboard"),
+);
+const CustomerAddresses = lazy(
+  () => import("./pages/customer/CustomerAddresses"),
+);
+const CustomerBookingDetail = lazy(
+  () => import("./pages/customer/CustomerBookingDetail"),
+);
+const CustomerProfile = lazy(() => import("./pages/customer/CustomerProfile"));
+const CustomerVehicles = lazy(() => import("./pages/customer/CustomerVehicles"));
 
-// Admin Pages
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminBookings from "./pages/admin/AdminBookings";
-import AdminPayments from "./pages/admin/AdminPayments";
-import AdminCleaners from "./pages/admin/AdminCleaners";
-import AdminServices from "./pages/admin/AdminServices";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminSettings from "./pages/admin/AdminSettings";
-import AdminRatings from "./pages/admin/AdminRatings";
+const CleanerDashboard = lazy(() => import("./pages/cleaner/CleanerDashboard"));
+const CleanerAssignments = lazy(
+  () => import("./pages/cleaner/CleanerAssignments"),
+);
+const CleanerAvailability = lazy(
+  () => import("./pages/cleaner/CleanerAvailability"),
+);
+const CleanerHistory = lazy(() => import("./pages/cleaner/CleanerHistory"));
+const CleanerProfile = lazy(() => import("./pages/cleaner/CleanerProfile"));
+const CleanerBookingDetails = lazy(
+  () => import("./pages/cleaner/CleanerBookingDetails"),
+);
+
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminBookings = lazy(() => import("./pages/admin/AdminBookings"));
+const AdminPayments = lazy(() => import("./pages/admin/AdminPayments"));
+const AdminCleaners = lazy(() => import("./pages/admin/AdminCleaners"));
+const AdminServices = lazy(() => import("./pages/admin/AdminServices"));
+const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
+const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
+const AdminRatings = lazy(() => import("./pages/admin/AdminRatings"));
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<HomePage />} />
-          <Route
-            path="/terms-and-conditions"
-            element={<TermsAndConditionsPage />}
-          />
+        <Suspense fallback={<div className="route-state">Loading...</div>}>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route
+              path="/terms-and-conditions"
+              element={<TermsAndConditionsPage />}
+            />
 
           {/* Auth Routes */}
           <Route
@@ -260,9 +274,10 @@ function App() {
             }
           />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </AuthProvider>
   );
