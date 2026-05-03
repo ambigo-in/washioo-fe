@@ -7,12 +7,18 @@ import type {
   SignUpPayload,
 } from "../types/authTypes";
 import type { UserProfile } from "../types/apiTypes";
+import { normalizeIndianPhone } from "../utils/phoneUtils";
 
 export const sendOtp = (phone_number: string, accountType: AccountType = "customer") =>
   apiRequest<SendOtpResponse>(`/auth/${accountType}/send-otp`, {
     method: "POST",
-    body: { phone_number },
+    body: { phone_number: normalizeIndianPhone(phone_number) },
   });
+
+const normalizeAuthPayload = <T extends { phone_number: string }>(payload: T): T => ({
+  ...payload,
+  phone_number: normalizeIndianPhone(payload.phone_number),
+});
 
 export const signUp = (
   payload: SignUpPayload,
@@ -20,13 +26,13 @@ export const signUp = (
 ) =>
   apiRequest<AuthResponse>(`/auth/${accountType}/signup`, {
     method: "POST",
-    body: payload,
+    body: normalizeAuthPayload(payload),
   });
 
 export const signIn = (payload: SignInPayload, accountType: AccountType = "customer") =>
   apiRequest<AuthResponse>(`/auth/${accountType}/signin`, {
     method: "POST",
-    body: payload,
+    body: normalizeAuthPayload(payload),
   });
 
 export const getCurrentUser = () =>
@@ -50,7 +56,9 @@ export const updateProfile = (payload: {
   apiRequest<{ message: string; user: UserProfile }>("/users/me", {
     method: "PATCH",
     auth: true,
-    body: payload,
+    body: payload.phone
+      ? { ...payload, phone: normalizeIndianPhone(payload.phone) }
+      : payload,
   });
 
 export const createAdmin = (payload: {
@@ -61,7 +69,10 @@ export const createAdmin = (payload: {
   apiRequest<{ message: string; admin: UserProfile }>("/auth/admin/create", {
     method: "POST",
     auth: true,
-    body: payload,
+    body: {
+      ...payload,
+      phone_number: normalizeIndianPhone(payload.phone_number),
+    },
   });
 
 export const updateAdmin = (
@@ -71,5 +82,7 @@ export const updateAdmin = (
   apiRequest<{ message: string; admin: UserProfile }>(`/auth/admin/${adminId}`, {
     method: "PATCH",
     auth: true,
-    body: payload,
+    body: payload.phone
+      ? { ...payload, phone: normalizeIndianPhone(payload.phone) }
+      : payload,
   });

@@ -58,8 +58,12 @@ export interface AdminBooking {
     payment_status: PaymentStatus;
     legacy_payment_status?: string;
     payment_type?: PaymentType | null;
+    payment_method?: string | null;
     amount: number;
     collected_amount?: number | null;
+    cleaner_share?: number | null;
+    admin_share?: number | null;
+    cleaner_handover_status?: "pending" | "settled";
   };
   created_at: string;
 }

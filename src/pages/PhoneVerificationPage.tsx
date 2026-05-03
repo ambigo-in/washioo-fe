@@ -3,9 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { sendOtp } from "../api/authApi";
 import { getApiErrorMessage } from "../api/client";
 import type { AccountType } from "../types/authTypes";
+import { isValidIndianPhone, normalizeIndianPhone } from "../utils/phoneUtils";
 import "../styles/PhoneVerificationPage.css";
-
-const normalizePhone = (value: string) => value.replace(/\s+/g, "");
 
 export default function PhoneVerificationPage() {
   const location = useLocation();
@@ -32,10 +31,10 @@ export default function PhoneVerificationPage() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    const phoneNumber = normalizePhone(phone);
+    const phoneNumber = normalizeIndianPhone(phone);
 
-    if (!phoneNumber.startsWith("+") || phoneNumber.length < 10) {
-      setError("Enter a valid phone number with country code.");
+    if (!isValidIndianPhone(phoneNumber)) {
+      setError("Enter a valid 10-digit mobile number.");
       return;
     }
 
@@ -67,9 +66,10 @@ export default function PhoneVerificationPage() {
         <input
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
-          placeholder="+91XXXXXXXXXX"
+          placeholder="Enter 10-digit mobile number"
           autoComplete="tel"
           inputMode="tel"
+          maxLength={14}
         />
         <select
           value={accountType}

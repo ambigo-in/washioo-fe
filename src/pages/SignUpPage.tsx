@@ -5,6 +5,7 @@ import { getApiErrorMessage } from "../api/client";
 import { useAuth } from "../context/useAuth";
 import { saveTokens } from "../utils/tokenManager";
 import type { AccountType } from "../types/authTypes";
+import { formatIndianPhoneForDisplay } from "../utils/phoneUtils";
 import "../styles/SignUpPage.css";
 
 export default function SignUpPage() {
@@ -48,6 +49,14 @@ export default function SignUpPage() {
       return;
     }
 
+    if (
+      accountType === "cleaner" &&
+      !/^\d{12}$/.test(aadhaarNumber.replace(/\D/g, ""))
+    ) {
+      setError("Enter a valid 12-digit Aadhaar number.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -58,7 +67,9 @@ export default function SignUpPage() {
         email: email.trim() || undefined,
         otp_code: otpCode.trim(),
         aadhaar_number:
-          accountType === "cleaner" ? aadhaarNumber.trim() : undefined,
+          accountType === "cleaner"
+            ? aadhaarNumber.replace(/\D/g, "")
+            : undefined,
         driving_license_number:
           accountType === "cleaner"
             ? drivingLicenseNumber.trim() || undefined
@@ -115,7 +126,11 @@ export default function SignUpPage() {
           placeholder="Full name"
           autoComplete="name"
         />
-        <input value={phone} disabled aria-label="Phone number" />
+        <input
+          value={formatIndianPhoneForDisplay(phone)}
+          disabled
+          aria-label="Phone number"
+        />
         <input
           value={email}
           onChange={(event) => setEmail(event.target.value)}

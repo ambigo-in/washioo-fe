@@ -5,6 +5,7 @@ import { getApiErrorMessage } from "../api/client";
 import { useAuth } from "../context/useAuth";
 import { saveTokens } from "../utils/tokenManager";
 import type { AccountType } from "../types/authTypes";
+import { formatIndianPhoneForDisplay } from "../utils/phoneUtils";
 import "../styles/SignInPage.css";
 
 export default function SignInPage() {
@@ -87,7 +88,11 @@ export default function SignInPage() {
 
         {error && <p className="signin-error">{error}</p>}
 
-        <input value={phone} disabled aria-label="Phone number" />
+        <input
+          value={formatIndianPhoneForDisplay(phone)}
+          disabled
+          aria-label="Phone number"
+        />
         <input
           value={otpCode}
           onChange={(event) => setOtpCode(event.target.value)}

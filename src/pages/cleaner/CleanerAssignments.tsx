@@ -9,10 +9,7 @@ import {
   rejectCleanerAssignment,
   startCleanerAssignment,
 } from "../../store/slices/cleanerSlice";
-import {
-  collectPayment,
-  loadCleanerEarnings,
-} from "../../store/slices/paymentSlice";
+import { loadCleanerEarnings } from "../../store/slices/paymentSlice";
 import type { PaymentType } from "../../types/apiTypes";
 import "./CleanerAssignments.css";
 
@@ -97,7 +94,7 @@ export default function CleanerAssignments() {
     }
   };
 
-  const handleComplete = async (assignmentId: string, bookingId: string) => {
+  const handleComplete = async (assignmentId: string) => {
     const assignment = assignments.find((item) => item.id === assignmentId);
     const amount =
       completeAmount[assignmentId] ??
@@ -122,15 +119,10 @@ export default function CleanerAssignments() {
           actionPayload: {
             cleaner_notes: "Completed",
             final_price: amount,
-          },
-        }),
-      ).unwrap();
-      await dispatch(
-        collectPayment({
-          bookingId,
-          body: {
-            amount,
             payment_type: type,
+            payment_method: type === "upi" ? "UPI" : "Cash",
+            collected_amount: amount,
+            collected_by_cleaner: true,
           },
         }),
       ).unwrap();
@@ -329,7 +321,7 @@ export default function CleanerAssignments() {
                         <button
                           className="btn-complete"
                           onClick={() =>
-                            handleComplete(assignment.id, assignment.booking_id)
+                            handleComplete(assignment.id)
                           }
                           disabled={actionLoading === assignment.id}
                         >

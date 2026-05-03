@@ -19,8 +19,7 @@ const statusLabel: Record<BookingStatus, string> = {
   cancelled: "Cancelled",
 };
 
-const canCancel = (status: BookingStatus) =>
-  !["in_progress", "completed", "cancelled"].includes(status);
+const canCancel = (status: BookingStatus) => status === "pending";
 
 const canEdit = (status: BookingStatus) => status === "pending";
 

@@ -5,7 +5,11 @@ import {
   saveTokens,
 } from "../utils/tokenManager";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const rawApiBaseUrl =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_PREFIX = "/washioo-api";
+const API_BASE_URL = rawApiBaseUrl.replace(/\/washioo-api\/?$/, "").replace(/\/$/, "");
+const apiUrl = (path: string) => `${API_BASE_URL}${API_PREFIX}${path}`;
 
 type RequestOptions = {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -82,7 +86,7 @@ const refreshTokens = async () => {
   const refreshToken = getRefreshToken();
   if (!refreshToken) return false;
 
-  const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+  const response = await fetch(apiUrl("/auth/refresh-token"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ refresh_token: refreshToken }),
@@ -116,7 +120,7 @@ export const apiRequest = async <T>(
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(apiUrl(path), {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),

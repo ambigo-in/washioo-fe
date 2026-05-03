@@ -137,7 +137,9 @@ export interface AssignmentActionPayload {
 
 export interface CompleteAssignmentPayload extends AssignmentActionPayload {
   final_price?: number;
-  payment_method?: string;
+  payment_method?: "UPI" | "Cash";
+  payment_type?: PaymentType;
+  collected_amount?: number;
   transaction_reference?: string;
   collected_by_cleaner?: boolean;
 }

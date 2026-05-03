@@ -3,7 +3,7 @@ import type { Address, AddressPayload } from "../types/apiTypes";
 
 export const fetchAddresses = (params: PaginationParams = {}) =>
   apiRequest<{ message: string; addresses: Address[]; total: number }>(
-    withQuery("/services/addresses", params),
+    withQuery("/services/addresses", { limit: 50, offset: 0, ...params }),
     { auth: true },
   );
 
@@ -16,7 +16,7 @@ export const createAddress = (payload: AddressPayload) =>
 
 export const updateAddress = (addressId: string, payload: Partial<AddressPayload>) =>
   apiRequest<{ message: string; address: Address }>(
-    `/customer/addresses/${addressId}`,
+    `/services/address/${addressId}`,
     {
       method: "PATCH",
       auth: true,

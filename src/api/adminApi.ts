@@ -116,6 +116,7 @@ export const updateAdminBooking = (
   payload: {
     service_category_id?: string;
     address_id?: string;
+    vehicle_id?: string;
     scheduled_date?: string;
     scheduled_time?: string;
     special_instructions?: string;
@@ -170,7 +171,7 @@ export const fetchCleaner = (cleanerId: string) =>
 export const createCleanerProfile = (payload: {
   user_id: string;
   vehicle_type?: string;
-  aadhaar_number?: string;
+  aadhaar_number: string;
   driving_license_number?: string;
   service_radius_km?: number;
   approval_status?: string;
