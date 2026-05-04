@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import OpenInMapsButton from "../../components/OpenInMapsButton";
 import {
   fetchAddresses,
   createAddress,
@@ -214,9 +215,13 @@ export default function CustomerAddresses() {
                   {address.city}, {address.state} - {address.pincode}
                 </p>
                 {address.latitude != null && address.longitude != null && (
-                  <p className="location-text">
-                    Location: {address.latitude}, {address.longitude}
-                  </p>
+                  <div className="address-location-link">
+                    <OpenInMapsButton
+                      latitude={address.latitude}
+                      longitude={address.longitude}
+                      label="Open address location"
+                    />
+                  </div>
                 )}
                 <div className="address-actions">
                   {!address.is_default && (
@@ -340,7 +345,7 @@ export default function CustomerAddresses() {
                 </button>
                 {formData.latitude != null && formData.longitude != null && (
                   <div className="location-preview">
-                    Location captured: {formData.latitude}, {formData.longitude}
+                    Location captured. It will be used for directions.
                   </div>
                 )}
                 <div className="form-actions">

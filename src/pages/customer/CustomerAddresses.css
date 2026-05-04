@@ -176,7 +176,6 @@
   font-size: 0.95rem;
 }
 
-.location-text,
 .location-preview {
   background: var(--brand-teal-soft);
   border: 1px solid var(--brand-teal-border);
@@ -186,6 +185,15 @@
   font-weight: 700;
   margin-top: 10px;
   padding: 8px 10px;
+}
+
+.address-location-link {
+  margin-top: 12px;
+}
+
+.address-location-link .maps-button {
+  min-height: 38px;
+  padding: 9px 14px;
 }
 
 .location-preview {

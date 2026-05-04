@@ -3,11 +3,13 @@ import "./OpenInMapsButton.css";
 type OpenInMapsButtonProps = {
   latitude?: number | null;
   longitude?: number | null;
+  label?: string;
 };
 
 export default function OpenInMapsButton({
   latitude,
   longitude,
+  label = "Open in Google Maps",
 }: OpenInMapsButtonProps) {
   const hasLocation = latitude != null && longitude != null;
 
@@ -16,10 +18,10 @@ export default function OpenInMapsButton({
       <button
         className="maps-button disabled"
         disabled
-        title="Location unavailable — customer hasn't shared live location"
+        title="Location unavailable - customer hasn't shared live location"
         type="button"
       >
-        Open in Google Maps
+        {label}
       </button>
     );
   }
@@ -31,7 +33,7 @@ export default function OpenInMapsButton({
       rel="noopener noreferrer"
       target="_blank"
     >
-      Open in Google Maps
+      {label}
     </a>
   );
 }
