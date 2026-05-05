@@ -1,5 +1,12 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { getCurrentUser, logoutUser } from "../../api/authApi";
+import {
+  getCurrentUser,
+  logoutUser,
+  sendOtp,
+  signIn,
+  signUp,
+  updateProfile,
+} from "../../api/authApi";
 import { getApiErrorMessage } from "../../api/client";
 import {
   clearTokens,
@@ -7,13 +14,20 @@ import {
   getRefreshToken,
   saveTokens,
 } from "../../utils/tokenManager";
-import type { AuthResponse } from "../../types/authTypes";
+import type {
+  AccountType,
+  AuthResponse,
+  SignInPayload,
+  SignUpPayload,
+} from "../../types/authTypes";
 import type { UserProfile, UserRole } from "../../types/apiTypes";
 
 type AuthState = {
   user: UserProfile | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  loading: boolean;
+  resendLoading: boolean;
   error: string | null;
 };
 
@@ -21,8 +35,83 @@ const initialState: AuthState = {
   user: null,
   isAuthenticated: !!getAccessToken(),
   isLoading: true,
+  loading: false,
+  resendLoading: false,
   error: null,
 };
+
+export const sendOtpRequest = createAsyncThunk(
+  "auth/sendOtp",
+  async (
+    payload: { phoneNumber: string; accountType?: AccountType },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await sendOtp(payload.phoneNumber, payload.accountType);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error));
+    }
+  },
+);
+
+export const resendOtp = createAsyncThunk(
+  "auth/resendOtp",
+  async (
+    payload: { phoneNumber: string; accountType?: AccountType },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await sendOtp(payload.phoneNumber, payload.accountType);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error));
+    }
+  },
+);
+
+export const signUpRequest = createAsyncThunk(
+  "auth/signUp",
+  async (
+    payload: {
+      body: SignUpPayload;
+      accountType?: Exclude<AccountType, "admin">;
+    },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await signUp(payload.body, payload.accountType);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error));
+    }
+  },
+);
+
+export const signInRequest = createAsyncThunk(
+  "auth/signIn",
+  async (
+    payload: { body: SignInPayload; accountType?: AccountType },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await signIn(payload.body, payload.accountType);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error));
+    }
+  },
+);
+
+export const updateProfileRequest = createAsyncThunk(
+  "auth/updateProfile",
+  async (
+    payload: { full_name?: string; email?: string; phone?: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await updateProfile(payload);
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error));
+    }
+  },
+);
 
 export const hydrateSession = createAsyncThunk(
   "auth/hydrateSession",
@@ -71,6 +160,7 @@ const authSlice = createSlice({
       state.user = action.payload.user ?? null;
       state.isAuthenticated = true;
       state.isLoading = false;
+      state.loading = false;
       state.error = null;
     },
     setUser(state, action: PayloadAction<UserProfile | null>) {
@@ -82,6 +172,8 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
       state.isLoading = false;
+      state.loading = false;
+      state.resendLoading = false;
       state.error = null;
     },
   },
@@ -111,8 +203,67 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
         state.isLoading = false;
+        state.loading = false;
         state.error = null;
-      });
+      })
+      .addCase(resendOtp.pending, (state) => {
+        state.resendLoading = true;
+        state.error = null;
+      })
+      .addCase(resendOtp.fulfilled, (state) => {
+        state.resendLoading = false;
+      })
+      .addCase(resendOtp.rejected, (state, action) => {
+        state.resendLoading = false;
+        state.error = String(action.payload ?? "Unable to resend OTP.");
+      })
+      .addCase(signUpRequest.fulfilled, (state, action) => {
+        saveTokens(action.payload.access_token, action.payload.refresh_token);
+        state.user = action.payload.user ?? null;
+        state.isAuthenticated = true;
+      })
+      .addCase(signInRequest.fulfilled, (state, action) => {
+        saveTokens(action.payload.access_token, action.payload.refresh_token);
+        state.user = action.payload.user ?? null;
+        state.isAuthenticated = true;
+      })
+      .addCase(updateProfileRequest.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.isAuthenticated = true;
+      })
+      .addMatcher(
+        (action) =>
+          action.type.startsWith("auth/") &&
+          action.type.endsWith("/pending") &&
+          action.type !== resendOtp.pending.type &&
+          action.type !== hydrateSession.pending.type,
+        (state) => {
+          state.loading = true;
+          state.error = null;
+        },
+      )
+      .addMatcher(
+        (action) =>
+          action.type.startsWith("auth/") &&
+          action.type.endsWith("/fulfilled") &&
+          action.type !== resendOtp.fulfilled.type &&
+          action.type !== hydrateSession.fulfilled.type,
+        (state) => {
+          state.loading = false;
+          state.error = null;
+        },
+      )
+      .addMatcher(
+        (action) =>
+          action.type.startsWith("auth/") &&
+          action.type.endsWith("/rejected") &&
+          action.type !== resendOtp.rejected.type &&
+          action.type !== hydrateSession.rejected.type,
+        (state, action: { payload?: unknown }) => {
+          state.loading = false;
+          state.error = String(action.payload ?? "Authentication request failed.");
+        },
+      );
   },
 });
 

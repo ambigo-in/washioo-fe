@@ -1,18 +1,18 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { signIn, sendOtp } from "../api/authApi";
-import { getApiErrorMessage } from "../api/client";
+import { LoadingButton } from "../components/ui";
 import { useAuth } from "../context/useAuth";
-import { saveTokens } from "../utils/tokenManager";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { resendOtp, signInRequest } from "../store/slices/authSlice";
 import type { AccountType } from "../types/authTypes";
 import { formatIndianPhoneForDisplay } from "../utils/phoneUtils";
 import "../styles/SignInPage.css";
 
 export default function SignInPage() {
+  const dispatch = useAppDispatch();
+  const { loading, resendLoading } = useAppSelector((state) => state.auth);
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [resending, setResending] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -47,34 +47,31 @@ export default function SignInPage() {
       return;
     }
 
-    setLoading(true);
     setError("");
 
     try {
-      const response = await signIn({
-        phone_number: phone,
-        otp_code: otpCode.trim(),
-      }, accountType);
-
-      saveTokens(response.access_token, response.refresh_token);
+      await dispatch(
+        signInRequest({
+          body: {
+            phone_number: phone,
+            otp_code: otpCode.trim(),
+          },
+          accountType,
+        }),
+      ).unwrap();
       await routeAfterLogin();
     } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
+      setError(String(err));
     }
   };
 
   const handleResend = async () => {
-    setResending(true);
     setError("");
 
     try {
-      await sendOtp(phone, accountType);
+      await dispatch(resendOtp({ phoneNumber: phone, accountType })).unwrap();
     } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setResending(false);
+      setError(String(err));
     }
   };
 
@@ -100,20 +97,21 @@ export default function SignInPage() {
           autoComplete="one-time-code"
           inputMode="numeric"
         />
-        <button disabled={loading} type="submit">
-          {loading ? "Signing in..." : "Login"}
-        </button>
+        <LoadingButton isLoading={loading} loadingText="Signing in..." type="submit">
+          Login
+        </LoadingButton>
 
         <p className="signin-footer-text">
           Did not receive it?{" "}
-          <button
+          <LoadingButton
             className="link-button"
-            disabled={resending}
+            isLoading={resendLoading}
+            loadingText="Resending..."
             onClick={handleResend}
             type="button"
           >
-            {resending ? "Sending..." : "Resend OTP"}
-          </button>
+            Resend OTP
+          </LoadingButton>
         </p>
       </form>
     </main>

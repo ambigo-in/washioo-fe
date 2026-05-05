@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { LoadingButton } from "../../components/ui";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   acceptCleanerAssignment,
@@ -30,7 +31,6 @@ export default function CleanerAssignments() {
   const dispatch = useAppDispatch();
   const { assignments, loading } = useAppSelector((state) => state.cleaner);
   const [filter, setFilter] = useState<FilterStatus>("all");
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [completeAmount, setCompleteAmount] = useState<Record<string, number>>(
     {},
   );
@@ -44,7 +44,6 @@ export default function CleanerAssignments() {
   }, [dispatch, filter]);
 
   const handleAccept = async (assignmentId: string) => {
-    setActionLoading(assignmentId);
     setActionError("");
     try {
       await dispatch(
@@ -55,13 +54,10 @@ export default function CleanerAssignments() {
       ).unwrap();
     } catch (error) {
       setActionError(String(error));
-    } finally {
-      setActionLoading(null);
     }
   };
 
   const handleReject = async (assignmentId: string) => {
-    setActionLoading(assignmentId);
     setActionError("");
     try {
       await dispatch(
@@ -72,13 +68,10 @@ export default function CleanerAssignments() {
       ).unwrap();
     } catch (error) {
       setActionError(String(error));
-    } finally {
-      setActionLoading(null);
     }
   };
 
   const handleStart = async (assignmentId: string) => {
-    setActionLoading(assignmentId);
     setActionError("");
     try {
       await dispatch(
@@ -89,8 +82,6 @@ export default function CleanerAssignments() {
       ).unwrap();
     } catch (error) {
       setActionError(String(error));
-    } finally {
-      setActionLoading(null);
     }
   };
 
@@ -110,7 +101,6 @@ export default function CleanerAssignments() {
       return;
     }
 
-    setActionLoading(assignmentId);
     setActionError("");
     try {
       await dispatch(
@@ -130,8 +120,6 @@ export default function CleanerAssignments() {
       dispatch(loadCleanerAssignments(filter === "all" ? undefined : filter));
     } catch (error) {
       setActionError(String(error));
-    } finally {
-      setActionLoading(null);
     }
   };
 
@@ -170,7 +158,7 @@ export default function CleanerAssignments() {
           ))}
         </div>
 
-        {loading ? (
+        {loading && assignments.length === 0 ? (
           <div className="loading-container">
             <div className="loading-spinner"></div>
             <p>Loading assignments...</p>
@@ -249,35 +237,34 @@ export default function CleanerAssignments() {
                     </Link>
                     {assignment.assignment_status === "assigned" && (
                       <>
-                        <button
+                        <LoadingButton
                           className="btn-accept"
                           onClick={() => handleAccept(assignment.id)}
-                          disabled={actionLoading === assignment.id}
+                          isLoading={loading}
+                          loadingText="Processing..."
                         >
-                          {actionLoading === assignment.id
-                            ? "Processing..."
-                            : "Accept"}
-                        </button>
-                        <button
+                          Accept
+                        </LoadingButton>
+                        <LoadingButton
                           className="btn-reject"
                           onClick={() => handleReject(assignment.id)}
-                          disabled={actionLoading === assignment.id}
+                          isLoading={loading}
+                          loadingText="Processing..."
                         >
                           Reject
-                        </button>
+                        </LoadingButton>
                       </>
                     )}
                     {assignment.assignment_status === "accepted" &&
                       !assignment.started_at && (
-                        <button
+                        <LoadingButton
                           className="btn-start"
                           onClick={() => handleStart(assignment.id)}
-                          disabled={actionLoading === assignment.id}
+                          isLoading={loading}
+                          loadingText="Starting..."
                         >
-                          {actionLoading === assignment.id
-                            ? "Starting..."
-                            : "Start Job"}
-                        </button>
+                          Start Job
+                        </LoadingButton>
                       )}
                     {assignment.assignment_status === "in_progress" && (
                       <div className="complete-section">
@@ -318,17 +305,16 @@ export default function CleanerAssignments() {
                             </select>
                           </div>
                         </div>
-                        <button
+                        <LoadingButton
                           className="btn-complete"
                           onClick={() =>
                             handleComplete(assignment.id)
                           }
-                          disabled={actionLoading === assignment.id}
+                          isLoading={loading}
+                          loadingText="Completing..."
                         >
-                          {actionLoading === assignment.id
-                            ? "Completing..."
-                            : "Complete Job"}
-                        </button>
+                          Complete Job
+                        </LoadingButton>
                       </div>
                     )}
                     {assignment.assignment_status === "completed" && (

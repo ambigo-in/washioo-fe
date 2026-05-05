@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import { LoadingButton } from "../components/ui";
 import { fetchCustomerVehicles } from "../api/vehicleApi";
 import type { AddressPayload, CustomerVehicle } from "../types/apiTypes";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -67,9 +68,7 @@ const CheckoutPage: React.FC = () => {
   const [vehicles, setVehicles] = useState<CustomerVehicle[]>([]);
   const [selectedVehicleId, setSelectedVehicleId] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [savingAddress, setSavingAddress] = useState(false);
   const [locating, setLocating] = useState(false);
-  const [booking, setBooking] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -167,7 +166,6 @@ const CheckoutPage: React.FC = () => {
       return;
     }
 
-    setSavingAddress(true);
     setError("");
     setSuccess("");
 
@@ -179,8 +177,6 @@ const CheckoutPage: React.FC = () => {
       setSuccess("Address saved.");
     } catch (err) {
       setError(String(err));
-    } finally {
-      setSavingAddress(false);
     }
   };
 
@@ -197,7 +193,6 @@ const CheckoutPage: React.FC = () => {
       return;
     }
 
-    setBooking(true);
     setError("");
     setSuccess("");
 
@@ -215,8 +210,6 @@ const CheckoutPage: React.FC = () => {
       navigate("/my-bookings", { replace: true });
     } catch (err) {
       setError(String(err));
-    } finally {
-      setBooking(false);
     }
   };
 
@@ -336,9 +329,13 @@ const CheckoutPage: React.FC = () => {
                     Location captured: {formData.latitude}, {formData.longitude}
                   </p>
                 )}
-                <button disabled={savingAddress} type="submit">
-                  {savingAddress ? "Saving..." : "Save Address"}
-                </button>
+                <LoadingButton
+                  isLoading={loading}
+                  loadingText="Saving address..."
+                  type="submit"
+                >
+                  Save Address
+                </LoadingButton>
               </form>
             )}
           </div>
@@ -410,9 +407,14 @@ const CheckoutPage: React.FC = () => {
               onChange={(event) => setInstructions(event.target.value)}
             />
 
-            <button disabled={booking} onClick={handleBooking} type="button">
-              {booking ? "Confirming..." : "Confirm Booking"}
-            </button>
+            <LoadingButton
+              isLoading={loading}
+              loadingText="Confirming booking..."
+              onClick={handleBooking}
+              type="button"
+            >
+              Confirm Booking
+            </LoadingButton>
           </aside>
         </div>
       </section>

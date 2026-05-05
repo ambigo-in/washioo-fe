@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
+import { LoadingButton } from "../components/ui";
 import type { BookingStatus, CustomerBooking } from "../types/apiTypes";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import {
@@ -50,7 +51,6 @@ const MyBookingsPage: React.FC = () => {
     loading,
     error: storeError,
   } = useAppSelector((state) => state.customer);
-  const [workingId, setWorkingId] = useState("");
   const [editingId, setEditingId] = useState("");
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
@@ -70,7 +70,6 @@ const MyBookingsPage: React.FC = () => {
   };
 
   const handleUpdate = async (booking: CustomerBooking) => {
-    setWorkingId(booking.id);
     setError("");
 
     try {
@@ -87,21 +86,16 @@ const MyBookingsPage: React.FC = () => {
       setEditingId("");
     } catch (err) {
       setError(String(err));
-    } finally {
-      setWorkingId("");
     }
   };
 
   const handleCancel = async (booking: CustomerBooking) => {
-    setWorkingId(booking.id);
     setError("");
 
     try {
       await dispatch(cancelCustomerBooking(booking.id)).unwrap();
     } catch (err) {
       setError(String(err));
-    } finally {
-      setWorkingId("");
     }
   };
 
@@ -119,7 +113,7 @@ const MyBookingsPage: React.FC = () => {
           <p className="form-alert error">{error || storeError}</p>
         )}
 
-        {loading ? (
+        {loading && bookings.length === 0 ? (
           <div className="loading-state">Loading bookings...</div>
         ) : bookings.length === 0 ? (
           <div className="empty-state">
@@ -210,13 +204,14 @@ const MyBookingsPage: React.FC = () => {
                       }
                     />
                     <div className="booking-actions">
-                      <button
-                        disabled={workingId === booking.id}
+                      <LoadingButton
+                        isLoading={loading}
+                        loadingText="Saving..."
                         onClick={() => handleUpdate(booking)}
                         type="button"
                       >
-                        {workingId === booking.id ? "Saving..." : "Save"}
-                      </button>
+                        Save
+                      </LoadingButton>
                       <button
                         className="secondary-action"
                         onClick={() => setEditingId("")}
@@ -240,14 +235,15 @@ const MyBookingsPage: React.FC = () => {
                       </button>
                     )}
                     {canCancel(booking.booking_status) && (
-                      <button
+                      <LoadingButton
                         className="danger-action"
-                        disabled={workingId === booking.id}
+                        isLoading={loading}
+                        loadingText="Cancelling..."
                         onClick={() => handleCancel(booking)}
                         type="button"
                       >
-                        {workingId === booking.id ? "Cancelling..." : "Cancel"}
-                      </button>
+                        Cancel
+                      </LoadingButton>
                     )}
                   </div>
                 )}

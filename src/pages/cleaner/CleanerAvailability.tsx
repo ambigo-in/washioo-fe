@@ -1,31 +1,21 @@
 import { useEffect, useState } from "react";
-import {
-  fetchCleanerProfile,
-  updateCleanerAvailability,
-} from "../../api/cleanerApi";
-import type { CleanerProfile } from "../../types/cleanerTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { LoadingButton } from "../../components/ui";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  loadCleanerProfile,
+  setCleanerAvailability,
+} from "../../store/slices/cleanerSlice";
 import "./CleanerAvailability.css";
 
 export default function CleanerAvailability() {
-  const [profile, setProfile] = useState<CleanerProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const dispatch = useAppDispatch();
+  const { profile, loading } = useAppSelector((state) => state.cleaner);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetchCleanerProfile();
-        setProfile(response.cleaner);
-      } catch (error) {
-        console.error("Failed to fetch profile:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+    dispatch(loadCleanerProfile());
+  }, [dispatch]);
 
   const handleAvailabilityChange = async (
     status: "offline" | "available" | "busy",
@@ -35,18 +25,12 @@ export default function CleanerAvailability() {
       return;
     }
 
-    setSaving(true);
     setMessage("");
     try {
-      const response = await updateCleanerAvailability({
-        availability_status: status,
-      });
-      setProfile(response.cleaner);
+      await dispatch(setCleanerAvailability(status)).unwrap();
       setMessage("Availability updated successfully!");
     } catch (error) {
       setMessage("Failed to update availability. Please try again.");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -101,22 +85,25 @@ export default function CleanerAvailability() {
           </p>
 
           <div className="options-grid">
-            <button
+            <LoadingButton
               className={`option-card ${profile?.availability_status === "offline" ? "active" : ""}`}
               onClick={() => handleAvailabilityChange("offline")}
-              disabled={saving}
+              isLoading={loading}
+              loadingText="Saving..."
             >
               <div className="option-icon">🌙</div>
               <h4>Offline</h4>
               <p>You are not accepting new jobs</p>
-            </button>
+            </LoadingButton>
 
-            <button
+            <LoadingButton
               className={`option-card ${profile?.availability_status === "available" ? "active" : ""} ${!isApproved ? "disabled" : ""}`}
               onClick={() =>
                 isApproved && handleAvailabilityChange("available")
               }
-              disabled={saving || !isApproved}
+              disabled={!isApproved}
+              isLoading={loading}
+              loadingText="Saving..."
             >
               <div className="option-icon">✅</div>
               <h4>Available</h4>
@@ -124,12 +111,14 @@ export default function CleanerAvailability() {
               {!isApproved && (
                 <span className="disabled-text">Not approved yet</span>
               )}
-            </button>
+            </LoadingButton>
 
-            <button
+            <LoadingButton
               className={`option-card ${profile?.availability_status === "busy" ? "active" : ""} ${!isApproved ? "disabled" : ""}`}
               onClick={() => isApproved && handleAvailabilityChange("busy")}
-              disabled={saving || !isApproved}
+              disabled={!isApproved}
+              isLoading={loading}
+              loadingText="Saving..."
             >
               <div className="option-icon">🔄</div>
               <h4>Busy</h4>
@@ -137,7 +126,7 @@ export default function CleanerAvailability() {
               {!isApproved && (
                 <span className="disabled-text">Not approved yet</span>
               )}
-            </button>
+            </LoadingButton>
           </div>
 
           {message && (

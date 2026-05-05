@@ -1,22 +1,22 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { signUp, sendOtp } from "../api/authApi";
-import { getApiErrorMessage } from "../api/client";
+import { LoadingButton } from "../components/ui";
 import { useAuth } from "../context/useAuth";
-import { saveTokens } from "../utils/tokenManager";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { resendOtp, signUpRequest } from "../store/slices/authSlice";
 import type { AccountType } from "../types/authTypes";
 import { formatIndianPhoneForDisplay } from "../utils/phoneUtils";
 import "../styles/SignUpPage.css";
 
 export default function SignUpPage() {
+  const dispatch = useAppDispatch();
+  const { loading, resendLoading } = useAppSelector((state) => state.auth);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [aadhaarNumber, setAadhaarNumber] = useState("");
   const [drivingLicenseNumber, setDrivingLicenseNumber] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [resending, setResending] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -57,26 +57,28 @@ export default function SignUpPage() {
       return;
     }
 
-    setLoading(true);
     setError("");
 
     try {
-      const response = await signUp({
-        full_name: fullName.trim(),
-        phone_number: phone,
-        email: email.trim() || undefined,
-        otp_code: otpCode.trim(),
-        aadhaar_number:
-          accountType === "cleaner"
-            ? aadhaarNumber.replace(/\D/g, "")
-            : undefined,
-        driving_license_number:
-          accountType === "cleaner"
-            ? drivingLicenseNumber.trim() || undefined
-            : undefined,
-      }, accountType);
-
-      saveTokens(response.access_token, response.refresh_token);
+      await dispatch(
+        signUpRequest({
+          body: {
+            full_name: fullName.trim(),
+            phone_number: phone,
+            email: email.trim() || undefined,
+            otp_code: otpCode.trim(),
+            aadhaar_number:
+              accountType === "cleaner"
+                ? aadhaarNumber.replace(/\D/g, "")
+                : undefined,
+            driving_license_number:
+              accountType === "cleaner"
+                ? drivingLicenseNumber.trim() || undefined
+                : undefined,
+          },
+          accountType,
+        }),
+      ).unwrap();
       const user = await login();
       // Route based on user roles - priority: admin > cleaner > customer
       if (user?.roles.includes("admin")) {
@@ -89,22 +91,17 @@ export default function SignUpPage() {
         navigate("/", { replace: true });
       }
     } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
+      setError(String(err));
     }
   };
 
   const handleResend = async () => {
-    setResending(true);
     setError("");
 
     try {
-      await sendOtp(phone, accountType);
+      await dispatch(resendOtp({ phoneNumber: phone, accountType })).unwrap();
     } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setResending(false);
+      setError(String(err));
     }
   };
 
@@ -162,20 +159,21 @@ export default function SignUpPage() {
             />
           </>
         )}
-        <button disabled={loading} type="submit">
-          {loading ? "Creating account..." : "Create Account"}
-        </button>
+        <LoadingButton isLoading={loading} loadingText="Sending OTP..." type="submit">
+          Create Account
+        </LoadingButton>
 
         <p className="signup-footer-text">
           Need a fresh code?{" "}
-          <button
+          <LoadingButton
             className="link-button"
-            disabled={resending}
+            isLoading={resendLoading}
+            loadingText="Resending..."
             onClick={handleResend}
             type="button"
           >
-            {resending ? "Sending..." : "Resend OTP"}
-          </button>
+            Resend OTP
+          </LoadingButton>
         </p>
       </form>
     </main>

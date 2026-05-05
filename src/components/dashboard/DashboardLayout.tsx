@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { LoadingButton } from "../ui";
 import { useAuth } from "../../context/useAuth";
+import { useAppSelector } from "../../store/hooks";
 import type { UserRole } from "../../types/apiTypes";
 import "./DashboardLayout.css";
 
@@ -93,6 +95,7 @@ export default function DashboardLayout({
   title,
 }: DashboardLayoutProps) {
   const { user, logout, roles, activeRole, setActiveRole } = useAuth();
+  const { loading } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -188,9 +191,14 @@ export default function DashboardLayout({
               <p className="user-phone">{user.phone}</p>
             </div>
           )}
-          <button onClick={handleLogout} className="logout-btn">
+          <LoadingButton
+            className="logout-btn"
+            isLoading={loading}
+            loadingText="Logging out..."
+            onClick={handleLogout}
+          >
             Logout
-          </button>
+          </LoadingButton>
         </div>
       </aside>
 

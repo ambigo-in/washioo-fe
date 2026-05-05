@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
 import {
   fetchBookingRatings,
-  submitBookingRating,
 } from "../api/ratingApi";
 import { ApiError, getApiErrorMessage } from "../api/client";
+import { LoadingButton } from "./ui";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { submitRating } from "../store/slices/ratingSlice";
 import type { BookingStatus } from "../types/apiTypes";
 import type { RatingResponse } from "../types/ratingTypes";
 import "./BookingRatingPanel.css";
@@ -49,9 +51,10 @@ export default function BookingRatingPanel({
   perspective,
   subjectName,
 }: BookingRatingPanelProps) {
+  const dispatch = useAppDispatch();
+  const { loading: submitting } = useAppSelector((state) => state.rating);
   const [ratings, setRatings] = useState<RatingResponse[]>([]);
   const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [error, setError] = useState("");
@@ -96,15 +99,19 @@ export default function BookingRatingPanel({
     event.preventDefault();
     if (!canSubmit) return;
 
-    setSubmitting(true);
     setError("");
 
     try {
-      await submitBookingRating(bookingId, {
-        booking_id: bookingId,
-        rating,
-        comment: comment.trim() || null,
-      });
+      await dispatch(
+        submitRating({
+          bookingId,
+          body: {
+            booking_id: bookingId,
+            rating,
+            comment: comment.trim() || null,
+          },
+        }),
+      ).unwrap();
       setSubmitted(true);
       setComment("");
       setRating(0);
@@ -116,8 +123,6 @@ export default function BookingRatingPanel({
       } else {
         setError(getApiErrorMessage(err));
       }
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -177,9 +182,14 @@ export default function BookingRatingPanel({
             <span className={commentTooLong ? "char-count error" : "char-count"}>
               {commentLength}/500
             </span>
-            <button type="submit" disabled={!canSubmit}>
-              {submitting ? "Submitting..." : "Submit rating"}
-            </button>
+            <LoadingButton
+              type="submit"
+              isLoading={submitting}
+              loadingText="Submitting..."
+              disabled={!canSubmit}
+            >
+              Submit rating
+            </LoadingButton>
           </div>
         </form>
       ) : ratings.length > 0 ? (

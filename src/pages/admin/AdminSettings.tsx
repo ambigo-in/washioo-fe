@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { LoadingButton } from "../../components/ui";
 import { useAuth } from "../../context/useAuth";
-import { updateProfile } from "../../api/authApi";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { updateProfileRequest } from "../../store/slices/authSlice";
 import "./AdminSettings.css";
 
 interface SettingsFormData {
@@ -11,8 +13,9 @@ interface SettingsFormData {
 }
 
 export default function AdminSettings() {
+  const dispatch = useAppDispatch();
+  const { loading } = useAppSelector((state) => state.auth);
   const { user, setUser } = useAuth();
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [formData, setFormData] = useState<SettingsFormData>({
@@ -29,16 +32,13 @@ export default function AdminSettings() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      setLoading(true);
       setError("");
-      const updatedUser = await updateProfile(formData);
+      const updatedUser = await dispatch(updateProfileRequest(formData)).unwrap();
       setUser(updatedUser.user);
       setSuccess("Settings updated successfully!");
     } catch (err) {
       setError("Failed to update settings");
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -85,13 +85,14 @@ export default function AdminSettings() {
               </div>
 
               <div className="form-actions">
-                <button
+                <LoadingButton
                   type="submit"
                   className="btn-primary"
-                  disabled={loading}
+                  isLoading={loading}
+                  loadingText="Saving..."
                 >
-                  {loading ? "Saving..." : "Save Changes"}
-                </button>
+                  Save Changes
+                </LoadingButton>
               </div>
             </form>
           </div>

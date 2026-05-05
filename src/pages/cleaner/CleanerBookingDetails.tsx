@@ -4,8 +4,9 @@ import { fetchCleanerBooking } from "../../api/cleanerApi";
 import { getApiErrorMessage } from "../../api/client";
 import BookingRatingPanel from "../../components/BookingRatingPanel";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { LoadingButton } from "../../components/ui";
 import OpenInMapsButton from "../../components/OpenInMapsButton";
-import { useAppDispatch } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   collectPayment,
   loadAdminPayments,
@@ -27,10 +28,10 @@ const formatMoney = (value: number) =>
 export default function CleanerBookingDetails() {
   const { bookingId } = useParams();
   const dispatch = useAppDispatch();
+  const { loading: paymentLoading } = useAppSelector((state) => state.payments);
   const [booking, setBooking] = useState<CleanerBookingDetail | null>(null);
   const [workflowPayment, setWorkflowPayment] = useState<Payment | null>(null);
   const [loading, setLoading] = useState(true);
-  const [submittingPayment, setSubmittingPayment] = useState(false);
   const [error, setError] = useState("");
   const [paymentError, setPaymentError] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState("");
@@ -95,7 +96,6 @@ export default function CleanerBookingDetails() {
       return;
     }
 
-    setSubmittingPayment(true);
     setPaymentError("");
     setPaymentSuccess("");
 
@@ -112,8 +112,6 @@ export default function CleanerBookingDetails() {
       void dispatch(loadAdminPayments("collected"));
     } catch (err) {
       setPaymentError(String(err));
-    } finally {
-      setSubmittingPayment(false);
     }
   };
 
@@ -266,13 +264,14 @@ export default function CleanerBookingDetails() {
                       </p>
                     )}
 
-                    <button
+                    <LoadingButton
                       type="submit"
                       className="mark-collected-btn"
-                      disabled={submittingPayment}
+                      isLoading={paymentLoading}
+                      loadingText="Updating payment..."
                     >
-                      {submittingPayment ? "Saving..." : "Mark as Collected"}
-                    </button>
+                      Mark as Collected
+                    </LoadingButton>
                     <p className="earnings-note">
                       Earnings update after admin reconciliation.
                     </p>

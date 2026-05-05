@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import OpenInMapsButton from "../../components/OpenInMapsButton";
-import {
-  fetchAddresses,
-  createAddress,
-  updateAddress,
-  deleteAddress,
-} from "../../api/addressApi";
+import { LoadingButton } from "../../components/ui";
 import type { Address, AddressPayload } from "../../types/apiTypes";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  loadAddresses,
+  patchAddress,
+  removeAddress,
+  saveAddress,
+} from "../../store/slices/customerSlice";
 import {
   getCurrentCoordinates,
   reverseGeocodeCoordinates,
@@ -37,8 +39,8 @@ const emptyFormData: AddressFormData = {
 };
 
 export default function CustomerAddresses() {
-  const [addresses, setAddresses] = useState<Address[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { addresses, loading } = useAppSelector((state) => state.customer);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -47,21 +49,8 @@ export default function CustomerAddresses() {
   const [formData, setFormData] = useState<AddressFormData>(emptyFormData);
 
   useEffect(() => {
-    loadAddresses();
-  }, []);
-
-  const loadAddresses = async () => {
-    try {
-      setLoading(true);
-      const data = await fetchAddresses();
-      setAddresses(data.addresses);
-    } catch (err) {
-      setError("Failed to load addresses");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    dispatch(loadAddresses()).unwrap().catch(() => setError("Failed to load addresses"));
+  }, [dispatch]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,15 +68,16 @@ export default function CustomerAddresses() {
 
     try {
       if (editingAddress) {
-        await updateAddress(String(editingAddress.id), payload);
+        await dispatch(
+          patchAddress({ addressId: String(editingAddress.id), changes: payload }),
+        ).unwrap();
       } else {
-        await createAddress(payload);
+        await dispatch(saveAddress(payload)).unwrap();
       }
       setShowForm(false);
       setEditingAddress(null);
       setFormData(emptyFormData);
       setSuccess("Address saved.");
-      loadAddresses();
     } catch (err) {
       setError("Failed to save address");
       console.error(err);
@@ -114,8 +104,7 @@ export default function CustomerAddresses() {
       return;
     }
     try {
-      await deleteAddress(id);
-      loadAddresses();
+      await dispatch(removeAddress(id)).unwrap();
     } catch (err) {
       setError("Failed to delete address");
       console.error(err);
@@ -124,8 +113,9 @@ export default function CustomerAddresses() {
 
   const handleSetDefault = async (address: Address) => {
     try {
-      await updateAddress(String(address.id), { is_default: true });
-      loadAddresses();
+      await dispatch(
+        patchAddress({ addressId: String(address.id), changes: { is_default: true } }),
+      ).unwrap();
     } catch (err) {
       setError("Failed to set default address");
       console.error(err);
@@ -225,12 +215,14 @@ export default function CustomerAddresses() {
                 )}
                 <div className="address-actions">
                   {!address.is_default && (
-                    <button
+                    <LoadingButton
                       className="btn-link"
+                      isLoading={loading}
+                      loadingText="Saving..."
                       onClick={() => handleSetDefault(address)}
                     >
                       Set as Default
-                    </button>
+                    </LoadingButton>
                   )}
                   <button
                     className="btn-link"
@@ -238,12 +230,14 @@ export default function CustomerAddresses() {
                   >
                     Edit
                   </button>
-                  <button
+                  <LoadingButton
                     className="btn-link danger"
+                    isLoading={loading}
+                    loadingText="Deleting..."
                     onClick={() => handleDelete(String(address.id))}
                   >
                     Delete
-                  </button>
+                  </LoadingButton>
                 </div>
               </div>
             ))}
@@ -335,14 +329,15 @@ export default function CustomerAddresses() {
                     </label>
                   </div>
                 </div>
-                <button
+                <LoadingButton
                   type="button"
                   className="btn-location"
                   disabled={locating}
+                  isLoading={false}
                   onClick={handleUseLiveLocation}
                 >
                   {locating ? "Capturing Location..." : "Use My Live Location"}
-                </button>
+                </LoadingButton>
                 {formData.latitude != null && formData.longitude != null && (
                   <div className="location-preview">
                     Location captured. It will be used for directions.
@@ -356,9 +351,14 @@ export default function CustomerAddresses() {
                   >
                     Cancel
                   </button>
-                  <button type="submit" className="btn-primary">
+                  <LoadingButton
+                    type="submit"
+                    className="btn-primary"
+                    isLoading={loading}
+                    loadingText="Saving address..."
+                  >
                     {editingAddress ? "Update" : "Add"} Address
-                  </button>
+                  </LoadingButton>
                 </div>
               </form>
             </div>

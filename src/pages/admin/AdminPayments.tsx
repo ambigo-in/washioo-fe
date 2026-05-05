@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { LoadingButton } from "../../components/ui";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   loadAdminBookings,
@@ -113,13 +114,15 @@ function SplitForm({
 
       {fieldError && <p className="field-error">{fieldError}</p>}
 
-      <button
+      <LoadingButton
         type="submit"
         className="confirm-split-btn"
-        disabled={submitting || !!fieldError || cleanerShare === ""}
+        isLoading={submitting}
+        loadingText="Confirming split..."
+        disabled={!!fieldError || cleanerShare === ""}
       >
-        {submitting ? "Splitting..." : "Confirm Split"}
-      </button>
+        Confirm Split
+      </LoadingButton>
     </form>
   );
 }
@@ -129,8 +132,6 @@ export default function AdminPayments() {
   const { bookings, cleaners, users } = useAppSelector((state) => state.admin);
   const { payments, loading, error } = useAppSelector((state) => state.payments);
   const [filter, setFilter] = useState<FilterStatus>("all");
-  const [submittingId, setSubmittingId] = useState<string | null>(null);
-  const [collectingId, setCollectingId] = useState<string | null>(null);
   const [localError, setLocalError] = useState("");
 
   const paymentFilter = useMemo(() => {
@@ -178,7 +179,6 @@ export default function AdminPayments() {
     cleanerShare: number,
     adminShare: number,
   ) => {
-    setSubmittingId(payment.id);
     setLocalError("");
 
     try {
@@ -194,13 +194,10 @@ export default function AdminPayments() {
       dispatch(loadAdminPayments(paymentFilter));
     } catch (err) {
       setLocalError(String(err));
-    } finally {
-      setSubmittingId(null);
     }
   };
 
   const handleAdminShareCollected = async (payment: Payment) => {
-    setCollectingId(payment.id);
     setLocalError("");
 
     try {
@@ -208,8 +205,6 @@ export default function AdminPayments() {
       dispatch(loadAdminPayments(paymentFilter));
     } catch (err) {
       setLocalError(String(err));
-    } finally {
-      setCollectingId(null);
     }
   };
 
@@ -240,7 +235,7 @@ export default function AdminPayments() {
           <p className="form-alert error">{localError || error}</p>
         )}
 
-        {loading ? (
+        {loading && payments.length === 0 ? (
           <div className="loading-state">
             <div className="loading-spinner" />
             <p>Loading payments...</p>
@@ -305,7 +300,7 @@ export default function AdminPayments() {
                   {payment.status === "collected" && (
                     <SplitForm
                       payment={payment}
-                      submitting={submittingId === payment.id}
+                      submitting={loading}
                       onSubmit={(cleanerShare, adminShare) =>
                         handleSplit(payment, cleanerShare, adminShare)
                       }
@@ -343,16 +338,15 @@ export default function AdminPayments() {
                       {payment.cleaner_handover_status !== "settled" && (
                         <div className="handover-action">
                           <span>Collect From Cleaner</span>
-                          <button
+                          <LoadingButton
                             type="button"
                             className="mark-admin-collected-btn"
-                            disabled={collectingId === payment.id}
+                            isLoading={loading}
+                            loadingText="Updating payment..."
                             onClick={() => handleAdminShareCollected(payment)}
                           >
-                            {collectingId === payment.id
-                              ? "Marking..."
-                              : `Mark ${formatMoney(payment.admin_share)} Collected`}
-                          </button>
+                            {`Mark ${formatMoney(payment.admin_share)} Collected`}
+                          </LoadingButton>
                         </div>
                       )}
                     </div>

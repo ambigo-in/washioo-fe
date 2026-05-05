@@ -1,12 +1,15 @@
 import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { sendOtp } from "../api/authApi";
-import { getApiErrorMessage } from "../api/client";
+import { LoadingButton } from "../components/ui";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { sendOtpRequest } from "../store/slices/authSlice";
 import type { AccountType } from "../types/authTypes";
 import { isValidIndianPhone, normalizeIndianPhone } from "../utils/phoneUtils";
 import "../styles/PhoneVerificationPage.css";
 
 export default function PhoneVerificationPage() {
+  const dispatch = useAppDispatch();
+  const { loading } = useAppSelector((state) => state.auth);
   const location = useLocation();
   const state = location.state as
     | { accountType?: AccountType; authMode?: "signin" | "signup" }
@@ -26,7 +29,6 @@ export default function PhoneVerificationPage() {
   const [authMode, setAuthMode] =
     useState<"signin" | "signup">(initialAuthMode);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent) => {
@@ -38,18 +40,17 @@ export default function PhoneVerificationPage() {
       return;
     }
 
-    setLoading(true);
     setError("");
 
     try {
-      await sendOtp(phoneNumber, accountType);
+      await dispatch(
+        sendOtpRequest({ phoneNumber, accountType }),
+      ).unwrap();
       navigate(authMode === "signup" && accountType !== "admin" ? "/signup" : "/signin", {
         state: { phone: phoneNumber, accountType, authMode },
       });
     } catch (err) {
-      setError(getApiErrorMessage(err));
-    } finally {
-      setLoading(false);
+      setError(String(err));
     }
   };
 
@@ -94,9 +95,9 @@ export default function PhoneVerificationPage() {
             <option value="signup">Create account</option>
           </select>
         )}
-        <button disabled={loading} type="submit">
-          {loading ? "Sending OTP..." : "Continue"}
-        </button>
+        <LoadingButton isLoading={loading} loadingText="Sending OTP..." type="submit">
+          Continue
+        </LoadingButton>
       </form>
     </main>
   );

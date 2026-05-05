@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type { BookingStatus } from "../../types/apiTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { LoadingButton } from "../../components/ui";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   assignAdminBooking,
@@ -18,7 +19,6 @@ export default function AdminBookings() {
     (state) => state.admin,
   );
   const [filter, setFilter] = useState<FilterStatus>("all");
-  const [assigningBooking, setAssigningBooking] = useState<string | null>(null);
   const [selectedCleaner, setSelectedCleaner] = useState<string>("");
   const [assignError, setAssignError] = useState("");
 
@@ -37,7 +37,6 @@ export default function AdminBookings() {
 
   const handleAssign = async (bookingId: string) => {
     if (!selectedCleaner) return;
-    setAssigningBooking(bookingId);
     setAssignError("");
     try {
       await dispatch(
@@ -47,8 +46,6 @@ export default function AdminBookings() {
       setSelectedCleaner("");
     } catch (error) {
       setAssignError(String(error));
-    } finally {
-      setAssigningBooking(null);
     }
   };
 
@@ -95,7 +92,7 @@ export default function AdminBookings() {
           ))}
         </div>
 
-        {loading ? (
+        {loading && bookings.length === 0 ? (
           <div className="loading-container">
             <div className="loading-spinner"></div>
             <p>Loading bookings...</p>
@@ -183,17 +180,17 @@ export default function AdminBookings() {
                         </option>
                       ))}
                     </select>
-                    <button
+                    <LoadingButton
                       className="btn-assign"
                       onClick={() => handleAssign(booking.id)}
+                      isLoading={loading}
+                      loadingText="Assigning..."
                       disabled={
-                        !selectedCleaner || assigningBooking === booking.id
+                        !selectedCleaner
                       }
                     >
-                      {assigningBooking === booking.id
-                        ? "Assigning..."
-                        : "Assign Cleaner"}
-                    </button>
+                      Assign Cleaner
+                    </LoadingButton>
                   </div>
                 )}
 
