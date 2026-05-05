@@ -12,8 +12,8 @@ import {
 } from "../../store/slices/customerSlice";
 import {
   getCurrentCoordinates,
-  reverseGeocodeCoordinates,
 } from "../../utils/locationUtils";
+import { formatAddress } from "../../utils/addressUtils";
 import "./CustomerAddresses.css";
 
 interface AddressFormData {
@@ -129,29 +129,14 @@ export default function CustomerAddresses() {
 
     try {
       const coordinates = await getCurrentCoordinates();
-      let geocoded: Partial<AddressPayload> = {};
-
-      try {
-        geocoded = await reverseGeocodeCoordinates(coordinates);
-      } catch {
-        setSuccess(
-          "Location captured. Address lookup failed, so you can fill the address manually.",
-        );
-      }
 
       setFormData((prev) => ({
         ...prev,
-        address_line1: geocoded.address_line1 || prev.address_line1,
-        city: geocoded.city || prev.city,
-        state: geocoded.state || prev.state,
-        pincode: geocoded.pincode || prev.pincode,
         latitude: coordinates.latitude,
         longitude: coordinates.longitude,
       }));
 
-      if (Object.keys(geocoded).length) {
-        setSuccess("Location captured and address fields updated.");
-      }
+      setSuccess("Location captured. Your typed address will stay unchanged.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to capture location.");
     } finally {
@@ -200,10 +185,7 @@ export default function CustomerAddresses() {
                   <span className="default-badge">Default</span>
                 )}
                 <h3>{address.address_label || "Address"}</h3>
-                <p className="address-text">{address.address_line1}</p>
-                <p className="address-text">
-                  {address.city}, {address.state} - {address.pincode}
-                </p>
+                <p className="address-text">{formatAddress(address)}</p>
                 {address.latitude != null && address.longitude != null && (
                   <div className="address-location-link">
                     <OpenInMapsButton

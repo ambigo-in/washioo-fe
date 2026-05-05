@@ -10,6 +10,7 @@ import {
   loadCustomerPaymentStatus,
 } from "../../store/slices/paymentSlice";
 import type { CustomerBooking } from "../../types/apiTypes";
+import { formatAddress } from "../../utils/addressUtils";
 import "./CustomerBookingDetail.css";
 
 const formatStatus = (value?: string | null) =>
@@ -129,16 +130,7 @@ export default function CustomerBookingDetail() {
 
             <section className="customer-detail-card">
               <h3>Address</h3>
-              <p>
-                {[address?.address_line1, address?.address_line2, address?.city]
-                  .filter(Boolean)
-                  .join(", ")}
-              </p>
-              <p>
-                {[address?.state, address?.pincode, address?.country]
-                  .filter(Boolean)
-                  .join(", ")}
-              </p>
+              <p>{formatAddress(address)}</p>
             </section>
 
             {booking.booking_status === "completed" && (

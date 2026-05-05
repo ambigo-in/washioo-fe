@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { fetchCleanerAssignments } from "../../api/cleanerApi";
 import type { Assignment } from "../../types/cleanerTypes";
+import { formatAddress } from "../../utils/addressUtils";
 import "./CleanerHistory.css";
 
 export default function CleanerHistory() {
@@ -194,7 +195,7 @@ export default function CleanerHistory() {
                   <div className="detail-row">
                     <span className="detail-label">Location</span>
                     <span className="detail-value">
-                      {assignment.booking?.address?.address_line1 || "N/A"}
+                      {formatAddress(assignment.booking?.address)}
                     </span>
                   </div>
                   <div className="detail-row">

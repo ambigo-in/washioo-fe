@@ -12,8 +12,8 @@ import {
 } from "../store/slices/customerSlice";
 import {
   getCurrentCoordinates,
-  reverseGeocodeCoordinates,
 } from "../utils/locationUtils";
+import { formatAddress } from "../utils/addressUtils";
 import "../styles/checkout.css";
 
 type CheckoutState = {
@@ -123,28 +123,14 @@ const CheckoutPage: React.FC = () => {
 
     try {
       const coordinates = await getCurrentCoordinates();
-      let geocoded: Partial<AddressPayload> = {};
-
-      try {
-        geocoded = await reverseGeocodeCoordinates(coordinates);
-      } catch {
-        setSuccess(
-          "Location captured. Address lookup failed, so you can fill the address manually.",
-        );
-      }
 
       setFormData((prev) => ({
         ...prev,
-        ...Object.fromEntries(
-          Object.entries(geocoded).filter(([, value]) => value),
-        ),
         ...coordinates,
         location_verified: true,
       }));
 
-      if (Object.keys(geocoded).length) {
-        setSuccess("Location captured and address fields updated.");
-      }
+      setSuccess("Location captured. Your typed address will stay unchanged.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to capture location.");
     } finally {
@@ -250,15 +236,7 @@ const CheckoutPage: React.FC = () => {
                     type="button"
                   >
                     <h3>{address.address_label || "Saved address"}</h3>
-                    <p>
-                      {address.address_line1}
-                      {address.city ? `, ${address.city}` : ""}
-                    </p>
-                    <span>
-                      {[address.state, address.pincode, address.country]
-                        .filter(Boolean)
-                        .join(", ")}
-                    </span>
+                    <p>{formatAddress(address)}</p>
                   </button>
                 ))}
               </div>
@@ -349,7 +327,7 @@ const CheckoutPage: React.FC = () => {
               <div className="selected-address-summary">
                 <span>Service address</span>
                 <strong>{selectedAddress.address_label || "Address"}</strong>
-                <p>{selectedAddress.address_line1}</p>
+                <p>{formatAddress(selectedAddress)}</p>
               </div>
             )}
 

@@ -14,6 +14,7 @@ import {
 } from "../../store/slices/paymentSlice";
 import type { Payment, PaymentStatus, PaymentType } from "../../types/apiTypes";
 import type { CleanerBookingDetail } from "../../types/cleanerTypes";
+import { formatAddress } from "../../utils/addressUtils";
 import "./CleanerBookingDetails.css";
 
 const formatStatus = (value?: string | null) =>
@@ -167,16 +168,7 @@ export default function CleanerBookingDetails() {
 
             <section className="detail-card">
               <h3>Address</h3>
-              <p className="full-address">
-                {[address?.address_line1, address?.address_line2, address?.city]
-                  .filter(Boolean)
-                  .join(", ")}
-              </p>
-              <p className="full-address">
-                {[address?.state, address?.pincode, address?.country]
-                  .filter(Boolean)
-                  .join(", ")}
-              </p>
+              <p className="full-address">{formatAddress(address)}</p>
             </section>
 
             <section className="detail-card">

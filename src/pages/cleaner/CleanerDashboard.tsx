@@ -7,6 +7,7 @@ import {
   loadCleanerProfile,
 } from "../../store/slices/cleanerSlice";
 import CleanerEarnings from "./CleanerEarnings";
+import { formatAddress } from "../../utils/addressUtils";
 import "./CleanerDashboard.css";
 
 export default function CleanerDashboard() {
@@ -117,10 +118,7 @@ export default function CleanerDashboard() {
                       {assignment.booking.scheduled_time.slice(0, 5)}
                     </p>
                     <p className="customer-address">
-                      {assignment.booking.address.address_line1}
-                      {assignment.booking.address.city
-                        ? `, ${assignment.booking.address.city}`
-                        : ""}
+                      {formatAddress(assignment.booking.address)}
                     </p>
                   </div>
                   <div className="assignment-actions">

@@ -9,6 +9,7 @@ import {
   loadAdminBookings,
   loadAdminCleaners,
 } from "../../store/slices/adminSlice";
+import { formatAddress } from "../../utils/addressUtils";
 import "./AdminBookings.css";
 
 type FilterStatus = "all" | BookingStatus;
@@ -146,7 +147,7 @@ export default function AdminBookings() {
                   <div className="detail-item">
                     <span className="label">Address</span>
                     <span className="value">
-                      {booking.address.address_line1}, {booking.address.city}
+                      {formatAddress(booking.address)}
                     </span>
                   </div>
                   <div className="detail-item">

@@ -12,6 +12,7 @@ import {
 } from "../../store/slices/cleanerSlice";
 import { loadCleanerEarnings } from "../../store/slices/paymentSlice";
 import type { PaymentType } from "../../types/apiTypes";
+import { formatAddress } from "../../utils/addressUtils";
 import "./CleanerAssignments.css";
 
 type FilterStatus =
@@ -216,8 +217,7 @@ export default function CleanerAssignments() {
                     <div className="detail-row">
                       <span className="label">📍 Location:</span>
                       <span>
-                        {assignment.booking.address.address_line1},{" "}
-                        {assignment.booking.address.city}
+                        {formatAddress(assignment.booking.address)}
                       </span>
                     </div>
                     {assignment.booking.special_instructions && (

@@ -9,6 +9,7 @@ import {
   loadCustomerBookings,
   patchBooking,
 } from "../store/slices/customerSlice";
+import { formatAddress } from "../utils/addressUtils";
 import "../styles/myBookings.css";
 
 const statusLabel: Record<BookingStatus, string> = {
@@ -171,10 +172,7 @@ const MyBookingsPage: React.FC = () => {
 
                 <div className="booking-address">
                   <span>Address</span>
-                  <p>
-                    {booking.address.address_line1}
-                    {booking.address.city ? `, ${booking.address.city}` : ""}
-                  </p>
+                  <p>{formatAddress(booking.address)}</p>
                 </div>
 
                 {booking.special_instructions && (
