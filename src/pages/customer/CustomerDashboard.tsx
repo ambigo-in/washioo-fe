@@ -19,9 +19,8 @@ export default function CustomerDashboard() {
   );
   const loading = customerLoading || servicesLoading;
   const serviceImages =[
-    "/p1.png",
     "/p2.png",
-    "/p3.png",
+    "/p1.png"
   ]
 
   useEffect(() => {
@@ -120,13 +119,13 @@ export default function CustomerDashboard() {
         {/* Available Services */}
         <section className="available-services">
           <h2>Available Services</h2>
-          <div className="services-grid">
+          <div className="customer-services-grid">
             {activeServices.map((service, index) => (
-              <div key={service.id} className="service-card">
+              <div key={service.id} className="customer-service-card">
                 <img
                   src={serviceImages[index % serviceImages.length]}
                   alt={service.service_name}
-                  className="service-image"
+                  className="customer-service-image"
                 />
                 <h3>{service.service_name}</h3>
                 <p>{service.description}</p>

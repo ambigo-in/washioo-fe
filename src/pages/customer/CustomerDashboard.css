@@ -105,13 +105,13 @@
   margin-bottom: 32px;
 }
 
-.services-grid {
+.customer-services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 16px;
 }
 
-.service-card {
+.customer-service-card {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -122,13 +122,22 @@
   height: auto;
 }
 
-.service-card h3 {
+.customer-service-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.customer-service-card h3 {
   margin: 0 0 8px;
   font-size: 1.1rem;
   color: var(--brand-text);
 }
 
-.service-card p {
+.customer-service-card p {
   margin: 0 0 16px;
   font-size: 0.9rem;
   color: var(--brand-text-muted);
