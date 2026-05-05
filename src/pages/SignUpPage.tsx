@@ -26,6 +26,8 @@ export default function SignUpPage() {
   const phone = state?.phone || "";
   const accountType =
     state?.accountType === "cleaner" ? state.accountType : "customer";
+  const dashboardPath =
+    accountType === "cleaner" ? "/cleaner/dashboard" : "/dashboard";
 
   useEffect(() => {
     if (!phone) navigate("/verify-phone", { replace: true });
@@ -79,17 +81,8 @@ export default function SignUpPage() {
           accountType,
         }),
       ).unwrap();
-      const user = await login();
-      // Route based on user roles - priority: admin > cleaner > customer
-      if (user?.roles.includes("admin")) {
-        navigate("/admin/dashboard", { replace: true });
-      } else if (user?.roles.includes("cleaner")) {
-        navigate("/cleaner/dashboard", { replace: true });
-      } else if (user?.roles.includes("customer")) {
-        navigate("/dashboard", { replace: true });
-      } else {
-        navigate("/", { replace: true });
-      }
+      await login();
+      navigate(dashboardPath, { replace: true });
     } catch (err) {
       setError(String(err));
     }

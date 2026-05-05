@@ -94,7 +94,7 @@ export default function DashboardLayout({
   children,
   title,
 }: DashboardLayoutProps) {
-  const { user, logout, roles, activeRole, setActiveRole } = useAuth();
+  const { user, logout, activeRole } = useAuth();
   const { loading } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -110,19 +110,6 @@ export default function DashboardLayout({
 
   const getRoleDisplay = (role?: UserRole | null) =>
     role ? role.charAt(0).toUpperCase() + role.slice(1) : "User";
-
-  const getDashboardPath = (role: UserRole) => {
-    if (role === "admin") return "/admin/dashboard";
-    if (role === "cleaner") return "/cleaner/dashboard";
-    return "/dashboard";
-  };
-
-  const handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const nextRole = event.target.value as UserRole;
-    setActiveRole(nextRole);
-    closeSidebar();
-    navigate(getDashboardPath(nextRole));
-  };
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -154,19 +141,6 @@ export default function DashboardLayout({
           <h2>Washioo</h2>
           <span className="role-badge">{getRoleDisplay(activeRole)}</span>
         </div>
-
-        {roles.length > 1 && activeRole && (
-          <label className="role-switcher">
-            <span>Viewing as</span>
-            <select value={activeRole} onChange={handleRoleChange}>
-              {roles.map((role) => (
-                <option key={role} value={role}>
-                  {getRoleDisplay(role)}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
 
         <nav className="sidebar-nav">
           {filteredNavItems.map((item) => (

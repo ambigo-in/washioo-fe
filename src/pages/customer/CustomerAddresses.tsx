@@ -100,13 +100,14 @@ export default function CustomerAddresses() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this address?")) {
+    if (!window.confirm("Remove this address?")) {
       return;
     }
     try {
       await dispatch(removeAddress(id)).unwrap();
+      setSuccess("Address removed.");
     } catch (err) {
-      setError("Failed to delete address");
+      setError("Failed to remove address");
       console.error(err);
     }
   };
@@ -164,7 +165,7 @@ export default function CustomerAddresses() {
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
 
-        {loading ? (
+        {loading && addresses.length === 0 ? (
           <div className="loading-container">
             <div className="loading-spinner" />
             <p>Loading addresses...</p>
@@ -215,10 +216,10 @@ export default function CustomerAddresses() {
                   <LoadingButton
                     className="btn-link danger"
                     isLoading={loading}
-                    loadingText="Deleting..."
+                    loadingText="Removing..."
                     onClick={() => handleDelete(String(address.id))}
                   >
-                    Delete
+                    Remove address
                   </LoadingButton>
                 </div>
               </div>

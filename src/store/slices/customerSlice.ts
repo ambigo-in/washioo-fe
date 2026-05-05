@@ -88,8 +88,8 @@ export const removeAddress = createAsyncThunk(
   "customer/removeAddress",
   async (addressId: string, { rejectWithValue }) => {
     try {
-      await deleteAddress(addressId);
-      return addressId;
+      const response = await deleteAddress(addressId);
+      return response.address_id ?? addressId;
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error));
     }

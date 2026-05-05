@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import type { UserRole } from "../types/apiTypes";
@@ -10,20 +10,8 @@ const ProtectedRoute: React.FC<{
   children,
   roles,
 }) => {
-  const { isAuthenticated, isLoading, hasRole, activeRole, setActiveRole } =
-    useAuth();
+  const { isAuthenticated, isLoading, hasRole, activeRole } = useAuth();
   const location = useLocation();
-
-  useEffect(() => {
-    if (
-      isAuthenticated &&
-      roles?.length === 1 &&
-      hasRole(roles[0]) &&
-      activeRole !== roles[0]
-    ) {
-      setActiveRole(roles[0]);
-    }
-  }, [activeRole, hasRole, isAuthenticated, roles, setActiveRole]);
 
   if (isLoading) {
     return <div className="route-state">Checking your session...</div>;
@@ -37,7 +25,17 @@ const ProtectedRoute: React.FC<{
     return <Navigate to="/" replace />;
   }
 
+  if (roles?.length && activeRole && !roles.includes(activeRole)) {
+    return <Navigate to={getDashboardPath(activeRole)} replace />;
+  }
+
   return <>{children}</>;
+};
+
+const getDashboardPath = (role: UserRole) => {
+  if (role === "admin") return "/admin/dashboard";
+  if (role === "cleaner") return "/cleaner/dashboard";
+  return "/dashboard";
 };
 
 export default ProtectedRoute;

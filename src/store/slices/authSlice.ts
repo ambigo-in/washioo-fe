@@ -12,6 +12,7 @@ import {
   clearTokens,
   getAccessToken,
   getRefreshToken,
+  getTokenActiveRole,
   saveTokens,
 } from "../../utils/tokenManager";
 import type {
@@ -28,6 +29,7 @@ type AuthState = {
   isLoading: boolean;
   loading: boolean;
   resendLoading: boolean;
+  activeRole: UserRole | null;
   error: string | null;
 };
 
@@ -37,6 +39,7 @@ const initialState: AuthState = {
   isLoading: true,
   loading: false,
   resendLoading: false,
+  activeRole: getTokenActiveRole(),
   error: null,
 };
 
@@ -161,6 +164,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.isLoading = false;
       state.loading = false;
+      state.activeRole = action.payload.account_type ?? getTokenActiveRole();
       state.error = null;
     },
     setUser(state, action: PayloadAction<UserProfile | null>) {
@@ -174,6 +178,7 @@ const authSlice = createSlice({
       state.isLoading = false;
       state.loading = false;
       state.resendLoading = false;
+      state.activeRole = null;
       state.error = null;
     },
   },
@@ -185,18 +190,21 @@ const authSlice = createSlice({
       .addCase(hydrateSession.fulfilled, (state, action) => {
         state.user = action.payload;
         state.isAuthenticated = !!action.payload;
+        state.activeRole = action.payload ? getTokenActiveRole() : null;
         state.isLoading = false;
         state.error = null;
       })
       .addCase(hydrateSession.rejected, (state, action) => {
         state.user = null;
         state.isAuthenticated = false;
+        state.activeRole = null;
         state.isLoading = false;
         state.error = String(action.payload ?? "Session expired.");
       })
       .addCase(refreshCurrentUser.fulfilled, (state, action) => {
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.activeRole = getTokenActiveRole();
         state.error = null;
       })
       .addCase(logoutSession.fulfilled, (state) => {
@@ -204,6 +212,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.isLoading = false;
         state.loading = false;
+        state.activeRole = null;
         state.error = null;
       })
       .addCase(resendOtp.pending, (state) => {
@@ -221,11 +230,13 @@ const authSlice = createSlice({
         saveTokens(action.payload.access_token, action.payload.refresh_token);
         state.user = action.payload.user ?? null;
         state.isAuthenticated = true;
+        state.activeRole = action.payload.account_type ?? getTokenActiveRole();
       })
       .addCase(signInRequest.fulfilled, (state, action) => {
         saveTokens(action.payload.access_token, action.payload.refresh_token);
         state.user = action.payload.user ?? null;
         state.isAuthenticated = true;
+        state.activeRole = action.payload.account_type ?? getTokenActiveRole();
       })
       .addCase(updateProfileRequest.fulfilled, (state, action) => {
         state.user = action.payload.user;

@@ -25,7 +25,12 @@ export const updateAddress = (addressId: string, payload: Partial<AddressPayload
   );
 
 export const deleteAddress = (addressId: string) =>
-  apiRequest<{ message: string; address_id: string }>(
+  apiRequest<{
+    message: string;
+    address_id?: string;
+    soft_deleted?: boolean;
+    hard_deleted?: boolean;
+  }>(
     `/services/address/${addressId}`,
     {
       method: "DELETE",
