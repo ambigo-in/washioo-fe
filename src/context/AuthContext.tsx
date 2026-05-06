@@ -8,6 +8,7 @@ import {
   refreshCurrentUser,
   setUser as setAuthUser,
 } from "../store/slices/authSlice";
+import { removeCleanerPushSubscription } from "../utils/pushNotifications";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -30,11 +31,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = refreshUser;
 
   const logout = async () => {
+    if (activeRole === "cleaner") {
+      await removeCleanerPushSubscription();
+    }
     await dispatch(logoutSession()).unwrap();
   };
 
   const hasRole = (role: UserRole) => roles.includes(role);
-  const setActiveRole = (_role: UserRole) => {
+  const setActiveRole = () => {
     // Active role is controlled by the role-specific auth endpoint/JWT.
   };
 

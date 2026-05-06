@@ -151,3 +151,29 @@ export interface AssignBookingPayload {
   cleaner_id: string;
   cleaner_notes?: string;
 }
+
+export interface WebPushPublicKeyResponse {
+  message: string;
+  web_push: {
+    enabled: boolean;
+    public_key: string | null;
+  };
+}
+
+export interface WebPushSubscriptionPayload {
+  endpoint: string;
+  expirationTime?: number | null;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
+
+export interface CleanerNotification {
+  id: string;
+  title: string;
+  message: string;
+  notification_type: string;
+  is_read: boolean;
+  created_at: string;
+}

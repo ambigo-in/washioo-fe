@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { LoadingButton } from "../ui";
 import { useAuth } from "../../context/useAuth";
 import { useAppSelector } from "../../store/hooks";
+import {
+  fetchNotifications,
+  markNotificationRead,
+} from "../../api/notificationApi";
 import type { UserRole } from "../../types/apiTypes";
+import type { NotificationItem } from "../../types/apiTypes";
+import { registerCleanerPushNotifications } from "../../utils/pushNotifications";
 import "./DashboardLayout.css";
 
 interface NavItem {
@@ -98,10 +104,44 @@ export default function DashboardLayout({
   const { loading } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const pushRegistrationAttempted = useRef(false);
 
   const filteredNavItems = navItems.filter((item) =>
     activeRole ? item.roles.includes(activeRole) : false,
   );
+  const unreadCount = notifications.filter((item) => !item.is_read).length;
+
+  useEffect(() => {
+    if (!activeRole) return;
+
+    let cancelled = false;
+
+    const loadNotifications = async () => {
+      try {
+        const response = await fetchNotifications(activeRole);
+        if (!cancelled) setNotifications(response.notifications);
+      } catch {
+        if (!cancelled) setNotifications([]);
+      }
+    };
+
+    loadNotifications();
+    const intervalId = window.setInterval(loadNotifications, 60000);
+
+    if (activeRole === "cleaner" && !pushRegistrationAttempted.current) {
+      pushRegistrationAttempted.current = true;
+      registerCleanerPushNotifications().catch(() => {
+        // The notification bell remains the fallback when browser push setup fails.
+      });
+    }
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [activeRole]);
 
   const handleLogout = async () => {
     await logout();
@@ -117,6 +157,46 @@ export default function DashboardLayout({
 
   const closeSidebar = () => {
     setSidebarOpen(false);
+  };
+
+  const getNotificationLandingPath = (role?: UserRole) => {
+    switch (role) {
+      case "cleaner":
+        return "/cleaner/assignments";
+      case "admin":
+        return "/admin/bookings";
+      case "customer":
+        return "/my-bookings";
+      default:
+        return "/";
+    }
+  };
+
+  const handleNotificationClick = async (notification: NotificationItem) => {
+    if (!notification.is_read && activeRole) {
+      try {
+        const response = await markNotificationRead(
+          activeRole,
+          notification.id,
+        );
+        setNotifications((current) =>
+          current.map((item) =>
+            item.id === notification.id ? response.notification : item,
+          ),
+        );
+      } catch {
+        setNotifications((current) =>
+          current.map((item) =>
+            item.id === notification.id ? { ...item, is_read: true } : item,
+          ),
+        );
+      }
+    }
+
+    setNotificationOpen(false);
+    navigate(
+      notification.url || getNotificationLandingPath(activeRole || "customer"),
+    );
   };
 
   return (
@@ -180,6 +260,73 @@ export default function DashboardLayout({
         {title && (
           <header className="dashboard-header">
             <h1>{title}</h1>
+            {activeRole && (
+              <div className="notification-wrapper">
+                <button
+                  className="notification-button"
+                  type="button"
+                  aria-label="Cleaner notifications"
+                  onClick={() => setNotificationOpen((current) => !current)}
+                >
+                  <span className="notification-bell" aria-hidden="true" />
+                  {unreadCount > 0 && (
+                    <span className="notification-count">{unreadCount}</span>
+                  )}
+                </button>
+                {notificationOpen && (
+                  <div className="notification-menu">
+                    <div className="notification-menu-header">
+                      <div>
+                        <strong>Notifications</strong>
+                        <div>{unreadCount} unread</div>
+                      </div>
+                      <button
+                        type="button"
+                        className="notification-view-all"
+                        onClick={() => {
+                          setNotificationOpen(false);
+                          navigate("/notifications");
+                        }}
+                      >
+                        View all
+                      </button>
+                    </div>
+                    {notifications.length ? (
+                      <div className="notification-list">
+                        {notifications.map((notification) => (
+                          <button
+                            key={notification.id}
+                            className={`notification-item ${
+                              notification.is_read ? "" : "unread"
+                            }`}
+                            type="button"
+                            onClick={() =>
+                              handleNotificationClick(notification)
+                            }
+                          >
+                            <span className="notification-title">
+                              {notification.title}
+                            </span>
+                            <span className="notification-message">
+                              {notification.message}
+                            </span>
+                            <span className="notification-time">
+                              {new Date(
+                                notification.created_at,
+                              ).toLocaleString()}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="notification-empty">
+                        No notifications yet.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </header>
         )}
         {children}

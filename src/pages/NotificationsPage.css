@@ -1,0 +1,110 @@
+.notifications-page {
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.notifications-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.notifications-header h2 {
+  margin: 0 0 6px;
+  color: var(--brand-text);
+}
+
+.notifications-header p {
+  margin: 0;
+  color: var(--brand-text-muted);
+  line-height: 1.6;
+}
+
+.notifications-mark-all {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: var(--brand-teal);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.notifications-mark-all:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.notifications-list {
+  display: grid;
+  gap: 14px;
+}
+
+.notifications-card {
+  width: 100%;
+  border: 1px solid var(--brand-border);
+  border-radius: 14px;
+  padding: 18px;
+  background: var(--brand-surface);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.notifications-card:hover {
+  transform: translateY(-1px);
+  background: var(--brand-white);
+}
+
+.notifications-card.unread {
+  border-color: var(--brand-teal-soft);
+  background: rgba(181, 255, 236, 0.55);
+}
+
+.notifications-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.notifications-card-header strong {
+  font-size: 1rem;
+}
+
+.notifications-card-header span {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--brand-teal);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.notifications-card p {
+  margin: 0 0 10px;
+  color: var(--brand-text-muted);
+  line-height: 1.6;
+}
+
+.notifications-card small {
+  color: var(--brand-text-muted);
+  font-size: 0.82rem;
+}
+
+.notifications-empty {
+  padding: 42px 24px;
+  border: 1px dashed var(--brand-border);
+  border-radius: 16px;
+  color: var(--brand-text-muted);
+  text-align: center;
+}

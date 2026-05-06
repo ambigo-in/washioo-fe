@@ -29,7 +29,9 @@ const CustomerBookingDetail = lazy(
   () => import("./pages/customer/CustomerBookingDetail"),
 );
 const CustomerProfile = lazy(() => import("./pages/customer/CustomerProfile"));
-const CustomerVehicles = lazy(() => import("./pages/customer/CustomerVehicles"));
+const CustomerVehicles = lazy(
+  () => import("./pages/customer/CustomerVehicles"),
+);
 
 const CleanerDashboard = lazy(() => import("./pages/cleaner/CleanerDashboard"));
 const CleanerAssignments = lazy(
@@ -52,6 +54,7 @@ const AdminServices = lazy(() => import("./pages/admin/AdminServices"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminRatings = lazy(() => import("./pages/admin/AdminRatings"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 
 function App() {
   return (
@@ -66,213 +69,221 @@ function App() {
               element={<TermsAndConditionsPage />}
             />
 
-          {/* Auth Routes */}
-          <Route
-            path="/verify-phone"
-            element={
-              <PublicRoute>
-                <PhoneVerificationPage />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/signin"
-            element={
-              <PublicRoute>
-                <SignInPage />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/signup"
-            element={
-              <PublicRoute>
-                <SignUpPage />
-              </PublicRoute>
-            }
-          />
+            {/* Auth Routes */}
+            <Route
+              path="/verify-phone"
+              element={
+                <PublicRoute>
+                  <PhoneVerificationPage />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/signin"
+              element={
+                <PublicRoute>
+                  <SignInPage />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/signup"
+              element={
+                <PublicRoute>
+                  <SignUpPage />
+                </PublicRoute>
+              }
+            />
 
-          {/* Customer Routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute roles={["customer"]}>
-                <CustomerDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/bookings"
-            element={
-              <ProtectedRoute roles={["customer"]}>
-                <BookingsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/checkout"
-            element={
-              <ProtectedRoute roles={["customer"]}>
-                <CheckoutPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/my-bookings"
-            element={
-              <ProtectedRoute roles={["customer"]}>
-                <MyBookingsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/customer/bookings/:bookingId"
-            element={
-              <ProtectedRoute roles={["customer"]}>
-                <CustomerBookingDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/addresses"
-            element={
-              <ProtectedRoute roles={["customer"]}>
-                <CustomerAddresses />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute roles={["customer"]}>
-                <CustomerProfile />
-              </ProtectedRoute>
-            }
-          />
+            {/* Customer Routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute roles={["customer"]}>
+                  <CustomerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/bookings"
+              element={
+                <ProtectedRoute roles={["customer"]}>
+                  <BookingsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <ProtectedRoute roles={["customer"]}>
+                  <CheckoutPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-bookings"
+              element={
+                <ProtectedRoute roles={["customer"]}>
+                  <MyBookingsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/customer/bookings/:bookingId"
+              element={
+                <ProtectedRoute roles={["customer"]}>
+                  <CustomerBookingDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/addresses"
+              element={
+                <ProtectedRoute roles={["customer"]}>
+                  <CustomerAddresses />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute roles={["customer"]}>
+                  <CustomerProfile />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Cleaner Routes */}
-          <Route
-            path="/cleaner/dashboard"
-            element={
-              <ProtectedRoute roles={["cleaner"]}>
-                <CleanerDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/cleaner/assignments"
-            element={
-              <ProtectedRoute roles={["cleaner"]}>
-                <CleanerAssignments />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/cleaner/bookings/:bookingId"
-            element={
-              <ProtectedRoute roles={["cleaner"]}>
-                <CleanerBookingDetails />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/cleaner/availability"
-            element={
-              <ProtectedRoute roles={["cleaner"]}>
-                <CleanerAvailability />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/cleaner/history"
-            element={
-              <ProtectedRoute roles={["cleaner"]}>
-                <CleanerHistory />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/cleaner/profile"
-            element={
-              <ProtectedRoute roles={["cleaner"]}>
-                <CleanerProfile />
-              </ProtectedRoute>
-            }
-          />
+            {/* Cleaner Routes */}
+            <Route
+              path="/cleaner/dashboard"
+              element={
+                <ProtectedRoute roles={["cleaner"]}>
+                  <CleanerDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cleaner/assignments"
+              element={
+                <ProtectedRoute roles={["cleaner"]}>
+                  <CleanerAssignments />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cleaner/bookings/:bookingId"
+              element={
+                <ProtectedRoute roles={["cleaner"]}>
+                  <CleanerBookingDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cleaner/availability"
+              element={
+                <ProtectedRoute roles={["cleaner"]}>
+                  <CleanerAvailability />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cleaner/history"
+              element={
+                <ProtectedRoute roles={["cleaner"]}>
+                  <CleanerHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/cleaner/profile"
+              element={
+                <ProtectedRoute roles={["cleaner"]}>
+                  <CleanerProfile />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Admin Routes */}
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute roles={["admin"]}>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/bookings"
-            element={
-              <ProtectedRoute roles={["admin"]}>
-                <AdminBookings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/payments"
-            element={
-              <ProtectedRoute roles={["admin"]}>
-                <AdminPayments />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/vehicles"
-            element={
-              <ProtectedRoute roles={["customer"]}>
-                <CustomerVehicles />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/ratings"
-            element={
-              <ProtectedRoute roles={["admin"]}>
-                <AdminRatings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/cleaners"
-            element={
-              <ProtectedRoute roles={["admin"]}>
-                <AdminCleaners />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/services"
-            element={
-              <ProtectedRoute roles={["admin"]}>
-                <AdminServices />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/users"
-            element={
-              <ProtectedRoute roles={["admin"]}>
-                <AdminUsers />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/settings"
-            element={
-              <ProtectedRoute roles={["admin"]}>
-                <AdminSettings />
-              </ProtectedRoute>
-            }
-          />
+            {/* Admin Routes */}
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/bookings"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminBookings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/payments"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminPayments />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vehicles"
+              element={
+                <ProtectedRoute roles={["customer"]}>
+                  <CustomerVehicles />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/ratings"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminRatings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/cleaners"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminCleaners />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/services"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminServices />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminUsers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/settings"
+              element={
+                <ProtectedRoute roles={["admin"]}>
+                  <AdminSettings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute roles={["customer", "cleaner", "admin"]}>
+                  <NotificationsPage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />

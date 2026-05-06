@@ -124,6 +124,192 @@
   min-height: 100vh;
 }
 
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+}
+
+.notification-wrapper {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.notification-button {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  background: var(--brand-white);
+  color: var(--brand-text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-button:hover {
+  background: var(--brand-surface);
+}
+
+.notification-bell {
+  position: relative;
+  width: 16px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 10px 10px 4px 4px;
+}
+
+.notification-bell::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -5px;
+  width: 6px;
+  height: 5px;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  transform: translateX(-50%);
+}
+
+.notification-bell::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 8px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  transform: translateX(-50%);
+}
+
+.notification-count {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #dc3545;
+  color: var(--brand-white);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.notification-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: min(360px, calc(100vw - 32px));
+  max-height: 460px;
+  overflow: hidden;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+  z-index: 20;
+}
+
+.notification-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--brand-border);
+  color: var(--brand-text);
+}
+
+.notification-menu-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.notification-menu-header span,
+.notification-menu-header div > div {
+  color: var(--brand-text-muted);
+  font-size: 0.85rem;
+}
+
+.notification-view-all {
+  border: none;
+  background: transparent;
+  color: var(--brand-teal);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.notification-view-all:hover {
+  background: rgba(17, 94, 89, 0.08);
+}
+
+.notification-list {
+  max-height: 390px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--brand-border);
+  background: var(--brand-white);
+  color: var(--brand-text);
+  cursor: pointer;
+  display: grid;
+  gap: 5px;
+  padding: 12px 16px;
+  text-align: left;
+}
+
+.notification-item:hover {
+  background: var(--brand-surface);
+}
+
+.notification-item.unread {
+  background: var(--brand-teal-soft);
+}
+
+.notification-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.notification-message {
+  color: var(--brand-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.notification-time {
+  color: var(--brand-text-muted);
+  font-size: 0.78rem;
+}
+
+.notification-empty {
+  margin: 0;
+  padding: 18px 16px;
+  color: var(--brand-text-muted);
+  font-size: 0.9rem;
+}
+
 /* Mobile Header */
 .mobile-header {
   display: none;
@@ -183,7 +369,7 @@
   .dashboard-sidebar {
     width: 220px;
   }
-  
+
   .dashboard-main {
     margin-left: 220px;
     padding: 20px 24px;
@@ -196,40 +382,44 @@
     width: 280px;
     transform: translateX(-100%);
   }
-  
+
   .dashboard-sidebar.open {
     transform: translateX(0);
   }
-  
+
   .dashboard-main {
     margin-left: 0;
     padding: 80px 16px 20px;
   }
-  
+
+  .dashboard-header {
+    align-items: flex-start;
+  }
+
   .mobile-header {
     display: flex;
   }
-  
+
   .sidebar-overlay.show {
     display: block;
   }
-  
+
   .sidebar-header {
     padding: 16px 20px;
   }
-  
+
   .sidebar-header h2 {
     font-size: 1.25rem;
   }
-  
+
   .nav-item {
     padding: 14px 16px;
   }
-  
+
   .nav-label {
     font-size: 1rem;
   }
-  
+
   .sidebar-footer {
     padding: 12px 20px;
   }
@@ -240,6 +430,8 @@
   .dashboard-main {
     padding: 76px 12px 16px;
   }
-  
+
   .mobile-logo {
     font-size: 1.1rem;
+  }
+}
