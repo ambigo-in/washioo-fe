@@ -1,5 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { apiRequest, getApiErrorMessage, withQuery } from "../../api/client";
+import {
+  apiRequest,
+  getApiErrorMessage,
+  withQuery,
+  type PaginationParams,
+} from "../../api/client";
 import type {
   AdminPaymentSplitRequest,
   CleanerEarningsSummary,
@@ -12,6 +17,7 @@ import type {
 
 type PaymentState = {
   payments: Payment[];
+  paymentsTotal: number;
   earnings: CleanerEarningsSummary | null;
   customerPaymentStatus: CustomerPaymentStatus | null;
   loading: boolean;
@@ -20,6 +26,7 @@ type PaymentState = {
 
 const initialState: PaymentState = {
   payments: [],
+  paymentsTotal: 0,
   earnings: null,
   customerPaymentStatus: null,
   loading: false,
@@ -71,7 +78,15 @@ export const submitAdminSplit = createAsyncThunk(
 export const loadAdminPayments = createAsyncThunk(
   "payments/loadAdminPayments",
   async (
-    filter:
+    payload:
+      | (PaginationParams & {
+          filter?:
+            | PaymentStatus
+            | {
+                status?: PaymentStatus;
+                cleaner_handover_status?: CleanerHandoverStatus;
+              };
+        })
       | PaymentStatus
       | {
           status?: PaymentStatus;
@@ -81,19 +96,33 @@ export const loadAdminPayments = createAsyncThunk(
     { rejectWithValue },
   ) => {
     try {
-      const params =
-        typeof filter === "string"
-          ? { status: filter }
-          : {
-              status: filter?.status,
-              cleaner_handover_status: filter?.cleaner_handover_status,
-            };
+      const params: PaginationParams & {
+        status?: PaymentStatus;
+        cleaner_handover_status?: CleanerHandoverStatus;
+      } = { limit: 50, offset: 0 };
+
+      if (typeof payload === "string") {
+        params.status = payload;
+      } else if (payload && "filter" in payload) {
+        params.limit = payload.limit ?? 50;
+        params.offset = payload.offset ?? 0;
+        if (typeof payload.filter === "string") {
+          params.status = payload.filter;
+        } else {
+          params.status = payload.filter?.status;
+          params.cleaner_handover_status =
+            payload.filter?.cleaner_handover_status;
+        }
+      } else if (payload && "status" in payload) {
+        params.status = payload.status;
+        params.cleaner_handover_status = payload.cleaner_handover_status;
+      }
       return await apiRequest<{
         message: string;
         payments: Payment[];
         total: number;
       }>(
-        withQuery("/admin/payments", { limit: 50, offset: 0, ...params }),
+        withQuery("/admin/payments", params),
         { auth: true },
       );
     } catch (error) {
@@ -169,6 +198,7 @@ const paymentSlice = createSlice({
       })
       .addCase(loadAdminPayments.fulfilled, (state, action) => {
         state.payments = action.payload.payments;
+        state.paymentsTotal = action.payload.total;
         state.loading = false;
       })
       .addCase(collectPayment.pending, (state) => {

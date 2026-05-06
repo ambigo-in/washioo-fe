@@ -1,7 +1,17 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import {
+  PaginationControls,
+  SearchInput,
+  StatusTabs,
+  matchesSearch,
+  paginateItems,
+  useDashboardQueryState,
+  type StatusTabOption,
+} from "../../components/dashboard/DashboardControls";
 import { LoadingButton } from "../../components/ui";
+import { fetchCleanerAssignments } from "../../api/cleanerApi";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   acceptCleanerAssignment,
@@ -30,8 +40,14 @@ const formatMoney = (value: number) =>
 
 export default function CleanerAssignments() {
   const dispatch = useAppDispatch();
-  const { assignments, loading } = useAppSelector((state) => state.cleaner);
-  const [filter, setFilter] = useState<FilterStatus>("all");
+  const { assignments, total, loading } = useAppSelector((state) => state.cleaner);
+  const query = useDashboardQueryState<FilterStatus>("all");
+  const [counts, setCounts] = useState<Record<Exclude<FilterStatus, "all">, number>>({
+    assigned: 0,
+    accepted: 0,
+    in_progress: 0,
+    completed: 0,
+  });
   const [completeAmount, setCompleteAmount] = useState<Record<string, number>>(
     {},
   );
@@ -41,8 +57,38 @@ export default function CleanerAssignments() {
   const [actionError, setActionError] = useState("");
 
   useEffect(() => {
-    dispatch(loadCleanerAssignments(filter === "all" ? undefined : filter));
-  }, [dispatch, filter]);
+    dispatch(
+      loadCleanerAssignments({
+        status: query.status === "all" ? undefined : query.status,
+        limit: query.pageSize,
+        offset: query.offset,
+      }),
+    );
+  }, [dispatch, query.offset, query.pageSize, query.status]);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all(
+      (["assigned", "accepted", "in_progress", "completed"] as const).map(
+        async (status) => {
+          const response = await fetchCleanerAssignments(status, {
+            limit: 1,
+            offset: 0,
+          });
+          return [status, response.total] as const;
+        },
+      ),
+    )
+      .then((entries) => {
+        if (active) {
+          setCounts(Object.fromEntries(entries) as Record<Exclude<FilterStatus, "all">, number>);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [total]);
 
   const handleAccept = async (assignmentId: string) => {
     setActionError("");
@@ -53,6 +99,13 @@ export default function CleanerAssignments() {
           actionPayload: { cleaner_notes: "Accepted" },
         }),
       ).unwrap();
+      dispatch(
+        loadCleanerAssignments({
+          status: query.status === "all" ? undefined : query.status,
+          limit: query.pageSize,
+          offset: query.offset,
+        }),
+      );
     } catch (error) {
       setActionError(String(error));
     }
@@ -67,6 +120,13 @@ export default function CleanerAssignments() {
           actionPayload: { cleaner_notes: "Rejected" },
         }),
       ).unwrap();
+      dispatch(
+        loadCleanerAssignments({
+          status: query.status === "all" ? undefined : query.status,
+          limit: query.pageSize,
+          offset: query.offset,
+        }),
+      );
     } catch (error) {
       setActionError(String(error));
     }
@@ -81,6 +141,13 @@ export default function CleanerAssignments() {
           actionPayload: { cleaner_notes: "Started" },
         }),
       ).unwrap();
+      dispatch(
+        loadCleanerAssignments({
+          status: query.status === "all" ? undefined : query.status,
+          limit: query.pageSize,
+          offset: query.offset,
+        }),
+      );
     } catch (error) {
       setActionError(String(error));
     }
@@ -118,7 +185,13 @@ export default function CleanerAssignments() {
         }),
       ).unwrap();
       dispatch(loadCleanerEarnings());
-      dispatch(loadCleanerAssignments(filter === "all" ? undefined : filter));
+      dispatch(
+        loadCleanerAssignments({
+          status: query.status === "all" ? undefined : query.status,
+          limit: query.pageSize,
+          offset: query.offset,
+        }),
+      );
     } catch (error) {
       setActionError(String(error));
     }
@@ -135,40 +208,56 @@ export default function CleanerAssignments() {
     return colors[status] || "var(--brand-text-muted)";
   };
 
+  const statusOptions: Array<StatusTabOption<FilterStatus>> = (
+    ["all", "assigned", "accepted", "in_progress", "completed"] as FilterStatus[]
+  ).map((status) => ({
+    value: status,
+    label: status === "all" ? "All" : status.replace("_", " "),
+    count:
+      status === "all"
+        ? Object.values(counts).reduce((sum, count) => sum + count, 0)
+        : counts[status],
+  }));
+  const filteredAssignments = assignments.filter((assignment) =>
+    matchesSearch(assignment, query.debouncedSearch, [
+      (item) => item.booking.booking_reference,
+      (item) => item.booking.service_name,
+      (item) => item.booking.customer_name,
+      (item) => item.assignment_status,
+      (item) => formatAddress(item.booking.address),
+    ]),
+  );
+  const visibleAssignments = query.debouncedSearch
+    ? paginateItems(filteredAssignments, query.page, query.pageSize)
+    : filteredAssignments;
+  const visibleTotal = query.debouncedSearch ? filteredAssignments.length : total;
+
   return (
     <DashboardLayout title="My Assignments">
       <div className="cleaner-assignments">
-        {/* Filter Tabs */}
-        <div className="filter-tabs">
-          {(
-            [
-              "all",
-              "assigned",
-              "accepted",
-              "in_progress",
-              "completed",
-            ] as FilterStatus[]
-          ).map((status) => (
-            <button
-              key={status}
-              className={`filter-tab ${filter === status ? "active" : ""}`}
-              onClick={() => setFilter(status)}
-            >
-              {status.charAt(0).toUpperCase() + status.slice(1)}
-            </button>
-          ))}
+        <div className="dashboard-toolbar">
+          <SearchInput
+            value={query.search}
+            onChange={query.setSearch}
+            placeholder="Search assignment, customer, location..."
+          />
         </div>
+        <StatusTabs
+          value={query.status}
+          options={statusOptions}
+          onChange={query.setStatus}
+        />
 
         {loading && assignments.length === 0 ? (
           <div className="loading-container">
             <div className="loading-spinner"></div>
             <p>Loading assignments...</p>
           </div>
-        ) : assignments.length > 0 ? (
+        ) : visibleAssignments.length > 0 ? (
           <>
             {actionError && <p className="form-alert error">{actionError}</p>}
             <div className="assignments-list">
-              {assignments.map((assignment) => (
+              {visibleAssignments.map((assignment) => (
                 <div key={assignment.id} className="assignment-card">
                   <div className="assignment-header">
                     <div className="service-info">
@@ -327,6 +416,12 @@ export default function CleanerAssignments() {
                 </div>
               ))}
             </div>
+            <PaginationControls
+              page={query.page}
+              pageSize={query.pageSize}
+              total={visibleTotal}
+              onPageChange={query.setPage}
+            />
           </>
         ) : (
           <div className="empty-state">

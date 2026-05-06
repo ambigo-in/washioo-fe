@@ -1,8 +1,18 @@
-import { useEffect, useState } from "react";
-import type { CSSProperties, FormEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
+import { fetchAllBookings } from "../../api/adminApi";
 import { fetchAdminRatings } from "../../api/ratingApi";
 import { getApiErrorMessage } from "../../api/client";
+import {
+  PaginationControls,
+  SearchInput,
+  StatusTabs,
+  matchesSearch,
+  paginateItems,
+  useDashboardQueryState,
+} from "../../components/dashboard/DashboardControls";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import type { AdminBooking } from "../../types/adminTypes";
 import type { RatingResponse, RatingReviewerRole } from "../../types/ratingTypes";
 import "./AdminRatings.css";
 
@@ -31,12 +41,11 @@ const formatRole = (role: RatingReviewerRole) =>
 
 export default function AdminRatings() {
   const [ratings, setRatings] = useState<RatingResponse[]>([]);
-  const [filter, setFilter] = useState<RatingFilter>("all");
-  const [bookingId, setBookingId] = useState("");
-  const [appliedBookingId, setAppliedBookingId] = useState("");
+  const [bookings, setBookings] = useState<AdminBooking[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const query = useDashboardQueryState<RatingFilter>("all");
 
   useEffect(() => {
     let active = true;
@@ -44,10 +53,9 @@ export default function AdminRatings() {
     setError("");
 
     fetchAdminRatings({
-      reviewerRole: filter,
-      bookingId: appliedBookingId.trim() || undefined,
-      page: 1,
-      limit: 50,
+      reviewerRole: query.status,
+      page: query.page,
+      limit: query.pageSize,
     })
       .then((response) => {
         if (!active) return;
@@ -64,12 +72,43 @@ export default function AdminRatings() {
     return () => {
       active = false;
     };
-  }, [filter, appliedBookingId]);
+  }, [query.page, query.pageSize, query.status]);
 
-  const handleBookingSearch = (event: FormEvent) => {
-    event.preventDefault();
-    setAppliedBookingId(bookingId);
-  };
+  useEffect(() => {
+    let active = true;
+    fetchAllBookings({ limit: 500, offset: 0 })
+      .then((response) => {
+        if (active) setBookings(response.bookings);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const bookingById = useMemo(
+    () => new Map(bookings.map((booking) => [booking.id, booking])),
+    [bookings],
+  );
+  const filteredRatings = ratings.filter((rating) => {
+    const booking = bookingById.get(rating.booking_id);
+    return matchesSearch(rating, query.debouncedSearch, [
+      (item) => item.reviewee_name,
+      (item) => item.comment,
+      (item) => item.reviewer_role,
+      (item) => item.rating,
+      () => booking?.booking_reference,
+      () => booking?.customer_name,
+      () => booking?.customer_phone,
+      () => booking?.service_name,
+      () => booking?.assignment?.cleaner_name,
+    ]);
+  });
+  const visibleRatings = query.debouncedSearch
+    ? paginateItems(filteredRatings, query.page, query.pageSize)
+    : filteredRatings;
+  const visibleTotal = query.debouncedSearch ? filteredRatings.length : total;
 
   return (
     <DashboardLayout title="Ratings">
@@ -80,43 +119,20 @@ export default function AdminRatings() {
             <p>Review feedback submitted after completed bookings.</p>
           </div>
 
-          <div className="rating-filter-tabs">
-            {filters.map((item) => (
-              <button
-                key={item.value}
-                type="button"
-                className={filter === item.value ? "active" : ""}
-                onClick={() => setFilter(item.value)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
+          <StatusTabs
+            value={query.status}
+            options={filters}
+            onChange={query.setStatus}
+          />
         </section>
 
-        <form className="rating-booking-search" onSubmit={handleBookingSearch}>
-          <label>
-            <span>Booking ID</span>
-            <input
-              value={bookingId}
-              onChange={(event) => setBookingId(event.target.value)}
-              placeholder="Filter by booking UUID"
-            />
-          </label>
-          <button type="submit">Apply</button>
-          {appliedBookingId && (
-            <button
-              type="button"
-              className="clear-filter-btn"
-              onClick={() => {
-                setBookingId("");
-                setAppliedBookingId("");
-              }}
-            >
-              Clear
-            </button>
-          )}
-        </form>
+        <div className="dashboard-toolbar">
+          <SearchInput
+            value={query.search}
+            onChange={query.setSearch}
+            placeholder="Search name, mobile, booking reference, service..."
+          />
+        </div>
 
         {error && <p className="ratings-alert">{error}</p>}
 
@@ -125,7 +141,7 @@ export default function AdminRatings() {
             <div className="loading-spinner" />
             <p>Loading ratings...</p>
           </div>
-        ) : ratings.length === 0 ? (
+        ) : visibleRatings.length === 0 ? (
           <div className="ratings-state">
             <h3>No ratings found.</h3>
             <p>Ratings appear here after customers or cleaners submit them.</p>
@@ -133,13 +149,14 @@ export default function AdminRatings() {
         ) : (
           <>
             <p className="ratings-count">
-              {total} rating{total === 1 ? "" : "s"}
+              {visibleTotal} rating{visibleTotal === 1 ? "" : "s"}
             </p>
             <div className="ratings-table">
               <table>
                 <thead>
                   <tr>
                     <th>Booking</th>
+                    <th>Customer</th>
                     <th>Direction</th>
                     <th>Rating</th>
                     <th>Reviewee</th>
@@ -148,28 +165,47 @@ export default function AdminRatings() {
                   </tr>
                 </thead>
                 <tbody>
-                  {ratings.map((rating) => (
-                    <tr key={rating.id}>
-                      <td>{rating.booking_id}</td>
-                      <td>
-                        <span className={`reviewer-badge ${rating.reviewer_role}`}>
-                          {formatRole(rating.reviewer_role)}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="rating-score-cell">
-                          <RatingStars value={rating.rating} />
-                          <strong>{rating.rating.toFixed(1)}</strong>
-                        </div>
-                      </td>
-                      <td>{rating.reviewee_name || "N/A"}</td>
-                      <td>{rating.comment || "No comment"}</td>
-                      <td>{new Date(rating.created_at).toLocaleString()}</td>
-                    </tr>
-                  ))}
+                  {visibleRatings.map((rating) => {
+                    const booking = bookingById.get(rating.booking_id);
+
+                    return (
+                      <tr key={rating.id}>
+                        <td>
+                          <strong>
+                            {booking?.booking_reference || rating.booking_id}
+                          </strong>
+                          <small>{booking?.service_name || "Service booking"}</small>
+                        </td>
+                        <td>
+                          <strong>{booking?.customer_name || "N/A"}</strong>
+                          <small>{booking?.customer_phone || "Mobile unavailable"}</small>
+                        </td>
+                        <td>
+                          <span className={`reviewer-badge ${rating.reviewer_role}`}>
+                            {formatRole(rating.reviewer_role)}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="rating-score-cell">
+                            <RatingStars value={rating.rating} />
+                            <strong>{rating.rating.toFixed(1)}</strong>
+                          </div>
+                        </td>
+                        <td>{rating.reviewee_name || booking?.assignment?.cleaner_name || "N/A"}</td>
+                        <td>{rating.comment || "No comment"}</td>
+                        <td>{new Date(rating.created_at).toLocaleString()}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
+            <PaginationControls
+              page={query.page}
+              pageSize={query.pageSize}
+              total={visibleTotal}
+              onPageChange={query.setPage}
+            />
           </>
         )}
       </div>

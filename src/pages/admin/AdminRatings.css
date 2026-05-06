@@ -3,8 +3,7 @@
   gap: 18px;
 }
 
-.ratings-toolbar,
-.rating-booking-search {
+.ratings-toolbar {
   background: var(--brand-white);
   border: 1px solid var(--brand-border);
   border-radius: 12px;
@@ -26,66 +25,6 @@
 .ratings-toolbar p {
   color: var(--brand-text-muted);
   margin: 0;
-}
-
-.rating-filter-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.rating-filter-tabs button,
-.rating-booking-search button {
-  border: 1px solid var(--brand-border-strong);
-  border-radius: 999px;
-  cursor: pointer;
-  font-weight: 900;
-  padding: 9px 14px;
-}
-
-.rating-filter-tabs button {
-  background: var(--brand-surface);
-  color: var(--brand-text);
-}
-
-.rating-filter-tabs button.active,
-.rating-filter-tabs button:hover,
-.rating-booking-search button {
-  background: var(--brand-teal-dark);
-  border-color: var(--brand-teal-dark);
-  color: var(--brand-white);
-}
-
-.rating-booking-search {
-  align-items: end;
-  display: grid;
-  gap: 12px;
-  grid-template-columns: minmax(240px, 1fr) auto auto;
-}
-
-.rating-booking-search label {
-  display: grid;
-  gap: 7px;
-}
-
-.rating-booking-search label span {
-  color: var(--brand-text-muted);
-  font-size: 0.78rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.rating-booking-search input {
-  border: 1px solid var(--brand-border-strong);
-  border-radius: 10px;
-  color: var(--brand-text);
-  padding: 11px 12px;
-}
-
-.rating-booking-search .clear-filter-btn {
-  background: var(--brand-surface);
-  border-color: var(--brand-border-strong);
-  color: var(--brand-text);
 }
 
 .ratings-count {
@@ -125,6 +64,17 @@
 
 .ratings-table tr:last-child td {
   border-bottom: 0;
+}
+
+.ratings-table td strong,
+.ratings-table td small {
+  display: block;
+}
+
+.ratings-table td small {
+  color: var(--brand-text-muted);
+  font-size: 0.82rem;
+  margin-top: 4px;
 }
 
 .reviewer-badge {
@@ -196,9 +146,5 @@
 @media (max-width: 820px) {
   .ratings-toolbar {
     flex-direction: column;
-  }
-
-  .rating-booking-search {
-    grid-template-columns: 1fr;
   }
 }

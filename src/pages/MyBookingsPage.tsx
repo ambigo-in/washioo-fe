@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
+import {
+  PaginationControls,
+  SearchInput,
+  StatusTabs,
+  matchesSearch,
+  paginateItems,
+  useDashboardQueryState,
+  type StatusTabOption,
+} from "../components/dashboard/DashboardControls";
 import { LoadingButton } from "../components/ui";
 import type { BookingStatus, CustomerBooking } from "../types/apiTypes";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -49,9 +58,11 @@ const MyBookingsPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const {
     bookings,
+    bookingsTotal,
     loading,
     error: storeError,
   } = useAppSelector((state) => state.customer);
+  const query = useDashboardQueryState<"all" | BookingStatus>("all");
   const [editingId, setEditingId] = useState("");
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
@@ -59,8 +70,8 @@ const MyBookingsPage: React.FC = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    dispatch(loadCustomerBookings());
-  }, [dispatch]);
+    dispatch(loadCustomerBookings({ limit: query.pageSize, offset: query.offset }));
+  }, [dispatch, query.offset, query.pageSize]);
 
   const startEdit = (booking: CustomerBooking) => {
     setEditingId(booking.id);
@@ -95,10 +106,55 @@ const MyBookingsPage: React.FC = () => {
 
     try {
       await dispatch(cancelCustomerBooking(booking.id)).unwrap();
+      await dispatch(
+        loadCustomerBookings({ limit: query.pageSize, offset: query.offset }),
+      ).unwrap();
     } catch (err) {
       setError(String(err));
     }
   };
+  const filteredBookings = bookings
+    .filter((booking) =>
+      query.status === "all" ? true : booking.booking_status === query.status,
+    )
+    .filter((booking) =>
+      matchesSearch(booking, query.debouncedSearch, [
+        (item) => item.booking_reference,
+        (item) => item.service_name,
+        (item) => item.booking_status,
+        (item) => formatAddress(item.address),
+      ]),
+    );
+  const visibleBookings =
+    query.debouncedSearch || query.status !== "all"
+      ? paginateItems(filteredBookings, query.page, query.pageSize)
+      : filteredBookings;
+  const totalVisible =
+    query.debouncedSearch || query.status !== "all"
+      ? filteredBookings.length
+      : bookingsTotal;
+  const counts = bookings.reduce(
+    (acc, booking) => {
+      acc[booking.booking_status] += 1;
+      return acc;
+    },
+    {
+      pending: 0,
+      assigned: 0,
+      accepted: 0,
+      in_progress: 0,
+      completed: 0,
+      cancelled: 0,
+    } as Record<BookingStatus, number>,
+  );
+  const tabOptions: Array<StatusTabOption<"all" | BookingStatus>> = [
+    { value: "all", label: "All", count: bookingsTotal || bookings.length },
+    ...Object.entries(statusLabel).map(([value, label]) => ({
+      value: value as BookingStatus,
+      label,
+      count: counts[value as BookingStatus],
+    })),
+  ];
 
   return (
     <>
@@ -113,17 +169,29 @@ const MyBookingsPage: React.FC = () => {
         {(error || storeError) && (
           <p className="form-alert error">{error || storeError}</p>
         )}
+        <div className="dashboard-toolbar">
+          <SearchInput
+            value={query.search}
+            onChange={query.setSearch}
+            placeholder="Search bookings, service, address..."
+          />
+        </div>
+        <StatusTabs
+          value={query.status}
+          options={tabOptions}
+          onChange={query.setStatus}
+        />
 
         {loading && bookings.length === 0 ? (
           <div className="loading-state">Loading bookings...</div>
-        ) : bookings.length === 0 ? (
+        ) : visibleBookings.length === 0 ? (
           <div className="empty-state">
             <h2>No bookings yet</h2>
             <p>Your confirmed wash bookings will appear here.</p>
           </div>
         ) : (
           <div className="bookings-list">
-            {bookings.map((booking) => (
+            {visibleBookings.map((booking) => (
               <article key={booking.id} className="booking-card">
                 <div className="booking-card-top">
                   <div>
@@ -249,6 +317,12 @@ const MyBookingsPage: React.FC = () => {
             ))}
           </div>
         )}
+        <PaginationControls
+          page={query.page}
+          pageSize={query.pageSize}
+          total={totalVisible}
+          onPageChange={query.setPage}
+        />
       </section>
     </>
   );

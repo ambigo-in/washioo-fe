@@ -11,7 +11,7 @@ import {
   fetchAddresses,
   updateAddress,
 } from "../../api/addressApi";
-import { getApiErrorMessage } from "../../api/client";
+import { getApiErrorMessage, type PaginationParams } from "../../api/client";
 import type {
   Address,
   AddressPayload,
@@ -39,9 +39,9 @@ const initialState: CustomerState = {
 
 export const loadCustomerBookings = createAsyncThunk(
   "customer/loadBookings",
-  async (_, { rejectWithValue }) => {
+  async (params: PaginationParams | undefined, { rejectWithValue }) => {
     try {
-      return await fetchBookings();
+      return await fetchBookings(params);
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error));
     }
@@ -101,7 +101,7 @@ export const bookService = createAsyncThunk(
   async (payload: BookingPayload, { dispatch, rejectWithValue }) => {
     try {
       const response = await createBooking(payload);
-      dispatch(loadCustomerBookings());
+      dispatch(loadCustomerBookings(undefined));
       return response;
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error));

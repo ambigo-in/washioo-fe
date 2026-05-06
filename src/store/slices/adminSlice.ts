@@ -7,13 +7,14 @@ import {
   fetchUsers,
   updateCleanerProfile,
 } from "../../api/adminApi";
-import { getApiErrorMessage } from "../../api/client";
+import { getApiErrorMessage, type PaginationParams } from "../../api/client";
 import type { AdminBooking, AdminUser, CleanerFilters } from "../../types/adminTypes";
 import type { BookingStatus } from "../../types/apiTypes";
 import type { CleanerProfile } from "../../types/cleanerTypes";
 
 type AdminState = {
   bookings: AdminBooking[];
+  bookingsTotal: number;
   cleaners: CleanerProfile[];
   users: AdminUser[];
   loading: boolean;
@@ -22,6 +23,7 @@ type AdminState = {
 
 const initialState: AdminState = {
   bookings: [],
+  bookingsTotal: 0,
   cleaners: [],
   users: [],
   loading: false,
@@ -30,9 +32,17 @@ const initialState: AdminState = {
 
 export const loadAdminBookings = createAsyncThunk(
   "admin/loadBookings",
-  async (status: BookingStatus | "all" = "all", { rejectWithValue }) => {
+  async (
+    payload: (PaginationParams & { status?: BookingStatus | "all" }) | BookingStatus | "all" = "all",
+    { rejectWithValue },
+  ) => {
     try {
-      return status === "all" ? await fetchAllBookings() : await fetchBookingsByStatus(status);
+      const params =
+        typeof payload === "string" ? { status: payload } : payload;
+      const { status = "all", ...pagination } = params;
+      return status === "all"
+        ? await fetchAllBookings(pagination)
+        : await fetchBookingsByStatus(status, pagination);
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error));
     }
@@ -113,6 +123,7 @@ const adminSlice = createSlice({
       })
       .addCase(loadAdminBookings.fulfilled, (state, action) => {
         state.bookings = action.payload.bookings;
+        state.bookingsTotal = action.payload.total;
         state.loading = false;
       })
       .addCase(loadAdminCleaners.fulfilled, (state, action) => {

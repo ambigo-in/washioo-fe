@@ -6,6 +6,7 @@ import type {
   PaymentStatus,
   PaymentType,
 } from "./apiTypes";
+import type { PaginationParams } from "../api/client";
 
 export type AdminPayment = PaymentRecord;
 
@@ -72,7 +73,7 @@ export interface AdminBookingFilters {
   status?: BookingStatus;
 }
 
-export interface CleanerFilters {
+export interface CleanerFilters extends PaginationParams {
   approval_status?: "pending" | "approved" | "rejected" | "suspended";
   availability_status?: "offline" | "available" | "busy";
 }
@@ -86,16 +87,3 @@ export interface DashboardStats {
   weekBookings: number;
 }
 
-export interface CleanerFilters {
-  approval_status?: "pending" | "approved" | "rejected" | "suspended";
-  availability_status?: "offline" | "available" | "busy";
-}
-
-export interface DashboardStats {
-  totalBookings: number;
-  pendingBookings: number;
-  activeCleaners: number;
-  totalRevenue: number;
-  todayBookings: number;
-  weekBookings: number;
-}

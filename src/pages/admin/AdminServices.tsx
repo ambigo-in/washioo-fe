@@ -10,6 +10,14 @@ import type {
   ServiceCategoryPayload,
 } from "../../types/adminTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import {
+  FilterSelect,
+  PaginationControls,
+  SearchInput,
+  matchesSearch,
+  paginateItems,
+  useDashboardQueryState,
+} from "../../components/dashboard/DashboardControls";
 import "./AdminServices.css";
 
 export default function AdminServices() {
@@ -18,6 +26,7 @@ export default function AdminServices() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const query = useDashboardQueryState<"all" | "active" | "inactive">("all");
 
   const [formData, setFormData] = useState<ServiceCategoryPayload>({
     service_name: "",
@@ -107,6 +116,20 @@ export default function AdminServices() {
     setEditingId(null);
     setShowForm(false);
   };
+  const filteredServices = services
+    .filter((service) => {
+      if (query.status === "active") return service.is_active;
+      if (query.status === "inactive") return !service.is_active;
+      return true;
+    })
+    .filter((service) =>
+      matchesSearch(service, query.debouncedSearch, [
+        (item) => item.service_name,
+        (item) => item.description,
+        (item) => item.base_price,
+      ]),
+    );
+  const visibleServices = paginateItems(filteredServices, query.page, query.pageSize);
 
   return (
     <DashboardLayout title="Manage Services">
@@ -117,6 +140,22 @@ export default function AdminServices() {
           <button className="btn-add" onClick={() => setShowForm(!showForm)}>
             {showForm ? "Cancel" : "+ Add Service"}
           </button>
+        </div>
+        <div className="dashboard-toolbar">
+          <SearchInput
+            value={query.search}
+            onChange={query.setSearch}
+            placeholder="Search services..."
+          />
+          <FilterSelect
+            value={query.status}
+            onChange={query.setStatus}
+            options={[
+              { value: "all", label: "All Services" },
+              { value: "active", label: "Active" },
+              { value: "inactive", label: "Inactive" },
+            ]}
+          />
         </div>
 
         {/* Service Form */}
@@ -213,9 +252,9 @@ export default function AdminServices() {
             <div className="loading-spinner"></div>
             <p>Loading services...</p>
           </div>
-        ) : services.length > 0 ? (
+        ) : visibleServices.length > 0 ? (
           <div className="services-list">
-            {services.map((service) => (
+            {visibleServices.map((service) => (
               <div
                 key={service.id}
                 className={`admin-service-card ${
@@ -279,6 +318,12 @@ export default function AdminServices() {
             <p>No services found. Add your first service!</p>
           </div>
         )}
+        <PaginationControls
+          page={query.page}
+          pageSize={query.pageSize}
+          total={filteredServices.length}
+          onPageChange={query.setPage}
+        />
       </div>
     </DashboardLayout>
   );

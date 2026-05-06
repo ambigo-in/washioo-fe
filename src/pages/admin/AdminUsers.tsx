@@ -2,26 +2,38 @@ import { useState, useEffect } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { fetchUsers } from "../../api/adminApi";
 import type { AdminUser } from "../../types/adminTypes";
+import {
+  FilterSelect,
+  PaginationControls,
+  SearchInput,
+  matchesSearch,
+  paginateItems,
+  useDashboardQueryState,
+} from "../../components/dashboard/DashboardControls";
 import "./AdminUsers.css";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState<
-    "all" | "customer" | "cleaner" | "admin"
-  >("all");
+  const query = useDashboardQueryState<"all" | "customer" | "cleaner" | "admin">("all");
 
   useEffect(() => {
     loadUsers();
-  }, []);
+  }, [query.offset, query.pageSize, query.status]);
 
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const data = await fetchUsers();
+      const data = await fetchUsers({
+        role: query.status === "all" ? undefined : query.status,
+        limit: query.pageSize,
+        offset: query.offset,
+      });
       setUsers(data.users);
+      setTotal(data.total);
+      setError("");
     } catch (err) {
       setError("Failed to load users");
       console.error(err);
@@ -30,16 +42,18 @@ export default function AdminUsers() {
     }
   };
 
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.phone?.includes(searchTerm);
-
-    const matchesRole =
-      roleFilter === "all" || user.roles?.includes(roleFilter);
-
-    return matchesSearch && matchesRole;
-  });
+  const filteredUsers = users.filter((user) =>
+    matchesSearch(user, query.debouncedSearch, [
+      (item) => item.full_name,
+      (item) => item.phone,
+      (item) => item.email,
+      (item) => item.roles?.join(" "),
+    ]),
+  );
+  const visibleUsers = query.debouncedSearch
+    ? paginateItems(filteredUsers, query.page, query.pageSize)
+    : filteredUsers;
+  const visibleTotal = query.debouncedSearch ? filteredUsers.length : total;
 
   const getRoleBadge = (roles?: string[]) => {
     if (!roles || roles.length === 0) return null;
@@ -73,28 +87,26 @@ export default function AdminUsers() {
         <div className="page-header">
           <h2>Manage Users</h2>
           <div className="header-stats">
-            <span>Total: {users.length}</span>
+            <span>Total: {total.toLocaleString()}</span>
           </div>
         </div>
 
         <div className="filter-row">
-          <div className="search-box">
-            <input
-              type="text"
-              placeholder="Search by name or phone..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value as any)}
-          >
-            <option value="all">All Roles</option>
-            <option value="customer">Customers</option>
-            <option value="cleaner">Cleaners</option>
-            <option value="admin">Admins</option>
-          </select>
+          <SearchInput
+            value={query.search}
+            onChange={query.setSearch}
+            placeholder="Search by name, phone, email..."
+          />
+          <FilterSelect
+            value={query.status}
+            onChange={query.setStatus}
+            options={[
+              { value: "all", label: "All Roles" },
+              { value: "customer", label: "Customers" },
+              { value: "cleaner", label: "Cleaners" },
+              { value: "admin", label: "Admins" },
+            ]}
+          />
         </div>
 
         {error && <div className="error-message">{error}</div>}
@@ -104,7 +116,7 @@ export default function AdminUsers() {
             <div className="loading-spinner" />
             <p>Loading users...</p>
           </div>
-        ) : filteredUsers.length === 0 ? (
+        ) : visibleUsers.length === 0 ? (
           <div className="empty-state">
             <p>No users found.</p>
           </div>
@@ -123,7 +135,7 @@ export default function AdminUsers() {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user) => (
+                {visibleUsers.map((user) => (
                   <tr key={user.id}>
                     <td>#{user.id}</td>
                     <td className="user-name">{user.full_name || "N/A"}</td>
@@ -148,6 +160,12 @@ export default function AdminUsers() {
             </table>
           </div>
         )}
+        <PaginationControls
+          page={query.page}
+          pageSize={query.pageSize}
+          total={visibleTotal}
+          onPageChange={query.setPage}
+        />
       </div>
     </DashboardLayout>
   );

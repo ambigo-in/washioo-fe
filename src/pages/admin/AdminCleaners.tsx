@@ -2,6 +2,15 @@ import { useEffect, useState } from "react";
 import { fetchCleaners, updateCleanerProfile } from "../../api/adminApi";
 import type { CleanerProfile } from "../../types/cleanerTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import {
+  PaginationControls,
+  SearchInput,
+  StatusTabs,
+  matchesSearch,
+  paginateItems,
+  useDashboardQueryState,
+  type StatusTabOption,
+} from "../../components/dashboard/DashboardControls";
 import { formatIndianPhoneForDisplay } from "../../utils/phoneUtils";
 import "./AdminCleaners.css";
 
@@ -23,8 +32,15 @@ const hasFullIdentityData = (cleaner: CleanerProfile) =>
 
 export default function AdminCleaners() {
   const [cleaners, setCleaners] = useState<CleanerProfile[]>([]);
+  const [total, setTotal] = useState(0);
+  const [counts, setCounts] = useState<Record<Exclude<FilterStatus, "all">, number>>({
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+    suspended: 0,
+  });
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<FilterStatus>("all");
+  const query = useDashboardQueryState<FilterStatus>("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [selectedCleaner, setSelectedCleaner] = useState<CleanerProfile | null>(
     null,
@@ -34,9 +50,14 @@ export default function AdminCleaners() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const status = filter === "all" ? undefined : filter;
-        const response = await fetchCleaners({ approval_status: status });
+        const status = query.status === "all" ? undefined : query.status;
+        const response = await fetchCleaners({
+          approval_status: status,
+          limit: query.pageSize,
+          offset: query.offset,
+        });
         setCleaners(response.cleaners);
+        setTotal(response.total);
       } catch (error) {
         console.error("Failed to fetch cleaners:", error);
       } finally {
@@ -44,7 +65,28 @@ export default function AdminCleaners() {
       }
     };
     fetchData();
-  }, [filter]);
+  }, [query.offset, query.pageSize, query.status]);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all(
+      (["pending", "approved", "rejected", "suspended"] as const).map(async (status) => {
+        const response = await fetchCleaners({
+          approval_status: status,
+          limit: 1,
+          offset: 0,
+        });
+        return [status, response.total] as const;
+      }),
+    )
+      .then((entries) => {
+        if (active) setCounts(Object.fromEntries(entries) as Record<Exclude<FilterStatus, "all">, number>);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [total]);
 
   const handleUpdateStatus = async (cleanerId: string, status: string) => {
     setUpdatingId(cleanerId);
@@ -52,9 +94,12 @@ export default function AdminCleaners() {
       await updateCleanerProfile(cleanerId, { approval_status: status as any });
       // Refresh the list
       const response = await fetchCleaners(
-        filter === "all" ? undefined : { approval_status: filter as any },
+        query.status === "all"
+          ? { limit: query.pageSize, offset: query.offset }
+          : { approval_status: query.status as any, limit: query.pageSize, offset: query.offset },
       );
       setCleaners(response.cleaners);
+      setTotal(response.total);
     } catch (error) {
       console.error("Failed to update cleaner:", error);
     } finally {
@@ -72,9 +117,12 @@ export default function AdminCleaners() {
         availability_status: status as any,
       });
       const response = await fetchCleaners(
-        filter === "all" ? undefined : { approval_status: filter as any },
+        query.status === "all"
+          ? { limit: query.pageSize, offset: query.offset }
+          : { approval_status: query.status as any, limit: query.pageSize, offset: query.offset },
       );
       setCleaners(response.cleaners);
+      setTotal(response.total);
     } catch (error) {
       console.error("Failed to update availability:", error);
     } finally {
@@ -102,38 +150,49 @@ export default function AdminCleaners() {
     "rejected",
     "suspended",
   ];
+  const filteredCleaners = cleaners.filter((cleaner) =>
+    matchesSearch(cleaner, query.debouncedSearch, [
+      (item) => item.full_name,
+      (item) => item.phone,
+      (item) => item.email,
+      (item) => item.vehicle_type,
+      (item) => item.approval_status,
+      (item) => item.availability_status,
+    ]),
+  );
+  const visibleCleaners = query.debouncedSearch
+    ? paginateItems(filteredCleaners, query.page, query.pageSize)
+    : filteredCleaners;
+  const visibleTotal = query.debouncedSearch ? filteredCleaners.length : total;
+  const tabOptions: Array<StatusTabOption<FilterStatus>> = filters.map((status) => ({
+    value: status,
+    label: status === "all" ? "All" : status,
+    count:
+      status === "all"
+        ? Object.values(counts).reduce((sum, count) => sum + count, 0)
+        : counts[status],
+  }));
 
   return (
     <DashboardLayout title="Manage Cleaners">
       <div className="admin-cleaners">
-        {/* Filter Tabs */}
-        <div className="filter-tabs">
-          {filters.map((status) => (
-            <button
-              key={status}
-              className={`filter-tab ${filter === status ? "active" : ""}`}
-              onClick={() => setFilter(status)}
-            >
-              {status === "all"
-                ? "All"
-                : status.charAt(0).toUpperCase() + status.slice(1)}
-              {status !== "all" && (
-                <span className="count">
-                  {cleaners.filter((c) => c.approval_status === status).length}
-                </span>
-              )}
-            </button>
-          ))}
+        <div className="dashboard-toolbar">
+          <SearchInput
+            value={query.search}
+            onChange={query.setSearch}
+            placeholder="Search cleaners, phone, vehicle..."
+          />
         </div>
+        <StatusTabs value={query.status} options={tabOptions} onChange={query.setStatus} />
 
         {loading ? (
           <div className="loading-container">
             <div className="loading-spinner"></div>
             <p>Loading cleaners...</p>
           </div>
-        ) : cleaners.length > 0 ? (
+        ) : visibleCleaners.length > 0 ? (
           <div className="cleaners-list">
-            {cleaners.map((cleaner) => (
+            {visibleCleaners.map((cleaner) => (
               <div key={cleaner.id} className="cleaner-card">
                 <div className="cleaner-header">
                   <div className="cleaner-info">
@@ -294,6 +353,12 @@ export default function AdminCleaners() {
             <p>No cleaners found.</p>
           </div>
         )}
+        <PaginationControls
+          page={query.page}
+          pageSize={query.pageSize}
+          total={visibleTotal}
+          onPageChange={query.setPage}
+        />
 
         {/* Cleaner Details Modal */}
         {selectedCleaner && (

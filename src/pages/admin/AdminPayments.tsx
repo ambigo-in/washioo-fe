@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import {
+  PaginationControls,
+  SearchInput,
+  StatusTabs,
+  matchesSearch,
+  paginateItems,
+  useDashboardQueryState,
+} from "../../components/dashboard/DashboardControls";
 import { LoadingButton } from "../../components/ui";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -130,30 +138,36 @@ function SplitForm({
 export default function AdminPayments() {
   const dispatch = useAppDispatch();
   const { bookings, cleaners, users } = useAppSelector((state) => state.admin);
-  const { payments, loading, error } = useAppSelector((state) => state.payments);
-  const [filter, setFilter] = useState<FilterStatus>("all");
+  const { payments, paymentsTotal, loading, error } = useAppSelector((state) => state.payments);
+  const query = useDashboardQueryState<FilterStatus>("all");
   const [localError, setLocalError] = useState("");
 
   const paymentFilter = useMemo(() => {
-    if (filter === "all") return undefined;
-    if (filter === "admin_due") {
+    if (query.status === "all") return undefined;
+    if (query.status === "admin_due") {
       return {
         status: "split_done" as PaymentStatus,
         cleaner_handover_status: "pending" as CleanerHandoverStatus,
       };
     }
-    if (filter === "admin_collected") {
+    if (query.status === "admin_collected") {
       return {
         status: "split_done" as PaymentStatus,
         cleaner_handover_status: "settled" as CleanerHandoverStatus,
       };
     }
-    return filter as PaymentStatus;
-  }, [filter]);
+    return query.status as PaymentStatus;
+  }, [query.status]);
 
   useEffect(() => {
-    dispatch(loadAdminPayments(paymentFilter));
-  }, [dispatch, paymentFilter]);
+    dispatch(
+      loadAdminPayments({
+        filter: paymentFilter,
+        limit: query.pageSize,
+        offset: query.offset,
+      }),
+    );
+  }, [dispatch, paymentFilter, query.offset, query.pageSize]);
 
   useEffect(() => {
     dispatch(loadAdminBookings("all"));
@@ -191,7 +205,13 @@ export default function AdminPayments() {
           },
         }),
       ).unwrap();
-      dispatch(loadAdminPayments(paymentFilter));
+      dispatch(
+        loadAdminPayments({
+          filter: paymentFilter,
+          limit: query.pageSize,
+          offset: query.offset,
+        }),
+      );
     } catch (err) {
       setLocalError(String(err));
     }
@@ -202,11 +222,37 @@ export default function AdminPayments() {
 
     try {
       await dispatch(markAdminShareCollected(payment.id)).unwrap();
-      dispatch(loadAdminPayments(paymentFilter));
+      dispatch(
+        loadAdminPayments({
+          filter: paymentFilter,
+          limit: query.pageSize,
+          offset: query.offset,
+        }),
+      );
     } catch (err) {
       setLocalError(String(err));
     }
   };
+
+  const filteredPayments = payments.filter((payment) => {
+    const booking = bookingById.get(payment.booking_id);
+    const cleaner = payment.collected_by
+      ? cleanerById.get(payment.collected_by)
+      : undefined;
+    return matchesSearch(payment, query.debouncedSearch, [
+      () => booking?.booking_reference,
+      () => booking?.service_name,
+      () => booking?.customer_name,
+      () => cleaner?.full_name,
+      (item) => item.status,
+      (item) => item.payment_type,
+      (item) => item.customer_id,
+    ]);
+  });
+  const visiblePayments = query.debouncedSearch
+    ? paginateItems(filteredPayments, query.page, query.pageSize)
+    : filteredPayments;
+  const visibleTotal = query.debouncedSearch ? filteredPayments.length : paymentsTotal;
 
   return (
     <DashboardLayout title="Payment Management">
@@ -217,19 +263,19 @@ export default function AdminPayments() {
             <p>Review cleaner collections and split each collected payment.</p>
           </div>
 
-          <div className="filter-tabs">
-            {filterTabs.map((tab) => (
-              <button
-                key={tab.value}
-                type="button"
-                className={`filter-tab ${filter === tab.value ? "active" : ""}`}
-                onClick={() => setFilter(tab.value)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+          <StatusTabs
+            value={query.status}
+            options={filterTabs}
+            onChange={query.setStatus}
+          />
         </section>
+        <div className="dashboard-toolbar">
+          <SearchInput
+            value={query.search}
+            onChange={query.setSearch}
+            placeholder="Search payments, bookings, customer, cleaner..."
+          />
+        </div>
 
         {(error || localError) && (
           <p className="form-alert error">{localError || error}</p>
@@ -240,14 +286,14 @@ export default function AdminPayments() {
             <div className="loading-spinner" />
             <p>Loading payments...</p>
           </div>
-        ) : payments.length === 0 ? (
+        ) : visiblePayments.length === 0 ? (
           <div className="empty-state">
             <h3>No payments found.</h3>
             <p>Collected payments will appear here after cleaners record them.</p>
           </div>
         ) : (
           <div className="payment-card-list">
-            {payments.map((payment) => {
+            {visiblePayments.map((payment) => {
               const booking = bookingById.get(payment.booking_id);
               const cleaner = payment.collected_by
                 ? cleanerById.get(payment.collected_by)
@@ -356,6 +402,12 @@ export default function AdminPayments() {
             })}
           </div>
         )}
+        <PaginationControls
+          page={query.page}
+          pageSize={query.pageSize}
+          total={visibleTotal}
+          onPageChange={query.setPage}
+        />
       </div>
     </DashboardLayout>
   );

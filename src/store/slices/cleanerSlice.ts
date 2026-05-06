@@ -8,7 +8,7 @@ import {
   startAssignment,
   updateCleanerAvailability,
 } from "../../api/cleanerApi";
-import { getApiErrorMessage } from "../../api/client";
+import { getApiErrorMessage, type PaginationParams } from "../../api/client";
 import type {
   Assignment,
   AssignmentActionPayload,
@@ -59,9 +59,17 @@ export const setCleanerAvailability = createAsyncThunk(
 
 export const loadCleanerAssignments = createAsyncThunk(
   "cleaner/loadAssignments",
-  async (status: string | undefined, { rejectWithValue }) => {
+  async (
+    payload: (PaginationParams & { status?: string }) | string | undefined,
+    { rejectWithValue },
+  ) => {
     try {
-      return await fetchCleanerAssignments(status);
+      const params =
+        typeof payload === "string" || payload === undefined
+          ? { status: payload }
+          : payload;
+      const { status, ...pagination } = params;
+      return await fetchCleanerAssignments(status, pagination);
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error));
     }

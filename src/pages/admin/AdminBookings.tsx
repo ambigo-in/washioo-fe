@@ -2,7 +2,17 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import type { BookingStatus } from "../../types/apiTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import {
+  PaginationControls,
+  SearchInput,
+  StatusTabs,
+  matchesSearch,
+  paginateItems,
+  useDashboardQueryState,
+  type StatusTabOption,
+} from "../../components/dashboard/DashboardControls";
 import { LoadingButton } from "../../components/ui";
+import { fetchBookingsByStatus } from "../../api/adminApi";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   assignAdminBooking,
@@ -16,16 +26,54 @@ type FilterStatus = "all" | BookingStatus;
 
 export default function AdminBookings() {
   const dispatch = useAppDispatch();
-  const { bookings, cleaners, loading } = useAppSelector(
+  const { bookings, bookingsTotal, cleaners, loading } = useAppSelector(
     (state) => state.admin,
   );
-  const [filter, setFilter] = useState<FilterStatus>("all");
+  const query = useDashboardQueryState<FilterStatus>("all");
   const [selectedCleaner, setSelectedCleaner] = useState<string>("");
   const [assignError, setAssignError] = useState("");
+  const [statusCounts, setStatusCounts] = useState<Record<BookingStatus, number>>({
+    pending: 0,
+    assigned: 0,
+    accepted: 0,
+    in_progress: 0,
+    completed: 0,
+    cancelled: 0,
+  });
 
   useEffect(() => {
-    dispatch(loadAdminBookings(filter));
-  }, [dispatch, filter]);
+    dispatch(
+      loadAdminBookings({
+        status: query.status,
+        limit: query.pageSize,
+        offset: query.offset,
+      }),
+    );
+  }, [dispatch, query.offset, query.pageSize, query.status]);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all(
+      ([
+        "pending",
+        "assigned",
+        "accepted",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ] as BookingStatus[]).map(async (status) => {
+        const response = await fetchBookingsByStatus(status, { limit: 1, offset: 0 });
+        return [status, response.total] as const;
+      }),
+    )
+      .then((entries) => {
+        if (active) setStatusCounts(Object.fromEntries(entries) as Record<BookingStatus, number>);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [bookingsTotal]);
 
   useEffect(() => {
     dispatch(
@@ -43,7 +91,13 @@ export default function AdminBookings() {
       await dispatch(
         assignAdminBooking({ bookingId, cleanerId: selectedCleaner }),
       ).unwrap();
-      await dispatch(loadAdminBookings(filter)).unwrap();
+      await dispatch(
+        loadAdminBookings({
+          status: query.status,
+          limit: query.pageSize,
+          offset: query.offset,
+        }),
+      ).unwrap();
       setSelectedCleaner("");
     } catch (error) {
       setAssignError(String(error));
@@ -71,38 +125,51 @@ export default function AdminBookings() {
     "completed",
     "cancelled",
   ];
+  const filteredBookings = bookings.filter((booking) =>
+    matchesSearch(booking, query.debouncedSearch, [
+      (item) => item.booking_reference,
+      (item) => item.customer_name,
+      (item) => item.customer_phone,
+      (item) => item.service_name,
+      (item) => item.assignment?.cleaner_name,
+      (item) => formatAddress(item.address),
+    ]),
+  );
+  const visibleBookings = query.debouncedSearch
+    ? paginateItems(filteredBookings, query.page, query.pageSize)
+    : filteredBookings;
+  const totalVisible = query.debouncedSearch ? filteredBookings.length : bookingsTotal;
+  const tabOptions: Array<StatusTabOption<FilterStatus>> = statusFilters.map((status) => ({
+    value: status,
+    label: status === "all" ? "All" : status.replace("_", " "),
+    count:
+      status === "all"
+        ? Object.values(statusCounts).reduce((sum, count) => sum + count, 0)
+        : statusCounts[status],
+  }));
 
   return (
     <DashboardLayout title="Manage Bookings">
       <div className="admin-bookings">
-        {/* Filter Tabs */}
-        <div className="filter-tabs">
-          {statusFilters.map((status) => (
-            <button
-              key={status}
-              className={`filter-tab ${filter === status ? "active" : ""}`}
-              onClick={() => setFilter(status)}
-            >
-              {status === "all" ? "All" : status.replace("_", " ")}
-              {status !== "all" && (
-                <span className="count">
-                  {bookings.filter((b) => b.booking_status === status).length}
-                </span>
-              )}
-            </button>
-          ))}
+        <div className="dashboard-toolbar">
+          <SearchInput
+            value={query.search}
+            onChange={query.setSearch}
+            placeholder="Search bookings, customers, cleaners..."
+          />
         </div>
+        <StatusTabs value={query.status} options={tabOptions} onChange={query.setStatus} />
 
         {loading && bookings.length === 0 ? (
           <div className="loading-container">
             <div className="loading-spinner"></div>
             <p>Loading bookings...</p>
           </div>
-        ) : bookings.length > 0 ? (
+        ) : visibleBookings.length > 0 ? (
           <>
           {assignError && <p className="form-alert error">{assignError}</p>}
           <div className="bookings-list">
-            {bookings.map((booking) => (
+            {visibleBookings.map((booking) => (
               <div key={booking.id} className="booking-card">
                 <div className="booking-header">
                   <div className="booking-ref">
@@ -208,6 +275,12 @@ export default function AdminBookings() {
               </div>
             ))}
           </div>
+          <PaginationControls
+            page={query.page}
+            pageSize={query.pageSize}
+            total={totalVisible}
+            onPageChange={query.setPage}
+          />
           </>
         ) : (
           <div className="empty-state">
