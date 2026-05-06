@@ -8,7 +8,9 @@ import {
 const rawApiBaseUrl =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 const API_PREFIX = "/washioo-api";
-const API_BASE_URL = rawApiBaseUrl.replace(/\/washioo-api\/?$/, "").replace(/\/$/, "");
+const API_BASE_URL = rawApiBaseUrl
+  .replace(/\/washioo-api\/?$/, "")
+  .replace(/\/$/, "");
 const apiUrl = (path: string) => {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${API_BASE_URL}${API_PREFIX}${normalizedPath}`;
@@ -158,4 +160,3 @@ export const getApiErrorMessage = (error: unknown) => {
   if (error instanceof Error) return error.message;
   return "Something went wrong. Please try again.";
 };
-
