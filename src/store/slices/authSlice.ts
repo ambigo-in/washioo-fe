@@ -7,7 +7,7 @@ import {
   signUp,
   updateProfile,
 } from "../../api/authApi";
-import { getApiErrorMessage } from "../../api/client";
+import { ApiError, getApiErrorMessage } from "../../api/client";
 import {
   clearTokens,
   getAccessToken,
@@ -124,6 +124,13 @@ export const hydrateSession = createAsyncThunk(
       const response = await getCurrentUser();
       return response.user;
     } catch (error) {
+      if (
+        error instanceof ApiError &&
+        error.status !== 401 &&
+        error.status !== 403
+      ) {
+        return rejectWithValue(getApiErrorMessage(error));
+      }
       clearTokens();
       return rejectWithValue(getApiErrorMessage(error));
     }

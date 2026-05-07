@@ -97,16 +97,32 @@ const refreshTokens = async () => {
   if (!refreshToken) return false;
 
   refreshRequest = (async () => {
-    const response = await fetch(apiUrl("/auth/refresh-token"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-    });
+    let response: Response;
+    try {
+      response = await fetch(apiUrl("/auth/refresh-token"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+    } catch {
+      throw new ApiError(
+        "Session refresh is temporarily unavailable. Please try again.",
+        503,
+        null,
+      );
+    }
 
     const payload = await parseResponse(response);
     if (!response.ok) {
-      clearTokens();
-      return false;
+      if (response.status === 401 || response.status === 403) {
+        clearTokens();
+        return false;
+      }
+      throw new ApiError(
+        readErrorMessage(payload, "Session refresh is temporarily unavailable. Please try again."),
+        response.status,
+        payload,
+      );
     }
 
     const tokens = payload as { access_token?: string; refresh_token?: string };
@@ -134,7 +150,12 @@ export const apiRequest = async <T>(
   }: RequestOptions = {},
 ): Promise<T> => {
   if (auth && shouldRefreshAccessToken()) {
-    await refreshTokens();
+    try {
+      await refreshTokens();
+    } catch {
+      // Keep using the current access token when refresh is temporarily unavailable.
+      // If the access token is already expired, the 401 retry path below will handle it.
+    }
   }
 
   const headers: Record<string, string> = {
