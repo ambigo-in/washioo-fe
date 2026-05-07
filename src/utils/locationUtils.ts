@@ -24,10 +24,37 @@ const geolocationOptions: PositionOptions = {
   timeout: 20000,
 };
 
-const readCurrentPosition = () =>
+export type LocationError = {
+  type:
+    | "unavailable"
+    | "permission_denied"
+    | "timeout"
+    | "disabled"
+    | "unknown";
+  message: string;
+  instructions?: string;
+};
+
+const createLocationError = (
+  type: LocationError["type"],
+  message: string,
+  instructions?: string,
+): LocationError => ({
+  type,
+  message,
+  instructions,
+});
+
+const readCurrentPosition = (): Promise<Coordinates> =>
   new Promise<Coordinates>((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error("Location is not available in this browser."));
+      reject(
+        createLocationError(
+          "unavailable",
+          "Location services are not available in this browser.",
+          "Please use a modern browser that supports location services.",
+        ),
+      );
       return;
     }
 
@@ -42,23 +69,51 @@ const readCurrentPosition = () =>
         );
       },
       (error) => {
-        if (error.code === error.PERMISSION_DENIED) {
-          reject(
-            new Error(
-              "Location access denied. Please enable location permission to save address.",
-            ),
-          );
-          return;
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            reject(
+              createLocationError(
+                "permission_denied",
+                "Location access was denied.",
+                "Please allow location access in your browser settings and try again. Click the location icon in the address bar or check site settings.",
+              ),
+            );
+            break;
+          case error.POSITION_UNAVAILABLE:
+            reject(
+              createLocationError(
+                "disabled",
+                "Location services appear to be disabled.",
+                "Please enable location services on your device and refresh the page. On mobile: Settings > Location > Turn on. On desktop: Check your system location settings.",
+              ),
+            );
+            break;
+          case error.TIMEOUT:
+            reject(
+              createLocationError(
+                "timeout",
+                "Location request timed out.",
+                "Please ensure you have a stable internet connection and try again. If the problem persists, check your location settings.",
+              ),
+            );
+            break;
+          default:
+            reject(
+              createLocationError(
+                "unknown",
+                "Unable to capture location.",
+                "Please try again or check your device's location settings.",
+              ),
+            );
         }
-        reject(new Error("Unable to capture location. Please try again."));
       },
       geolocationOptions,
     );
   });
 
-export const getCurrentCoordinates = async () => {
+export const getCurrentCoordinates = async (): Promise<Coordinates> => {
   const readings: Coordinates[] = [];
-  let lastError: unknown = null;
+  let lastError: LocationError | unknown = null;
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
@@ -74,9 +129,14 @@ export const getCurrentCoordinates = async () => {
   }
 
   if (readings.length === 0) {
-    throw lastError instanceof Error
-      ? lastError
-      : new Error("Unable to capture location. Please try again.");
+    if (lastError && typeof lastError === "object" && "type" in lastError) {
+      throw lastError as LocationError;
+    }
+    throw createLocationError(
+      "unknown",
+      "Unable to capture location. Please try again.",
+      "Please check your location settings and try again.",
+    );
   }
 
   return readings.sort(

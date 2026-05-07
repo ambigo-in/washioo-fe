@@ -97,6 +97,15 @@
   margin-bottom: 16px;
 }
 
+.info-message {
+  padding: 12px 16px;
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;

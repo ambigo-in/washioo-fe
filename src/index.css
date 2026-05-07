@@ -24,7 +24,12 @@
 }
 
 body {
-  background: linear-gradient(135deg, var(--brand-teal-soft), var(--brand-white), var(--brand-teal-soft));
+  background: linear-gradient(
+    135deg,
+    var(--brand-teal-soft),
+    var(--brand-white),
+    var(--brand-teal-soft)
+  );
   color: var(--brand-text);
 }
 
@@ -68,6 +73,11 @@ textarea:disabled {
 .form-alert.success {
   background: var(--brand-teal-soft);
   color: var(--brand-teal-dark);
+}
+
+.form-alert.info {
+  background: #e3f2fd;
+  color: #1565c0;
 }
 
 .link-button {

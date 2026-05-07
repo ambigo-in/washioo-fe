@@ -13,6 +13,7 @@ import {
 import {
   getCurrentCoordinates,
   locationAccuracyMessage,
+  type LocationError,
 } from "../../utils/locationUtils";
 import { formatAddress } from "../../utils/addressUtils";
 import "./CustomerAddresses.css";
@@ -59,11 +60,14 @@ export default function CustomerAddresses() {
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [locating, setLocating] = useState(false);
   const [success, setSuccess] = useState("");
+  const [locationInstructions, setLocationInstructions] = useState("");
   const [formData, setFormData] = useState<AddressFormData>(emptyFormData);
   const [fieldErrors, setFieldErrors] = useState<AddressFieldErrors>({});
 
   useEffect(() => {
-    dispatch(loadAddresses()).unwrap().catch(() => setError("Failed to load addresses"));
+    dispatch(loadAddresses())
+      .unwrap()
+      .catch(() => setError("Failed to load addresses"));
   }, [dispatch]);
 
   useEffect(() => {
@@ -122,7 +126,10 @@ export default function CustomerAddresses() {
     try {
       if (editingAddress) {
         await dispatch(
-          patchAddress({ addressId: String(editingAddress.id), changes: payload }),
+          patchAddress({
+            addressId: String(editingAddress.id),
+            changes: payload,
+          }),
         ).unwrap();
       } else {
         await dispatch(saveAddress(payload)).unwrap();
@@ -170,7 +177,10 @@ export default function CustomerAddresses() {
   const handleSetDefault = async (address: Address) => {
     try {
       await dispatch(
-        patchAddress({ addressId: String(address.id), changes: { is_default: true } }),
+        patchAddress({
+          addressId: String(address.id),
+          changes: { is_default: true },
+        }),
       ).unwrap();
     } catch (err) {
       setError("Failed to set default address");
@@ -182,6 +192,7 @@ export default function CustomerAddresses() {
     setLocating(true);
     setError("");
     setSuccess("");
+    setLocationInstructions("");
 
     try {
       const coordinates = await getCurrentCoordinates();
@@ -195,7 +206,17 @@ export default function CustomerAddresses() {
       setFieldErrors((prev) => ({ ...prev, location: undefined }));
       setSuccess(locationAccuracyMessage(coordinates.accuracy));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to capture location.");
+      if (err && typeof err === "object" && "type" in err) {
+        const locationError = err as LocationError;
+        setError(locationError.message);
+        if (locationError.instructions) {
+          setLocationInstructions(locationError.instructions);
+        }
+      } else {
+        setError(
+          err instanceof Error ? err.message : "Unable to capture location.",
+        );
+      }
     } finally {
       setLocating(false);
     }
@@ -221,6 +242,11 @@ export default function CustomerAddresses() {
         </div>
 
         {error && <div className="error-message">{error}</div>}
+        {locationInstructions && (
+          <div className="info-message">
+            <p>{locationInstructions}</p>
+          </div>
+        )}
         {success && <div className="success-message">{success}</div>}
 
         {loading && addresses.length === 0 ? (
@@ -295,10 +321,16 @@ export default function CustomerAddresses() {
                   <input
                     type="text"
                     value={formData.address_label}
-                    onChange={(e) => updateFormField("address_label", e.target.value)}
+                    onChange={(e) =>
+                      updateFormField("address_label", e.target.value)
+                    }
                     aria-invalid={!!fieldErrors.address_label}
-                    className={fieldErrors.address_label ? "field-invalid" : undefined}
-                    data-field-error={fieldErrors.address_label ? "true" : undefined}
+                    className={
+                      fieldErrors.address_label ? "field-invalid" : undefined
+                    }
+                    data-field-error={
+                      fieldErrors.address_label ? "true" : undefined
+                    }
                   />
                   {fieldErrors.address_label && (
                     <p className="field-error">{fieldErrors.address_label}</p>
@@ -309,10 +341,16 @@ export default function CustomerAddresses() {
                   <input
                     type="text"
                     value={formData.address_line1}
-                    onChange={(e) => updateFormField("address_line1", e.target.value)}
+                    onChange={(e) =>
+                      updateFormField("address_line1", e.target.value)
+                    }
                     aria-invalid={!!fieldErrors.address_line1}
-                    className={fieldErrors.address_line1 ? "field-invalid" : undefined}
-                    data-field-error={fieldErrors.address_line1 ? "true" : undefined}
+                    className={
+                      fieldErrors.address_line1 ? "field-invalid" : undefined
+                    }
+                    data-field-error={
+                      fieldErrors.address_line1 ? "true" : undefined
+                    }
                   />
                   {fieldErrors.address_line1 && (
                     <p className="field-error">{fieldErrors.address_line1}</p>
@@ -340,7 +378,9 @@ export default function CustomerAddresses() {
                       value={formData.state}
                       onChange={(e) => updateFormField("state", e.target.value)}
                       aria-invalid={!!fieldErrors.state}
-                      className={fieldErrors.state ? "field-invalid" : undefined}
+                      className={
+                        fieldErrors.state ? "field-invalid" : undefined
+                      }
                       data-field-error={fieldErrors.state ? "true" : undefined}
                     />
                     {fieldErrors.state && (
@@ -354,10 +394,16 @@ export default function CustomerAddresses() {
                     <input
                       type="text"
                       value={formData.pincode}
-                      onChange={(e) => updateFormField("pincode", e.target.value)}
+                      onChange={(e) =>
+                        updateFormField("pincode", e.target.value)
+                      }
                       aria-invalid={!!fieldErrors.pincode}
-                      className={fieldErrors.pincode ? "field-invalid" : undefined}
-                      data-field-error={fieldErrors.pincode ? "true" : undefined}
+                      className={
+                        fieldErrors.pincode ? "field-invalid" : undefined
+                      }
+                      data-field-error={
+                        fieldErrors.pincode ? "true" : undefined
+                      }
                     />
                     {fieldErrors.pincode && (
                       <p className="field-error">{fieldErrors.pincode}</p>

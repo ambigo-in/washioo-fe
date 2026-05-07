@@ -13,6 +13,7 @@ import {
 import {
   getCurrentCoordinates,
   locationAccuracyMessage,
+  type LocationError,
 } from "../utils/locationUtils";
 import { formatAddress } from "../utils/addressUtils";
 import "../styles/checkout.css";
@@ -76,6 +77,7 @@ const CheckoutPage: React.FC = () => {
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [locationInstructions, setLocationInstructions] = useState("");
   const [fieldErrors, setFieldErrors] = useState<CheckoutFieldErrors>({});
 
   const [formData, setFormData] = useState<AddressPayload>(emptyAddress);
@@ -90,7 +92,9 @@ const CheckoutPage: React.FC = () => {
   }, [navigate, serviceData?.serviceId]);
 
   useEffect(() => {
-    dispatch(loadAddresses()).unwrap().catch((err) => setError(String(err)));
+    dispatch(loadAddresses())
+      .unwrap()
+      .catch((err) => setError(String(err)));
   }, [dispatch]);
 
   useEffect(() => {
@@ -137,6 +141,7 @@ const CheckoutPage: React.FC = () => {
     setLocating(true);
     setError("");
     setSuccess("");
+    setLocationInstructions("");
 
     try {
       const coordinates = await getCurrentCoordinates();
@@ -150,7 +155,17 @@ const CheckoutPage: React.FC = () => {
       setFieldErrors((prev) => ({ ...prev, location: undefined }));
       setSuccess(locationAccuracyMessage(coordinates.accuracy));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to capture location.");
+      if (err && typeof err === "object" && "type" in err) {
+        const locationError = err as LocationError;
+        setError(locationError.message);
+        if (locationError.instructions) {
+          setLocationInstructions(locationError.instructions);
+        }
+      } else {
+        setError(
+          err instanceof Error ? err.message : "Unable to capture location.",
+        );
+      }
     } finally {
       setLocating(false);
     }
@@ -195,7 +210,8 @@ const CheckoutPage: React.FC = () => {
 
     const nextFieldErrors: CheckoutFieldErrors = {};
     if (!selectedAddressId) {
-      nextFieldErrors.selectedAddress = "Choose a saved address or add a new one.";
+      nextFieldErrors.selectedAddress =
+        "Choose a saved address or add a new one.";
     }
 
     if (!scheduledDate || !scheduledTime) {
@@ -250,6 +266,11 @@ const CheckoutPage: React.FC = () => {
             <h2>Select Address</h2>
 
             {error && <p className="form-alert error">{error}</p>}
+            {locationInstructions && (
+              <div className="form-alert info">
+                <p>{locationInstructions}</p>
+              </div>
+            )}
             {success && <p className="form-alert success">{success}</p>}
 
             {loading ? (
@@ -280,12 +301,19 @@ const CheckoutPage: React.FC = () => {
               <p>No saved addresses yet.</p>
             )}
             {fieldErrors.selectedAddress && (
-              <p className="field-error-box" data-field-error="true" tabIndex={-1}>
+              <p
+                className="field-error-box"
+                data-field-error="true"
+                tabIndex={-1}
+              >
                 {fieldErrors.selectedAddress}
               </p>
             )}
 
-            <button type="button" onClick={() => setShowForm((value) => !value)}>
+            <button
+              type="button"
+              onClick={() => setShowForm((value) => !value)}
+            >
               {showForm ? "Close Address Form" : "+ Add New Address"}
             </button>
 
@@ -294,15 +322,23 @@ const CheckoutPage: React.FC = () => {
                 <input
                   placeholder="Label"
                   value={formData.address_label || ""}
-                  onChange={(event) => updateForm("address_label", event.target.value)}
+                  onChange={(event) =>
+                    updateForm("address_label", event.target.value)
+                  }
                 />
                 <input
                   placeholder="Address Line 1"
                   value={formData.address_line1}
-                  onChange={(event) => updateForm("address_line1", event.target.value)}
+                  onChange={(event) =>
+                    updateForm("address_line1", event.target.value)
+                  }
                   aria-invalid={!!fieldErrors.address_line1}
-                  className={fieldErrors.address_line1 ? "field-invalid" : undefined}
-                  data-field-error={fieldErrors.address_line1 ? "true" : undefined}
+                  className={
+                    fieldErrors.address_line1 ? "field-invalid" : undefined
+                  }
+                  data-field-error={
+                    fieldErrors.address_line1 ? "true" : undefined
+                  }
                 />
                 {fieldErrors.address_line1 && (
                   <p className="field-error">{fieldErrors.address_line1}</p>
@@ -310,12 +346,16 @@ const CheckoutPage: React.FC = () => {
                 <input
                   placeholder="Address Line 2"
                   value={formData.address_line2 || ""}
-                  onChange={(event) => updateForm("address_line2", event.target.value)}
+                  onChange={(event) =>
+                    updateForm("address_line2", event.target.value)
+                  }
                 />
                 <input
                   placeholder="Landmark"
                   value={formData.landmark || ""}
-                  onChange={(event) => updateForm("landmark", event.target.value)}
+                  onChange={(event) =>
+                    updateForm("landmark", event.target.value)
+                  }
                 />
                 <div className="form-row">
                   <input
@@ -326,14 +366,18 @@ const CheckoutPage: React.FC = () => {
                   <input
                     placeholder="State"
                     value={formData.state || ""}
-                    onChange={(event) => updateForm("state", event.target.value)}
+                    onChange={(event) =>
+                      updateForm("state", event.target.value)
+                    }
                   />
                 </div>
                 <div className="form-row">
                   <input
                     placeholder="Pincode"
                     value={formData.pincode || ""}
-                    onChange={(event) => updateForm("pincode", event.target.value)}
+                    onChange={(event) =>
+                      updateForm("pincode", event.target.value)
+                    }
                   />
                   <label className="checkbox-row">
                     <input
@@ -346,11 +390,19 @@ const CheckoutPage: React.FC = () => {
                     Default
                   </label>
                 </div>
-                <button disabled={locating} onClick={getLiveLocation} type="button">
+                <button
+                  disabled={locating}
+                  onClick={getLiveLocation}
+                  type="button"
+                >
                   {locating ? "Capturing Location..." : "Use My Live Location"}
                 </button>
                 {fieldErrors.location && (
-                  <p className="field-error-box" data-field-error="true" tabIndex={-1}>
+                  <p
+                    className="field-error-box"
+                    data-field-error="true"
+                    tabIndex={-1}
+                  >
                     {fieldErrors.location}
                   </p>
                 )}
@@ -393,9 +445,12 @@ const CheckoutPage: React.FC = () => {
                   <option value="">No vehicle selected</option>
                   {vehicles.map((vehicle) => (
                     <option key={vehicle.id} value={vehicle.id}>
-                      {[vehicle.make, vehicle.model].filter(Boolean).join(" ") ||
-                        vehicle.vehicle_type}
-                      {vehicle.license_plate ? ` - ${vehicle.license_plate}` : ""}
+                      {[vehicle.make, vehicle.model]
+                        .filter(Boolean)
+                        .join(" ") || vehicle.vehicle_type}
+                      {vehicle.license_plate
+                        ? ` - ${vehicle.license_plate}`
+                        : ""}
                     </option>
                   ))}
                 </select>
@@ -467,4 +522,3 @@ const CheckoutPage: React.FC = () => {
 };
 
 export default CheckoutPage;
-
