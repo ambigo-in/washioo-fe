@@ -12,6 +12,7 @@ import {
 } from "../store/slices/customerSlice";
 import {
   getCurrentCoordinates,
+  locationAccuracyMessage,
 } from "../utils/locationUtils";
 import { formatAddress } from "../utils/addressUtils";
 import "../styles/checkout.css";
@@ -147,7 +148,7 @@ const CheckoutPage: React.FC = () => {
       }));
 
       setFieldErrors((prev) => ({ ...prev, location: undefined }));
-      setSuccess("Location captured. Your typed address will stay unchanged.");
+      setSuccess(locationAccuracyMessage(coordinates.accuracy));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to capture location.");
     } finally {
