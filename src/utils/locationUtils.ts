@@ -42,7 +42,7 @@ export const getCurrentCoordinates = () =>
         }
         reject(new Error("Unable to capture location. Please try again."));
       },
-      { enableHighAccuracy: true, timeout: 12000 },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 20000 },
     );
   });
 

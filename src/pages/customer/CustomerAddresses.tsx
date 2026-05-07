@@ -27,6 +27,18 @@ interface AddressFormData {
   is_default: boolean;
 }
 
+type AddressFieldErrors = Partial<
+  Record<
+    | "address_label"
+    | "address_line1"
+    | "city"
+    | "state"
+    | "pincode"
+    | "location",
+    string
+  >
+>;
+
 const emptyFormData: AddressFormData = {
   address_label: "",
   address_line1: "",
@@ -47,19 +59,59 @@ export default function CustomerAddresses() {
   const [locating, setLocating] = useState(false);
   const [success, setSuccess] = useState("");
   const [formData, setFormData] = useState<AddressFormData>(emptyFormData);
+  const [fieldErrors, setFieldErrors] = useState<AddressFieldErrors>({});
 
   useEffect(() => {
     dispatch(loadAddresses()).unwrap().catch(() => setError("Failed to load addresses"));
   }, [dispatch]);
 
+  useEffect(() => {
+    const firstError = document.querySelector<HTMLElement>(
+      ".modal-content [data-field-error='true']",
+    );
+    firstError?.scrollIntoView({ behavior: "smooth", block: "center" });
+    firstError?.focus?.();
+  }, [fieldErrors]);
+
+  const updateFormField = (
+    field: keyof AddressFormData,
+    value: string | boolean | number | null,
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const nextFieldErrors: AddressFieldErrors = {};
+    if (!formData.address_label.trim()) {
+      nextFieldErrors.address_label = "Add a simple label like Home or Office.";
+    }
+    if (!formData.address_line1.trim()) {
+      nextFieldErrors.address_line1 = "Street address is required.";
+    }
+    if (!formData.city.trim()) {
+      nextFieldErrors.city = "City is required.";
+    }
+    if (!formData.state.trim()) {
+      nextFieldErrors.state = "State is required.";
+    }
+    if (!formData.pincode.trim()) {
+      nextFieldErrors.pincode = "Pincode is required.";
+    }
     if (formData.latitude == null || formData.longitude == null) {
-      setError("Use My Live Location is required before saving an address.");
+      nextFieldErrors.location = "Tap Use My Live Location before saving.";
+    }
+
+    if (Object.keys(nextFieldErrors).length) {
+      setFieldErrors(nextFieldErrors);
+      setError("Fix the highlighted address fields.");
       return;
     }
 
+    setFieldErrors({});
+    setError("");
     const payload: AddressPayload = {
       ...formData,
       country: "India",
@@ -86,6 +138,8 @@ export default function CustomerAddresses() {
 
   const handleEdit = (address: Address) => {
     setEditingAddress(address);
+    setFieldErrors({});
+    setError("");
     setFormData({
       address_label: address.address_label || "",
       address_line1: address.address_line1 || "",
@@ -137,6 +191,7 @@ export default function CustomerAddresses() {
         longitude: coordinates.longitude,
       }));
 
+      setFieldErrors((prev) => ({ ...prev, location: undefined }));
       setSuccess("Location captured. Your typed address will stay unchanged.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to capture location.");
@@ -156,6 +211,8 @@ export default function CustomerAddresses() {
               setShowForm(true);
               setEditingAddress(null);
               setFormData(emptyFormData);
+              setFieldErrors({});
+              setError("");
             }}
           >
             + Add New Address
@@ -231,34 +288,34 @@ export default function CustomerAddresses() {
           <div className="modal-overlay" onClick={() => setShowForm(false)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <h3>{editingAddress ? "Edit Address" : "Add New Address"}</h3>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} noValidate>
                 <div className="form-group">
                   <label>Label (e.g., Home, Office)</label>
                   <input
                     type="text"
                     value={formData.address_label}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        address_label: e.target.value,
-                      })
-                    }
-                    required
+                    onChange={(e) => updateFormField("address_label", e.target.value)}
+                    aria-invalid={!!fieldErrors.address_label}
+                    className={fieldErrors.address_label ? "field-invalid" : undefined}
+                    data-field-error={fieldErrors.address_label ? "true" : undefined}
                   />
+                  {fieldErrors.address_label && (
+                    <p className="field-error">{fieldErrors.address_label}</p>
+                  )}
                 </div>
                 <div className="form-group">
                   <label>Street Address</label>
                   <input
                     type="text"
                     value={formData.address_line1}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        address_line1: e.target.value,
-                      })
-                    }
-                    required
+                    onChange={(e) => updateFormField("address_line1", e.target.value)}
+                    aria-invalid={!!fieldErrors.address_line1}
+                    className={fieldErrors.address_line1 ? "field-invalid" : undefined}
+                    data-field-error={fieldErrors.address_line1 ? "true" : undefined}
                   />
+                  {fieldErrors.address_line1 && (
+                    <p className="field-error">{fieldErrors.address_line1}</p>
+                  )}
                 </div>
                 <div className="form-row">
                   <div className="form-group">
@@ -266,22 +323,28 @@ export default function CustomerAddresses() {
                     <input
                       type="text"
                       value={formData.city}
-                      onChange={(e) =>
-                        setFormData({ ...formData, city: e.target.value })
-                      }
-                      required
+                      onChange={(e) => updateFormField("city", e.target.value)}
+                      aria-invalid={!!fieldErrors.city}
+                      className={fieldErrors.city ? "field-invalid" : undefined}
+                      data-field-error={fieldErrors.city ? "true" : undefined}
                     />
+                    {fieldErrors.city && (
+                      <p className="field-error">{fieldErrors.city}</p>
+                    )}
                   </div>
                   <div className="form-group">
                     <label>State</label>
                     <input
                       type="text"
                       value={formData.state}
-                      onChange={(e) =>
-                        setFormData({ ...formData, state: e.target.value })
-                      }
-                      required
+                      onChange={(e) => updateFormField("state", e.target.value)}
+                      aria-invalid={!!fieldErrors.state}
+                      className={fieldErrors.state ? "field-invalid" : undefined}
+                      data-field-error={fieldErrors.state ? "true" : undefined}
                     />
+                    {fieldErrors.state && (
+                      <p className="field-error">{fieldErrors.state}</p>
+                    )}
                   </div>
                 </div>
                 <div className="form-row">
@@ -290,11 +353,14 @@ export default function CustomerAddresses() {
                     <input
                       type="text"
                       value={formData.pincode}
-                      onChange={(e) =>
-                        setFormData({ ...formData, pincode: e.target.value })
-                      }
-                      required
+                      onChange={(e) => updateFormField("pincode", e.target.value)}
+                      aria-invalid={!!fieldErrors.pincode}
+                      className={fieldErrors.pincode ? "field-invalid" : undefined}
+                      data-field-error={fieldErrors.pincode ? "true" : undefined}
                     />
+                    {fieldErrors.pincode && (
+                      <p className="field-error">{fieldErrors.pincode}</p>
+                    )}
                   </div>
                   <div className="form-group checkbox">
                     <label>
@@ -302,10 +368,7 @@ export default function CustomerAddresses() {
                         type="checkbox"
                         checked={formData.is_default}
                         onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            is_default: e.target.checked,
-                          })
+                          updateFormField("is_default", e.target.checked)
                         }
                       />
                       Set as default address
@@ -321,6 +384,15 @@ export default function CustomerAddresses() {
                 >
                   {locating ? "Capturing Location..." : "Use My Live Location"}
                 </LoadingButton>
+                {fieldErrors.location && (
+                  <div
+                    className="field-error-box"
+                    data-field-error="true"
+                    tabIndex={-1}
+                  >
+                    {fieldErrors.location}
+                  </div>
+                )}
                 {formData.latitude != null && formData.longitude != null && (
                   <div className="location-preview">
                     Location captured. It will be used for directions.

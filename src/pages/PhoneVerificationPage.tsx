@@ -42,11 +42,16 @@ export default function PhoneVerificationPage() {
         sendOtpRequest({ phoneNumber, accountType }),
       ).unwrap();
 
+      const resolvedAccountType = response.account_type || accountType;
+      const hasExistingAccount =
+        response.user_exist || response.roles?.includes(resolvedAccountType);
       const nextPath =
-        accountType === "admin" || response.user_exist ? "/signin" : "/signup";
+        resolvedAccountType === "admin" || hasExistingAccount
+          ? "/signin"
+          : "/signup";
 
       navigate(nextPath, {
-        state: { phone: phoneNumber, accountType },
+        state: { phone: phoneNumber, accountType: resolvedAccountType },
       });
     } catch (err) {
       setError(String(err));

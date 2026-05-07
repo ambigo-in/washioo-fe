@@ -151,6 +151,29 @@
   box-shadow: 0 0 0 4px rgba(var(--brand-teal-rgb), 0.08);
 }
 
+.address-form input.field-invalid,
+.booking-summary input.field-invalid,
+.booking-summary select.field-invalid,
+.booking-summary textarea.field-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
+}
+
+.field-error,
+.field-error-box {
+  color: #b42318 !important;
+  font-size: 0.86rem !important;
+  font-weight: 700;
+  margin: 6px 0 0;
+}
+
+.field-error-box {
+  background: #fff5f5;
+  border: 1px solid #ffcdd2;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
 .form-row {
   display: grid;
   gap: 14px;

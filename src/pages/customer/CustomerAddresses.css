@@ -272,6 +272,28 @@
   border-color: var(--brand-teal);
 }
 
+.form-group input.field-invalid,
+.form-group select.field-invalid,
+.form-group textarea.field-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.field-error,
+.field-error-box {
+  color: #b42318;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 6px 0 0;
+}
+
+.field-error-box {
+  background: #fff5f5;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
 .form-group.checkbox label {
   display: flex;
   align-items: center;

@@ -3,6 +3,7 @@ import {
   getAccessToken,
   getRefreshToken,
   saveTokens,
+  shouldRefreshAccessToken,
 } from "../utils/tokenManager";
 
 const rawApiBaseUrl =
@@ -87,24 +88,40 @@ const parseResponse = async (response: Response) => {
   }
 };
 
+let refreshRequest: Promise<boolean> | null = null;
+
 const refreshTokens = async () => {
+  if (refreshRequest) return refreshRequest;
+
   const refreshToken = getRefreshToken();
   if (!refreshToken) return false;
 
-  const response = await fetch(apiUrl("/auth/refresh-token"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refresh_token: refreshToken }),
+  refreshRequest = (async () => {
+    const response = await fetch(apiUrl("/auth/refresh-token"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
+
+    const payload = await parseResponse(response);
+    if (!response.ok) {
+      clearTokens();
+      return false;
+    }
+
+    const tokens = payload as { access_token?: string; refresh_token?: string };
+    if (!tokens.access_token || !tokens.refresh_token) {
+      clearTokens();
+      return false;
+    }
+
+    saveTokens(tokens.access_token, tokens.refresh_token);
+    return true;
+  })().finally(() => {
+    refreshRequest = null;
   });
 
-  const payload = await parseResponse(response);
-  if (!response.ok) {
-    clearTokens();
-    return false;
-  }
-
-  saveTokens(payload.access_token, payload.refresh_token);
-  return true;
+  return refreshRequest;
 };
 
 export const apiRequest = async <T>(
@@ -116,6 +133,10 @@ export const apiRequest = async <T>(
     retryOnUnauthorized = true,
   }: RequestOptions = {},
 ): Promise<T> => {
+  if (auth && shouldRefreshAccessToken()) {
+    await refreshTokens();
+  }
+
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };

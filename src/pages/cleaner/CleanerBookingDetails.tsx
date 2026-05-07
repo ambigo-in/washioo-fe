@@ -147,6 +147,7 @@ export default function CleanerBookingDetails() {
               <OpenInMapsButton
                 latitude={address?.latitude}
                 longitude={address?.longitude}
+                mode="directions"
               />
             </div>
           </div>

@@ -23,6 +23,10 @@ type CheckoutState = {
   duration: number | null;
 };
 
+type CheckoutFieldErrors = Partial<
+  Record<"address_line1" | "location" | "selectedAddress" | "schedule", string>
+>;
+
 const emptyAddress: AddressPayload = {
   address_label: "Home",
   address_line1: "",
@@ -71,6 +75,7 @@ const CheckoutPage: React.FC = () => {
   const [locating, setLocating] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<CheckoutFieldErrors>({});
 
   const [formData, setFormData] = useState<AddressPayload>(emptyAddress);
   const [scheduledDate, setScheduledDate] = useState("");
@@ -114,7 +119,18 @@ const CheckoutPage: React.FC = () => {
 
   const updateForm = (field: keyof AddressPayload, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (field === "address_line1") {
+      setFieldErrors((prev) => ({ ...prev, address_line1: undefined }));
+    }
   };
+
+  useEffect(() => {
+    const firstError = document.querySelector<HTMLElement>(
+      ".checkout-page [data-field-error='true']",
+    );
+    firstError?.scrollIntoView({ behavior: "smooth", block: "center" });
+    firstError?.focus?.();
+  }, [fieldErrors]);
 
   const getLiveLocation = async () => {
     setLocating(true);
@@ -130,6 +146,7 @@ const CheckoutPage: React.FC = () => {
         location_verified: true,
       }));
 
+      setFieldErrors((prev) => ({ ...prev, location: undefined }));
       setSuccess("Location captured. Your typed address will stay unchanged.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to capture location.");
@@ -141,17 +158,23 @@ const CheckoutPage: React.FC = () => {
   const handleCreateAddress = async (event: FormEvent) => {
     event.preventDefault();
     const payload = compactAddressPayload(formData);
+    const nextFieldErrors: CheckoutFieldErrors = {};
 
     if (!payload.address_line1) {
-      setError("Address line 1 is required.");
-      return;
+      nextFieldErrors.address_line1 = "Address line 1 is required.";
     }
 
     if (payload.latitude == null || payload.longitude == null) {
-      setError("Use My Live Location is required before saving an address.");
+      nextFieldErrors.location = "Tap Use My Live Location before saving.";
+    }
+
+    if (Object.keys(nextFieldErrors).length) {
+      setFieldErrors(nextFieldErrors);
+      setError("Fix the highlighted address field.");
       return;
     }
 
+    setFieldErrors({});
     setError("");
     setSuccess("");
 
@@ -169,16 +192,22 @@ const CheckoutPage: React.FC = () => {
   const handleBooking = async () => {
     if (!serviceData) return;
 
+    const nextFieldErrors: CheckoutFieldErrors = {};
     if (!selectedAddressId) {
-      setError("Choose or add an address before booking.");
-      return;
+      nextFieldErrors.selectedAddress = "Choose a saved address or add a new one.";
     }
 
     if (!scheduledDate || !scheduledTime) {
-      setError("Choose a service date and time.");
+      nextFieldErrors.schedule = "Choose both service date and time.";
+    }
+
+    if (Object.keys(nextFieldErrors).length) {
+      setFieldErrors(nextFieldErrors);
+      setError("Fix the highlighted booking detail.");
       return;
     }
 
+    setFieldErrors({});
     setError("");
     setSuccess("");
 
@@ -232,7 +261,13 @@ const CheckoutPage: React.FC = () => {
                     className={`address-card ${
                       selectedAddressId === address.id ? "selected" : ""
                     }`}
-                    onClick={() => setSelectedAddressId(address.id)}
+                    onClick={() => {
+                      setSelectedAddressId(address.id);
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        selectedAddress: undefined,
+                      }));
+                    }}
                     type="button"
                   >
                     <h3>{address.address_label || "Saved address"}</h3>
@@ -242,6 +277,11 @@ const CheckoutPage: React.FC = () => {
               </div>
             ) : (
               <p>No saved addresses yet.</p>
+            )}
+            {fieldErrors.selectedAddress && (
+              <p className="field-error-box" data-field-error="true" tabIndex={-1}>
+                {fieldErrors.selectedAddress}
+              </p>
             )}
 
             <button type="button" onClick={() => setShowForm((value) => !value)}>
@@ -259,7 +299,13 @@ const CheckoutPage: React.FC = () => {
                   placeholder="Address Line 1"
                   value={formData.address_line1}
                   onChange={(event) => updateForm("address_line1", event.target.value)}
+                  aria-invalid={!!fieldErrors.address_line1}
+                  className={fieldErrors.address_line1 ? "field-invalid" : undefined}
+                  data-field-error={fieldErrors.address_line1 ? "true" : undefined}
                 />
+                {fieldErrors.address_line1 && (
+                  <p className="field-error">{fieldErrors.address_line1}</p>
+                )}
                 <input
                   placeholder="Address Line 2"
                   value={formData.address_line2 || ""}
@@ -302,9 +348,14 @@ const CheckoutPage: React.FC = () => {
                 <button disabled={locating} onClick={getLiveLocation} type="button">
                   {locating ? "Capturing Location..." : "Use My Live Location"}
                 </button>
+                {fieldErrors.location && (
+                  <p className="field-error-box" data-field-error="true" tabIndex={-1}>
+                    {fieldErrors.location}
+                  </p>
+                )}
                 {formData.latitude != null && formData.longitude != null && (
                   <p className="location-captured">
-                    Location captured: {formData.latitude}, {formData.longitude}
+                    Location captured. It will be used for service directions.
                   </p>
                 )}
                 <LoadingButton
@@ -368,7 +419,13 @@ const CheckoutPage: React.FC = () => {
                 min={today}
                 type="date"
                 value={scheduledDate}
-                onChange={(event) => setScheduledDate(event.target.value)}
+                onChange={(event) => {
+                  setScheduledDate(event.target.value);
+                  setFieldErrors((prev) => ({ ...prev, schedule: undefined }));
+                }}
+                aria-invalid={!!fieldErrors.schedule}
+                className={fieldErrors.schedule ? "field-invalid" : undefined}
+                data-field-error={fieldErrors.schedule ? "true" : undefined}
               />
             </label>
             <label>
@@ -376,9 +433,17 @@ const CheckoutPage: React.FC = () => {
               <input
                 type="time"
                 value={scheduledTime}
-                onChange={(event) => setScheduledTime(event.target.value)}
+                onChange={(event) => {
+                  setScheduledTime(event.target.value);
+                  setFieldErrors((prev) => ({ ...prev, schedule: undefined }));
+                }}
+                aria-invalid={!!fieldErrors.schedule}
+                className={fieldErrors.schedule ? "field-invalid" : undefined}
               />
             </label>
+            {fieldErrors.schedule && (
+              <p className="field-error">{fieldErrors.schedule}</p>
+            )}
             <textarea
               placeholder="Special instructions optional"
               value={instructions}

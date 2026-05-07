@@ -1,5 +1,7 @@
 export interface SendOtpResponse {
   message: string;
+  account_type?: AccountType;
+  roles?: AccountType[];
   user_exist?: boolean;
 }
 

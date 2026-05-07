@@ -148,6 +148,8 @@
   justify-content: space-between;
   align-items: center;
   gap: 20px;
+  width: 100%;
+  margin-top: auto;
 }
 .service-footer .duration {
   font-size: 0.85rem;
@@ -163,6 +165,25 @@
 .duration {
   font-size: 0.85rem;
   color: var(--brand-text-muted);
+}
+
+.customer-book-service-btn {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--brand-teal);
+  color: var(--brand-white);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.customer-book-service-btn:hover {
+  background: var(--brand-teal-dark);
+  transform: translateY(-1px);
 }
 
 /* Recent Bookings */

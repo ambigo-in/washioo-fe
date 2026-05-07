@@ -2,6 +2,7 @@ import type { UserRole } from "../types/apiTypes";
 
 type AccessTokenPayload = {
   active_role?: UserRole;
+  exp?: number;
   role?: UserRole;
   roles?: UserRole[];
   type?: string;
@@ -43,4 +44,12 @@ export const getAccessTokenPayload = (): AccessTokenPayload | null => {
 export const getTokenActiveRole = () => {
   const payload = getAccessTokenPayload();
   return payload?.active_role ?? payload?.role ?? null;
+};
+
+export const shouldRefreshAccessToken = (bufferSeconds = 60) => {
+  const payload = getAccessTokenPayload();
+  if (!payload?.exp) return false;
+
+  const expiresAt = payload.exp * 1000;
+  return expiresAt - Date.now() <= bufferSeconds * 1000;
 };

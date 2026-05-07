@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -10,6 +10,7 @@ import { loadServices } from "../../store/slices/servicesSlice";
 import "./CustomerDashboard.css";
 
 export default function CustomerDashboard() {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { bookings, addresses, loading: customerLoading } = useAppSelector(
     (state) => state.customer,
@@ -43,6 +44,17 @@ export default function CustomerDashboard() {
 
   const recentBookings = bookings.slice(0, 3);
   const activeServices = services.filter((s) => s.is_active);
+
+  const handleBookNow = (service: (typeof activeServices)[number]) => {
+    navigate("/checkout", {
+      state: {
+        serviceId: service.id,
+        serviceName: service.service_name,
+        price: service.base_price,
+        duration: service.estimated_duration_minutes,
+      },
+    });
+  };
 
   if (loading) {
     return (
@@ -135,6 +147,13 @@ export default function CustomerDashboard() {
                     {service.estimated_duration_minutes} min
                   </span>
                 </div>
+                <button
+                  className="customer-book-service-btn"
+                  onClick={() => handleBookNow(service)}
+                  type="button"
+                >
+                  Book Now
+                </button>
               </div>
             ))}
           </div>
