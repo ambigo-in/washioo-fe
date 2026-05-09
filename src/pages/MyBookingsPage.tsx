@@ -68,10 +68,91 @@ const MyBookingsPage: React.FC = () => {
   const [editTime, setEditTime] = useState("");
   const [editInstructions, setEditInstructions] = useState("");
   const [error, setError] = useState("");
+  const [pageSize, setPageSize] = useState(10);
+  const [sortBy, setSortBy] = useState<
+    "date-desc" | "date-asc" | "price-desc" | "price-asc"
+  >("date-desc");
+  const [priceFilter, setPriceFilter] = useState<
+    "all" | "0-100" | "100-500" | "500+"
+  >("all");
+  const [dateRangeFilter, setDateRangeFilter] = useState<
+    "all" | "today" | "week" | "month"
+  >("all");
 
   useEffect(() => {
-    dispatch(loadCustomerBookings({ limit: query.pageSize, offset: query.offset }));
+    dispatch(
+      loadCustomerBookings({ limit: query.pageSize, offset: query.offset }),
+    );
   }, [dispatch, query.offset, query.pageSize]);
+
+  // Helper functions for filtering
+  const isDateInRange = (dateStr: string, range: string) => {
+    const bookingDate = new Date(dateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    switch (range) {
+      case "today":
+        return bookingDate.toDateString() === today.toDateString();
+      case "week": {
+        const weekEnd = new Date(today);
+        weekEnd.setDate(today.getDate() + 7);
+        return bookingDate >= today && bookingDate <= weekEnd;
+      }
+      case "month": {
+        const monthEnd = new Date(today);
+        monthEnd.setMonth(today.getMonth() + 1);
+        return bookingDate >= today && bookingDate <= monthEnd;
+      }
+      default:
+        return true;
+    }
+  };
+
+  const isPriceInRange = (amount: number, range: string) => {
+    switch (range) {
+      case "0-5000":
+        return amount >= 0 && amount <= 5000;
+      case "5000-10000":
+        return amount > 5000 && amount <= 10000;
+      case "10000+":
+        return amount > 10000;
+      default:
+        return true;
+    }
+  };
+
+  const sortBookings = (bookingsToSort: CustomerBooking[]) => {
+    const sorted = [...bookingsToSort];
+    switch (sortBy) {
+      case "date-desc":
+        return sorted.sort(
+          (a, b) =>
+            new Date(b.scheduled_date).getTime() -
+            new Date(a.scheduled_date).getTime(),
+        );
+      case "date-asc":
+        return sorted.sort(
+          (a, b) =>
+            new Date(a.scheduled_date).getTime() -
+            new Date(b.scheduled_date).getTime(),
+        );
+      case "price-desc":
+        return sorted.sort(
+          (a, b) =>
+            (b.final_price ?? b.estimated_price) -
+            (a.final_price ?? a.estimated_price),
+        );
+      case "price-asc":
+        return sorted.sort(
+          (a, b) =>
+            (a.final_price ?? a.estimated_price) -
+            (b.final_price ?? b.estimated_price),
+        );
+      default:
+        return sorted;
+    }
+  };
 
   const startEdit = (booking: CustomerBooking) => {
     setEditingId(booking.id);
@@ -124,15 +205,36 @@ const MyBookingsPage: React.FC = () => {
         (item) => item.booking_status,
         (item) => formatAddress(item.address),
       ]),
+    )
+    .filter((booking) =>
+      isPriceInRange(
+        booking.payment?.amount ??
+          booking.final_price ??
+          booking.estimated_price,
+        priceFilter,
+      ),
+    )
+    .filter((booking) =>
+      isDateInRange(booking.scheduled_date, dateRangeFilter),
     );
+
+  const sortedBookings = sortBookings(filteredBookings);
+
   const visibleBookings =
-    query.debouncedSearch || query.status !== "all"
-      ? paginateItems(filteredBookings, query.page, query.pageSize)
-      : filteredBookings;
+    query.debouncedSearch ||
+    query.status !== "all" ||
+    priceFilter !== "all" ||
+    dateRangeFilter !== "all"
+      ? paginateItems(sortedBookings, query.page, pageSize)
+      : paginateItems(sortedBookings, query.page, pageSize);
+
   const totalVisible =
-    query.debouncedSearch || query.status !== "all"
-      ? filteredBookings.length
-      : bookingsTotal;
+    query.debouncedSearch ||
+    query.status !== "all" ||
+    priceFilter !== "all" ||
+    dateRangeFilter !== "all"
+      ? sortedBookings.length
+      : Math.min(pageSize, sortedBookings.length);
   const counts = bookings.reduce(
     (acc, booking) => {
       acc[booking.booking_status] += 1;
@@ -173,8 +275,53 @@ const MyBookingsPage: React.FC = () => {
           <SearchInput
             value={query.search}
             onChange={query.setSearch}
-            placeholder="Search bookings, service, address..."
+            placeholder="Search by reference, service, address..."
           />
+          <div className="toolbar-filters">
+            <select
+              className="filter-select"
+              value={dateRangeFilter}
+              onChange={(e) => setDateRangeFilter(e.target.value as any)}
+            >
+              <option value="all">All Dates</option>
+              <option value="today">Today</option>
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+            </select>
+
+            <select
+              className="filter-select"
+              value={priceFilter}
+              onChange={(e) => setPriceFilter(e.target.value as any)}
+            >
+              <option value="all">All Prices</option>
+              <option value="0-5000">Rs. 0 - 5,000</option>
+              <option value="5000-10000">Rs. 5,000 - 10,000</option>
+              <option value="10000+">Rs. 10,000+</option>
+            </select>
+
+            <select
+              className="filter-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+            >
+              <option value="date-desc">Newest First</option>
+              <option value="date-asc">Oldest First</option>
+              <option value="price-desc">Highest Price</option>
+              <option value="price-asc">Lowest Price</option>
+            </select>
+
+            <select
+              className="filter-select page-size-select"
+              value={pageSize}
+              onChange={(e) => setPageSize(Number(e.target.value))}
+            >
+              <option value="5">5 per page</option>
+              <option value="10">10 per page</option>
+              <option value="15">15 per page</option>
+              <option value="20">20 per page</option>
+            </select>
+          </div>
         </div>
         <StatusTabs
           value={query.status}
@@ -217,7 +364,8 @@ const MyBookingsPage: React.FC = () => {
                   <div>
                     <span>Price</span>
                     <strong>
-                      Rs. {formatMoney(
+                      Rs.{" "}
+                      {formatMoney(
                         booking.payment?.amount ??
                           booking.final_price ??
                           booking.estimated_price,
@@ -319,7 +467,7 @@ const MyBookingsPage: React.FC = () => {
         )}
         <PaginationControls
           page={query.page}
-          pageSize={query.pageSize}
+          pageSize={pageSize}
           total={totalVisible}
           onPageChange={query.setPage}
         />
