@@ -43,15 +43,20 @@ export default function PhoneVerificationPage() {
       ).unwrap();
 
       const resolvedAccountType = response.account_type || accountType;
+      const requestedAccountType = accountType;
+      const hasRoleForRequestedType =
+        response.roles?.includes(requestedAccountType);
       const hasExistingAccount =
-        response.user_exist || response.roles?.includes(resolvedAccountType);
+        requestedAccountType === "admin"
+          ? true
+          : (hasRoleForRequestedType ?? response.user_exist);
       const nextPath =
-        resolvedAccountType === "admin" || hasExistingAccount
+        requestedAccountType === "admin" || hasExistingAccount
           ? "/signin"
           : "/signup";
 
       navigate(nextPath, {
-        state: { phone: phoneNumber, accountType: resolvedAccountType },
+        state: { phone: phoneNumber, accountType: requestedAccountType },
       });
     } catch (err) {
       setError(String(err));
