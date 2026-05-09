@@ -35,11 +35,13 @@ export const fetchCustomerRatingSummary = (customerId: string) =>
 export const fetchAdminRatings = ({
   reviewerRole,
   bookingId,
+  rating,
   page = 1,
   limit = 50,
 }: {
   reviewerRole?: RatingReviewerRole | "all";
   bookingId?: string;
+  rating?: number;
   page?: number;
   limit?: number;
 } = {}) =>
@@ -47,6 +49,7 @@ export const fetchAdminRatings = ({
     withQuery("/admin/ratings", {
       reviewer_role: reviewerRole === "all" ? undefined : reviewerRole,
       booking_id: bookingId,
+      rating,
       page,
       limit,
     }),

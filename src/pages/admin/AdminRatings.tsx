@@ -4,6 +4,7 @@ import { fetchAllBookings } from "../../api/adminApi";
 import { fetchAdminRatings } from "../../api/ratingApi";
 import { getApiErrorMessage } from "../../api/client";
 import {
+  FilterSelect,
   PaginationControls,
   SearchInput,
   StatusTabs,
@@ -17,6 +18,7 @@ import type { RatingResponse, RatingReviewerRole } from "../../types/ratingTypes
 import "./AdminRatings.css";
 
 type RatingFilter = "all" | RatingReviewerRole;
+type RatingScoreFilter = "all" | "5" | "4" | "3" | "2" | "1";
 
 const filters: { label: string; value: RatingFilter }[] = [
   { label: "All", value: "all" },
@@ -46,6 +48,7 @@ export default function AdminRatings() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const query = useDashboardQueryState<RatingFilter>("all");
+  const [ratingScore, setRatingScore] = useState<RatingScoreFilter>("all");
 
   useEffect(() => {
     let active = true;
@@ -54,6 +57,7 @@ export default function AdminRatings() {
 
     fetchAdminRatings({
       reviewerRole: query.status,
+      rating: ratingScore === "all" ? undefined : Number(ratingScore),
       page: query.page,
       limit: query.pageSize,
     })
@@ -72,7 +76,7 @@ export default function AdminRatings() {
     return () => {
       active = false;
     };
-  }, [query.page, query.pageSize, query.status]);
+  }, [query.page, query.pageSize, query.status, ratingScore]);
 
   useEffect(() => {
     let active = true;
@@ -131,6 +135,22 @@ export default function AdminRatings() {
             value={query.search}
             onChange={query.setSearch}
             placeholder="Search name, mobile, booking reference, service..."
+          />
+          <FilterSelect
+            label="Rating"
+            value={ratingScore}
+            onChange={(value) => {
+              setRatingScore(value);
+              query.setPage(1);
+            }}
+            options={[
+              { value: "all", label: "All Ratings" },
+              { value: "5", label: "5 stars" },
+              { value: "4", label: "4 stars" },
+              { value: "3", label: "3 stars" },
+              { value: "2", label: "2 stars" },
+              { value: "1", label: "1 star" },
+            ]}
           />
         </div>
 

@@ -4,12 +4,19 @@ import { fetchAllBookings, fetchCleaners } from "../../api/adminApi";
 import type { AdminBooking } from "../../types/adminTypes";
 import type { CleanerProfile } from "../../types/cleanerTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import {
+  PaginationControls,
+  paginateItems,
+} from "../../components/dashboard/DashboardControls";
 import "./AdminDashboard.css";
+
+const RECENT_BOOKINGS_PAGE_SIZE = 5;
 
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<AdminBooking[]>([]);
   const [cleaners, setCleaners] = useState<CleanerProfile[]>([]);
   const [loading, setLoading] = useState(true);
+  const [recentPage, setRecentPage] = useState(1);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,7 +67,11 @@ export default function AdminDashboard() {
   );
 
   // Recent bookings
-  const recentBookings = bookings.slice(0, 5);
+  const recentBookings = paginateItems(
+    bookings,
+    recentPage,
+    RECENT_BOOKINGS_PAGE_SIZE,
+  );
 
   if (loading) {
     return (
@@ -162,6 +173,7 @@ export default function AdminDashboard() {
             </Link>
           </div>
           {recentBookings.length > 0 ? (
+            <>
             <div className="bookings-table">
               <table>
                 <thead>
@@ -177,7 +189,9 @@ export default function AdminDashboard() {
                 <tbody>
                   {recentBookings.map((booking) => (
                     <tr key={booking.id}>
-                      <td>{booking.booking_reference}</td>
+                      <td>
+                        <strong>{booking.booking_reference}</strong>
+                      </td>
                       <td>{booking.customer_name}</td>
                       <td>{booking.service_name}</td>
                       <td>
@@ -201,6 +215,13 @@ export default function AdminDashboard() {
                 </tbody>
               </table>
             </div>
+            <PaginationControls
+              page={recentPage}
+              pageSize={RECENT_BOOKINGS_PAGE_SIZE}
+              total={bookings.length}
+              onPageChange={setRecentPage}
+            />
+            </>
           ) : (
             <div className="empty-state">
               <p>No bookings yet.</p>

@@ -1,5 +1,23 @@
 .admin-cleaners {
-  max-width: 1200px;
+  display: grid;
+  gap: 12px;
+  max-width: 1240px;
+}
+
+.admin-cleaners .dashboard-toolbar {
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
+  border-radius: 12px;
+  justify-content: center;
+  margin: 0;
+  padding: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.admin-cleaners .dashboard-search {
+  max-width: 680px;
 }
 
 /* Filter Tabs */
@@ -47,12 +65,15 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
 }
 
 .cleaner-card {
   background: var(--brand-white);
   border-radius: 12px;
   border: 1px solid var(--brand-border);
+  min-width: 820px;
   padding: 20px;
 }
 
@@ -95,8 +116,8 @@
 /* Cleaner Details */
 .cleaner-details {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(5, minmax(135px, 1fr));
+  gap: 10px;
   padding: 16px;
   background: var(--brand-surface);
   border-radius: 8px;
@@ -261,19 +282,24 @@
   background: var(--brand-white);
   border-radius: 12px;
   width: 100%;
-  max-width: 700px;
+  max-width: 820px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .modal-header {
+  background: var(--brand-white);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 24px 24px 0 24px;
   border-bottom: 1px solid var(--brand-border);
   margin-bottom: 20px;
+  padding-bottom: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .modal-header h3 {
@@ -385,9 +411,19 @@
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+  align-items: center;
   padding-top: 20px;
   border-top: 1px solid var(--brand-border);
   margin-top: 20px;
+  position: sticky;
+  bottom: 0;
+  background: var(--brand-white);
+  padding-bottom: 4px;
+}
+
+.modal-actions button {
+  min-width: 128px;
+  text-align: center;
 }
 
 .btn-view-details {
@@ -408,4 +444,19 @@
 
 .btn-secondary:hover:not(:disabled) {
   background: var(--brand-surface);
+}
+
+@media (max-width: 720px) {
+  .cleaner-card {
+    min-width: 760px;
+  }
+
+  .modal-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
 }

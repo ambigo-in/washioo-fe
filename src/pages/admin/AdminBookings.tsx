@@ -175,6 +175,12 @@ export default function AdminBookings() {
   return (
     <DashboardLayout title="Manage Bookings">
       <div className="admin-bookings">
+        <section className="admin-page-heading">
+          <div>
+            <h2>Booking Operations</h2>
+            <p>Search, assign, and monitor every booking from one compact workspace.</p>
+          </div>
+        </section>
         <div className="dashboard-toolbar">
           <SearchInput
             value={query.search}

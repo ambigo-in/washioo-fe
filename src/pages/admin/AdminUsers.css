@@ -1,12 +1,18 @@
 .users-page {
-  max-width: 1200px;
+  display: grid;
+  gap: 12px;
+  max-width: 1240px;
 }
 
 .page-header {
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
+  border-radius: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  padding: 14px 16px;
 }
 
 .page-header h2 {
@@ -21,9 +27,16 @@
 }
 
 .filter-row {
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
+  border-radius: 12px;
   display: flex;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
+  padding: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 4;
 }
 
 .search-box {
@@ -104,11 +117,13 @@
   border-radius: 12px;
   border: 1px solid var(--brand-border);
   overflow-x: auto;
+  max-width: 100%;
 }
 
 .users-table table {
-  width: 100%;
   border-collapse: collapse;
+  min-width: 940px;
+  width: 100%;
 }
 
 .users-table thead {
@@ -116,6 +131,7 @@
 }
 
 .users-table th {
+  background: var(--brand-surface);
   padding: 14px 16px;
   text-align: left;
   font-size: 0.85rem;
@@ -123,6 +139,9 @@
   color: var(--brand-text-muted);
   text-transform: uppercase;
   border-bottom: 1px solid var(--brand-border);
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .users-table td {
@@ -130,6 +149,14 @@
   font-size: 0.95rem;
   color: var(--brand-text);
   border-bottom: 1px solid var(--brand-border);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.users-table td:nth-child(4) {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .users-table tbody tr:hover {
