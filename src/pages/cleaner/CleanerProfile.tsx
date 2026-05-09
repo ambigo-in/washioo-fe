@@ -20,6 +20,9 @@ interface VerificationModalState {
   type: "aadhaar" | "license" | null;
 }
 
+const hasFullIdentityValue = (value?: string | null) =>
+  !!value && !value.includes("*");
+
 export default function CleanerProfile() {
   const dispatch = useAppDispatch();
   const { t } = useLanguage();
@@ -89,7 +92,18 @@ export default function CleanerProfile() {
     try {
       const enteredDigits = verificationPassword.replace(/\D/g, "");
       const response = await verifyCleanerIdentity(enteredDigits);
+      const fullValue =
+        verificationModal.type === "aadhaar"
+          ? response.cleaner.aadhaar_number
+          : response.cleaner.driving_license_number;
       setCleanerProfile(response.cleaner);
+
+      if (!hasFullIdentityValue(fullValue)) {
+        setVerificationModal({ isOpen: false, type: null });
+        setError(t("profile.fullDetailsUnavailable"));
+        setSuccess("");
+        return;
+      }
 
       if (verificationModal.type === "aadhaar") {
         setShowFullDetails((prev) => ({ ...prev, aadhaar: true }));
@@ -112,6 +126,17 @@ export default function CleanerProfile() {
     setVerificationPassword("");
     setError("");
   };
+
+  const aadhaarDisplay =
+    showFullDetails.aadhaar &&
+    hasFullIdentityValue(cleanerProfile?.aadhaar_number)
+      ? cleanerProfile?.aadhaar_number
+      : cleanerProfile?.aadhaar_number_masked || t("profile.provided");
+  const licenseDisplay =
+    showFullDetails.license &&
+    hasFullIdentityValue(cleanerProfile?.driving_license_number)
+      ? cleanerProfile?.driving_license_number
+      : cleanerProfile?.driving_license_number_masked || t("profile.provided");
 
   return (
     <DashboardLayout title={t("profile.myProfile")}>
@@ -210,9 +235,7 @@ export default function CleanerProfile() {
               <span className="info-value">
                 {cleanerProfile?.has_aadhaar ? (
                   <span>
-                    {showFullDetails.aadhaar
-                      ? cleanerProfile.aadhaar_number || t("profile.provided")
-                      : cleanerProfile.aadhaar_number_masked || t("profile.provided")}
+                    {aadhaarDisplay}
                     {!showFullDetails.aadhaar && (
                       <button
                         type="button"
@@ -233,10 +256,7 @@ export default function CleanerProfile() {
               <span className="info-value">
                 {cleanerProfile?.has_driving_license ? (
                   <span>
-                    {showFullDetails.license
-                      ? cleanerProfile.driving_license_number || t("profile.provided")
-                      : cleanerProfile.driving_license_number_masked ||
-                        t("profile.provided")}
+                    {licenseDisplay}
                     {!showFullDetails.license && (
                       <button
                         type="button"
