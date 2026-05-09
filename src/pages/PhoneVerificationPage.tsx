@@ -57,7 +57,11 @@ export default function PhoneVerificationPage() {
           : "/signup";
 
       navigate(nextPath, {
-        state: { phone: phoneNumber, accountType: requestedAccountType },
+        state: {
+          phone: phoneNumber,
+          accountType: requestedAccountType,
+          otpSentAt: Date.now(),
+        },
       });
     } catch (err) {
       setError(String(err));
@@ -103,7 +107,7 @@ export default function PhoneVerificationPage() {
         </select>
         <LoadingButton
           isLoading={loading}
-          loadingText="Sending OTP..."
+          loadingText={t("auth.sendingOtp")}
           type="submit"
         >
           {t("auth.continue")}

@@ -8,14 +8,21 @@ type AccessTokenPayload = {
   type?: string;
 };
 
+let cachedAccessToken: string | null = null;
+let cachedAccessPayload: AccessTokenPayload | null = null;
+
 export const saveTokens = (access: string, refresh: string) => {
   localStorage.setItem("access_token", access);
   localStorage.setItem("refresh_token", refresh);
+  cachedAccessToken = access;
+  cachedAccessPayload = null;
 };
 
 export const clearTokens = () => {
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
+  cachedAccessToken = null;
+  cachedAccessPayload = null;
 };
 
 export const getAccessToken = () => localStorage.getItem("access_token");
@@ -30,13 +37,21 @@ const decodeBase64Url = (value: string) => {
 export const getAccessTokenPayload = (): AccessTokenPayload | null => {
   const token = getAccessToken();
   if (!token) return null;
+  if (token === cachedAccessToken && cachedAccessPayload) {
+    return cachedAccessPayload;
+  }
 
   const [, payload] = token.split(".");
   if (!payload) return null;
 
   try {
-    return JSON.parse(decodeBase64Url(payload)) as AccessTokenPayload;
+    const parsed = JSON.parse(decodeBase64Url(payload)) as AccessTokenPayload;
+    cachedAccessToken = token;
+    cachedAccessPayload = parsed;
+    return parsed;
   } catch {
+    cachedAccessToken = null;
+    cachedAccessPayload = null;
     return null;
   }
 };

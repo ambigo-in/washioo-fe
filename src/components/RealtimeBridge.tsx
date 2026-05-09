@@ -13,6 +13,9 @@ type RealtimeBridgeProps = {
 
 const notificationEvents = new Set([
   "notification_created",
+]);
+
+const dataRefreshEvents = new Set([
   "booking_auto_assigned",
   "booking_assignment_updated",
   "admin_action_required",
@@ -31,6 +34,7 @@ export default function RealtimeBridge({
 }: RealtimeBridgeProps) {
   const dispatch = useAppDispatch();
   const reconnectTimer = useRef<number | null>(null);
+  const refreshTimer = useRef<number | null>(null);
   const connection = useRef<RealtimeConnection | null>(null);
   const reconnectAttempt = useRef(0);
 
@@ -62,6 +66,14 @@ export default function RealtimeBridge({
         window.dispatchEvent(new CustomEvent("washioo:notifications-refresh"));
       }
 
+      if (!dataRefreshEvents.has(event.type)) {
+        return;
+      }
+
+      if (refreshTimer.current != null) return;
+      refreshTimer.current = window.setTimeout(() => {
+        refreshTimer.current = null;
+
       if (activeRole === "cleaner") {
         dispatch(loadCleanerAssignments(undefined));
         dispatch(loadCleanerProfile());
@@ -70,6 +82,7 @@ export default function RealtimeBridge({
       } else if (activeRole === "admin") {
         dispatch(loadAdminBookings("all"));
       }
+      }, 500);
     };
 
     const openConnection = () => {
@@ -91,6 +104,10 @@ export default function RealtimeBridge({
       if (reconnectTimer.current != null) {
         window.clearTimeout(reconnectTimer.current);
         reconnectTimer.current = null;
+      }
+      if (refreshTimer.current != null) {
+        window.clearTimeout(refreshTimer.current);
+        refreshTimer.current = null;
       }
       reconnectAttempt.current = 0;
       closeConnection();

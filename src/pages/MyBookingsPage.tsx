@@ -35,6 +35,10 @@ const canCancel = (status: BookingStatus) => status === "pending";
 
 const canEdit = (status: BookingStatus) => status === "pending";
 
+type DateRangeFilter = "all" | "today" | "week" | "month";
+type PriceFilter = "all" | "0-5000" | "5000-10000" | "10000+";
+type SortOption = "date-desc" | "date-asc" | "price-desc" | "price-asc";
+
 const formatMoney = (value: number) =>
   value.toLocaleString(undefined, {
     minimumFractionDigits: 2,
@@ -57,15 +61,10 @@ const MyBookingsPage: React.FC = () => {
   const [editInstructions, setEditInstructions] = useState("");
   const [error, setError] = useState("");
   const [pageSize, setPageSize] = useState(10);
-  const [sortBy, setSortBy] = useState<
-    "date-desc" | "date-asc" | "price-desc" | "price-asc"
-  >("date-desc");
-  const [priceFilter, setPriceFilter] = useState<
-    "all" | "0-100" | "100-500" | "500+"
-  >("all");
-  const [dateRangeFilter, setDateRangeFilter] = useState<
-    "all" | "today" | "week" | "month"
-  >("all");
+  const [sortBy, setSortBy] = useState<SortOption>("date-desc");
+  const [priceFilter, setPriceFilter] = useState<PriceFilter>("all");
+  const [dateRangeFilter, setDateRangeFilter] =
+    useState<DateRangeFilter>("all");
 
   const formatPaymentMethod = (booking: CustomerBooking) => {
     const payment = booking.payment;
@@ -285,7 +284,9 @@ const MyBookingsPage: React.FC = () => {
             <select
               className="filter-select"
               value={dateRangeFilter}
-              onChange={(e) => setDateRangeFilter(e.target.value as any)}
+              onChange={(e) =>
+                setDateRangeFilter(e.target.value as DateRangeFilter)
+              }
             >
               <option value="all">{t("booking.allDates")}</option>
               <option value="today">{t("booking.today")}</option>
@@ -296,7 +297,7 @@ const MyBookingsPage: React.FC = () => {
             <select
               className="filter-select"
               value={priceFilter}
-              onChange={(e) => setPriceFilter(e.target.value as any)}
+              onChange={(e) => setPriceFilter(e.target.value as PriceFilter)}
             >
               <option value="all">{t("booking.allPrices")}</option>
               <option value="0-5000">Rs. 0 - 5,000</option>
@@ -307,7 +308,7 @@ const MyBookingsPage: React.FC = () => {
             <select
               className="filter-select"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as SortOption)}
             >
               <option value="date-desc">{t("booking.newestFirst")}</option>
               <option value="date-asc">{t("booking.oldestFirst")}</option>

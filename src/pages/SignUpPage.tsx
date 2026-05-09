@@ -7,6 +7,7 @@ import { resendOtp, signUpRequest } from "../store/slices/authSlice";
 import type { AccountType } from "../types/authTypes";
 import { formatIndianPhoneForDisplay } from "../utils/phoneUtils";
 import { useLanguage } from "../i18n/LanguageContext";
+import { useOtpResendCooldown } from "../hooks/useOtpResendCooldown";
 import "../styles/SignUpPage.css";
 
 export default function SignUpPage() {
@@ -24,10 +25,16 @@ export default function SignUpPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const state = location.state as { phone?: string; accountType?: AccountType } | null;
+  const state = location.state as {
+    phone?: string;
+    accountType?: AccountType;
+    otpSentAt?: number;
+  } | null;
   const phone = state?.phone || "";
   const accountType =
     state?.accountType === "cleaner" ? state.accountType : "customer";
+  const { isCoolingDown, restartCooldown, secondsRemaining } =
+    useOtpResendCooldown(state?.otpSentAt);
   const dashboardPath =
     accountType === "cleaner" ? "/cleaner/dashboard" : "/dashboard";
 
@@ -91,10 +98,13 @@ export default function SignUpPage() {
   };
 
   const handleResend = async () => {
+    if (isCoolingDown) return;
+
     setError("");
 
     try {
       await dispatch(resendOtp({ phoneNumber: phone, accountType })).unwrap();
+      restartCooldown();
     } catch (err) {
       setError(String(err));
     }
@@ -162,12 +172,15 @@ export default function SignUpPage() {
           {t("auth.freshCode")}{" "}
           <LoadingButton
             className="link-button"
+            disabled={isCoolingDown}
             isLoading={resendLoading}
-            loadingText="Resending..."
+            loadingText={t("auth.resendingOtp")}
             onClick={handleResend}
             type="button"
           >
-            {t("auth.resendOtp")}
+            {isCoolingDown
+              ? t("auth.resendIn", { seconds: secondsRemaining })
+              : t("auth.resendOtp")}
           </LoadingButton>
         </p>
       </form>

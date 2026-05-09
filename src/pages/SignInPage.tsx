@@ -7,6 +7,7 @@ import { resendOtp, signInRequest } from "../store/slices/authSlice";
 import type { AccountType } from "../types/authTypes";
 import { formatIndianPhoneForDisplay } from "../utils/phoneUtils";
 import { useLanguage } from "../i18n/LanguageContext";
+import { useOtpResendCooldown } from "../hooks/useOtpResendCooldown";
 import "../styles/SignInPage.css";
 
 export default function SignInPage() {
@@ -19,9 +20,15 @@ export default function SignInPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const state = location.state as { phone?: string; accountType?: AccountType } | null;
+  const state = location.state as {
+    phone?: string;
+    accountType?: AccountType;
+    otpSentAt?: number;
+  } | null;
   const phone = state?.phone || "";
-const accountType = state?.accountType || "customer";
+  const accountType = state?.accountType || "customer";
+  const { isCoolingDown, restartCooldown, secondsRemaining } =
+    useOtpResendCooldown(state?.otpSentAt);
 
   const dashboardPath =
     accountType === "admin"
@@ -62,10 +69,13 @@ const accountType = state?.accountType || "customer";
   };
 
   const handleResend = async () => {
+    if (isCoolingDown) return;
+
     setError("");
 
     try {
       await dispatch(resendOtp({ phoneNumber: phone, accountType })).unwrap();
+      restartCooldown();
     } catch (err) {
       setError(String(err));
     }
@@ -99,12 +109,15 @@ const accountType = state?.accountType || "customer";
           {t("auth.didNotReceive")}{" "}
           <LoadingButton
             className="link-button"
+            disabled={isCoolingDown}
             isLoading={resendLoading}
-            loadingText="Resending..."
+            loadingText={t("auth.resendingOtp")}
             onClick={handleResend}
             type="button"
           >
-            {t("auth.resendOtp")}
+            {isCoolingDown
+              ? t("auth.resendIn", { seconds: secondsRemaining })
+              : t("auth.resendOtp")}
           </LoadingButton>
         </p>
       </form>

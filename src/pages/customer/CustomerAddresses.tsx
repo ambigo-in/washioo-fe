@@ -70,7 +70,7 @@ export default function CustomerAddresses() {
     dispatch(loadAddresses())
       .unwrap()
       .catch(() => setError(t("address.failedLoad")));
-  }, [dispatch]);
+  }, [dispatch, t]);
 
   useEffect(() => {
     const firstError = document.querySelector<HTMLElement>(

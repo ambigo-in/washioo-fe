@@ -96,3 +96,9 @@ textarea:disabled {
   text-decoration: underline;
   transform: none !important;
 }
+
+.link-button:disabled {
+  color: var(--brand-text-muted) !important;
+  opacity: 0.85;
+  text-decoration: none;
+}
