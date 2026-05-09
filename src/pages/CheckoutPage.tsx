@@ -47,7 +47,9 @@ const today = new Date().toISOString().split("T")[0];
 const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
   .toISOString()
   .split("T")[0];
-const quickTimeOptions = ["09:00", "14:00", "18:00"];
+const quickTimeOptions = ["Now", "09:00", "14:00", "18:00"];
+
+const formatCurrentTime = () => new Date().toTimeString().slice(0, 5);
 
 const compactAddressPayload = (payload: AddressPayload): AddressPayload => ({
   address_label: payload.address_label?.trim() || "Home",
@@ -254,7 +256,7 @@ const CheckoutPage: React.FC = () => {
     if (!serviceData) return;
 
     const nextFieldErrors: CheckoutFieldErrors = {};
-    let bookingAddressId = selectedAddressId;
+    let bookingAddressId: string | null = selectedAddressId || null;
 
     try {
       if (showForm && hasUnsavedAddress) {
@@ -278,6 +280,8 @@ const CheckoutPage: React.FC = () => {
       setError("Fix the highlighted booking detail.");
       return;
     }
+
+    if (!bookingAddressId) return;
 
     setFieldErrors({});
     setError("");
@@ -565,7 +569,9 @@ const CheckoutPage: React.FC = () => {
                   key={timeOption}
                   type="button"
                   onClick={() => {
-                    setScheduledTime(timeOption);
+                    setScheduledTime(
+                      timeOption === "Now" ? formatCurrentTime() : timeOption,
+                    );
                     setFieldErrors((prev) => ({
                       ...prev,
                       schedule: undefined,

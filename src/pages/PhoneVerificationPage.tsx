@@ -42,7 +42,6 @@ export default function PhoneVerificationPage() {
         sendOtpRequest({ phoneNumber, accountType }),
       ).unwrap();
 
-      const resolvedAccountType = response.account_type || accountType;
       const requestedAccountType = accountType;
       const hasRoleForRequestedType =
         response.roles?.includes(requestedAccountType);
