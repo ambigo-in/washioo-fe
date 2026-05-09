@@ -19,9 +19,9 @@ export const normalizeCoordinates = ({
 });
 
 const geolocationOptions: PositionOptions = {
-  enableHighAccuracy: true,
-  maximumAge: 30000,
-  timeout: 10000,
+  enableHighAccuracy: false,
+  maximumAge: 120000,
+  timeout: 5000,
 };
 
 export type LocationError = {
@@ -112,25 +112,11 @@ const readCurrentPosition = (): Promise<Coordinates> =>
   });
 
 export const getCurrentCoordinates = async (): Promise<Coordinates> => {
-  const readings: Coordinates[] = [];
-  let lastError: LocationError | unknown = null;
-
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    try {
-      const reading = await readCurrentPosition();
-      readings.push(reading);
-
-      if ((reading.accuracy ?? Number.POSITIVE_INFINITY) <= 80) {
-        return reading;
-      }
-    } catch (error) {
-      lastError = error;
-    }
-  }
-
-  if (readings.length === 0) {
-    if (lastError && typeof lastError === "object" && "type" in lastError) {
-      throw lastError as LocationError;
+  try {
+    return await readCurrentPosition();
+  } catch (error) {
+    if (error && typeof error === "object" && "type" in error) {
+      throw error as LocationError;
     }
     throw createLocationError(
       "unknown",
@@ -138,12 +124,6 @@ export const getCurrentCoordinates = async (): Promise<Coordinates> => {
       "Please check your location settings and try again.",
     );
   }
-
-  return readings.sort(
-    (a, b) =>
-      (a.accuracy ?? Number.POSITIVE_INFINITY) -
-      (b.accuracy ?? Number.POSITIVE_INFINITY),
-  )[0];
 };
 
 export const locationAccuracyMessage = (accuracy?: number | null) => {

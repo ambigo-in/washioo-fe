@@ -27,6 +27,9 @@ export interface ServiceCategory {
   description: string | null;
   base_price: number;
   estimated_duration_minutes: number | null;
+  allow_extra_payment?: boolean;
+  max_extra_amount?: number | null;
+  extra_payment_instructions?: string | null;
   is_active: boolean;
 }
 

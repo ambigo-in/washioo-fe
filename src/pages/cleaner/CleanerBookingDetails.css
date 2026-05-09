@@ -41,6 +41,45 @@
   gap: 12px;
 }
 
+.detail-action-bar {
+  align-items: center;
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px;
+}
+
+.detail-action-bar button {
+  border: 0;
+  border-radius: 10px;
+  color: var(--brand-white);
+  cursor: pointer;
+  font-weight: 900;
+  min-height: 40px;
+  padding: 10px 16px;
+}
+
+.detail-action-bar .btn-accept {
+  background: #15803d;
+}
+
+.detail-action-bar .btn-reject {
+  background: #dc2626;
+}
+
+.detail-action-bar .btn-start {
+  background: var(--brand-teal-dark);
+}
+
+.detail-action-bar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .status-pill {
   background: var(--brand-teal-soft);
   border-radius: 999px;
@@ -255,6 +294,11 @@
   .hero-actions,
   .hero-actions .maps-button {
     align-items: stretch;
+    width: 100%;
+  }
+
+  .detail-action-bar,
+  .detail-action-bar button {
     width: 100%;
   }
 

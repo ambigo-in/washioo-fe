@@ -28,29 +28,30 @@ const getFilteredNotifications = (
 ) => {
   if (!role) return notifications;
 
-  const cleanerKeywords = [
-    "assigned",
-    "scheduled",
-    "started",
-    "completed",
-    "rating",
-    "payment",
-  ];
-  const customerKeywords = [
-    "assigned",
-    "started",
-    "completed",
-    "rating",
-    "payment",
-  ];
+  const cleanerTypes = new Set(["booking_assigned", "service_scheduled_today"]);
+  const customerTypes = new Set([
+    "cleaner_assigned",
+    "booking_accepted",
+    "cleaner_started_route",
+    "service_started",
+    "service_completed",
+    "customer_rating",
+    "payment_collected",
+  ]);
+  const adminTypes = new Set([
+    "booking_assignment_accepted",
+    "booking_assignment_rejected",
+  ]);
 
-  const keywords = role === "cleaner" ? cleanerKeywords : customerKeywords;
-  return notifications.filter((n) =>
-    keywords.some(
-      (keyword) =>
-        n.title.toLowerCase().includes(keyword) ||
-        n.message.toLowerCase().includes(keyword),
-    ),
+  const allowedTypes =
+    role === "cleaner"
+      ? cleanerTypes
+      : role === "admin"
+        ? adminTypes
+        : customerTypes;
+
+  return notifications.filter((notification) =>
+    allowedTypes.has(notification.notification_type),
   );
 };
 

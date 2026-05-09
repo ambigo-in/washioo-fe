@@ -117,6 +117,9 @@ export default function AdminServices() {
       description: "",
       base_price: 0,
       estimated_duration_minutes: 60,
+      allow_extra_payment: false,
+      max_extra_amount: 0,
+      extra_payment_instructions: "",
       is_active: true,
     });
     setEditingId(null);

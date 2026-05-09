@@ -8,6 +8,11 @@ import { LoadingButton } from "../../components/ui";
 import OpenInMapsButton from "../../components/OpenInMapsButton";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
+  acceptCleanerAssignment,
+  rejectCleanerAssignment,
+  startCleanerAssignment,
+} from "../../store/slices/cleanerSlice";
+import {
   collectPayment,
   loadAdminPayments,
   loadCleanerEarnings,
@@ -36,35 +41,41 @@ export default function CleanerBookingDetails() {
   const [error, setError] = useState("");
   const [paymentError, setPaymentError] = useState("");
   const [paymentSuccess, setPaymentSuccess] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [assignmentActionLoading, setAssignmentActionLoading] = useState(false);
   const [collectedAmount, setCollectedAmount] = useState("");
   const [paymentType, setPaymentType] = useState<PaymentType>("cash");
 
-  useEffect(() => {
+  const loadBookingDetails = async (active = true) => {
     if (!bookingId) return;
 
+    try {
+      const response = await fetchCleanerBooking(bookingId);
+      if (active) {
+        setBooking(response.booking);
+        const amount =
+          response.booking.payment.amount ??
+          response.booking.final_price ??
+          response.booking.estimated_price;
+        setCollectedAmount(String(amount));
+        setError("");
+      }
+    } catch (err) {
+      if (active) setError(getApiErrorMessage(err));
+    } finally {
+      if (active) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     let active = true;
 
-    fetchCleanerBooking(bookingId)
-      .then((response) => {
-        if (active) {
-          setBooking(response.booking);
-          const amount =
-            response.booking.payment.amount ??
-            response.booking.final_price ??
-            response.booking.estimated_price;
-          setCollectedAmount(String(amount));
-        }
-      })
-      .catch((err) => {
-        if (active) setError(getApiErrorMessage(err));
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
+    void loadBookingDetails(active);
 
     return () => {
       active = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId]);
 
   const address = booking?.address;
@@ -86,6 +97,30 @@ export default function CleanerBookingDetails() {
   const canRecordPayment =
     booking?.booking_status === "completed" &&
     inferredPaymentStatus === "pending_collection";
+  const assignment = booking?.assignment;
+
+  const refreshAfterAssignmentAction = async (
+    action: typeof acceptCleanerAssignment,
+    notes: string,
+  ) => {
+    if (!assignment?.id) return;
+
+    setActionError("");
+    setAssignmentActionLoading(true);
+    try {
+      await dispatch(
+        action({
+          assignmentId: assignment.id,
+          actionPayload: { cleaner_notes: notes },
+        }),
+      ).unwrap();
+      await loadBookingDetails(true);
+    } catch (err) {
+      setActionError(String(err));
+    } finally {
+      setAssignmentActionLoading(false);
+    }
+  };
 
   const handleCollectPayment = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -151,6 +186,63 @@ export default function CleanerBookingDetails() {
               />
             </div>
           </div>
+
+          {actionError && (
+            <p className="payment-message error">{actionError}</p>
+          )}
+
+          {assignment && assignment.assignment_status !== "completed" && (
+            <div className="detail-action-bar">
+              {assignment.assignment_status === "assigned" && (
+                <>
+                  <LoadingButton
+                    className="btn-accept"
+                    isLoading={assignmentActionLoading}
+                    loadingText="Accepting..."
+                    onClick={() =>
+                      refreshAfterAssignmentAction(
+                        acceptCleanerAssignment,
+                        "Accepted",
+                      )
+                    }
+                    type="button"
+                  >
+                    Accept
+                  </LoadingButton>
+                  <LoadingButton
+                    className="btn-reject"
+                    isLoading={assignmentActionLoading}
+                    loadingText="Rejecting..."
+                    onClick={() =>
+                      refreshAfterAssignmentAction(
+                        rejectCleanerAssignment,
+                        "Rejected",
+                      )
+                    }
+                    type="button"
+                  >
+                    Reject
+                  </LoadingButton>
+                </>
+              )}
+              {assignment.assignment_status === "accepted" && (
+                <LoadingButton
+                  className="btn-start"
+                  isLoading={assignmentActionLoading}
+                  loadingText="Starting..."
+                  onClick={() =>
+                    refreshAfterAssignmentAction(
+                      startCleanerAssignment,
+                      "Started",
+                    )
+                  }
+                  type="button"
+                >
+                  Start Service
+                </LoadingButton>
+              )}
+            </div>
+          )}
 
           <div className="detail-grid">
             <section className="detail-card">
