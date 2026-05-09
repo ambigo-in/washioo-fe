@@ -147,6 +147,20 @@ export const assignBooking = (
     },
   );
 
+export const autoAssignBooking = (bookingId: string) =>
+  apiRequest<{
+    message: string;
+    assigned: boolean;
+    reason: string;
+    score?: number | null;
+    distance_km?: number | null;
+    candidates?: number;
+    assignment: Assignment | null;
+  }>(`/services/admin/bookings/${bookingId}/auto-assign`, {
+    method: "POST",
+    auth: true,
+  });
+
 // Cleaner Profile APIs
 export const fetchCleaners = (filters?: CleanerFilters) => {
   return apiRequest<{

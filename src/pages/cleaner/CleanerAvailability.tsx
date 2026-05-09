@@ -5,7 +5,9 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   loadCleanerProfile,
   setCleanerAvailability,
+  setCleanerLocation,
 } from "../../store/slices/cleanerSlice";
+import { getCurrentCoordinates } from "../../utils/locationUtils";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerAvailability.css";
 
@@ -29,6 +31,10 @@ export default function CleanerAvailability() {
 
     setMessage("");
     try {
+      if (status === "available") {
+        const coordinates = await getCurrentCoordinates();
+        await dispatch(setCleanerLocation(coordinates)).unwrap();
+      }
       await dispatch(setCleanerAvailability(status)).unwrap();
       setMessage(t("availability.updateSuccess"));
     } catch {

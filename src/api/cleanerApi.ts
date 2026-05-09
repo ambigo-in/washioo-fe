@@ -28,6 +28,19 @@ export const updateCleanerAvailability = (payload: AvailabilityPayload) =>
     },
   );
 
+export const updateCleanerLocation = (payload: {
+  latitude: number;
+  longitude: number;
+}) =>
+  apiRequest<{ message: string; cleaner: CleanerProfile }>(
+    "/services/cleaner/location",
+    {
+      method: "PATCH",
+      auth: true,
+      body: payload,
+    },
+  );
+
 // Assignment APIs
 export const fetchCleanerAssignments = (
   status?: string,

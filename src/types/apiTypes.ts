@@ -179,6 +179,11 @@ export interface AssignmentSummary {
   started_at: string | null;
   completed_at: string | null;
   cleaner_notes: string | null;
+  expires_at?: string | null;
+  auto_assigned?: boolean;
+  assignment_rank?: number | null;
+  assignment_score?: number | null;
+  distance_km?: number | null;
 }
 
 export interface CustomerBooking {
@@ -223,6 +228,7 @@ export interface CreatedBooking {
   scheduled_time: string;
   booking_status: BookingStatus;
   estimated_price: number;
+  assignment?: AssignmentSummary | null;
   created_at: string;
 }
 

@@ -22,6 +22,11 @@ export interface CleanerProfile {
   has_aadhaar?: boolean;
   has_driving_license?: boolean;
   service_radius_km: number | null;
+  current_latitude?: number | null;
+  current_longitude?: number | null;
+  last_location_at?: string | null;
+  last_available_at?: string | null;
+  auto_assign_enabled?: boolean;
   approval_status: "pending" | "approved" | "rejected" | "suspended";
   availability_status: "offline" | "available" | "busy";
   rating: number;
@@ -45,7 +50,7 @@ export interface Assignment {
   completed_at: string | null;
   cleaner_notes: string | null;
   booking_id: string;
-  assigned_by_admin: string;
+  assigned_by_admin: string | null;
   cleaner: CleanerProfile;
   booking: {
     id: string;
@@ -174,6 +179,7 @@ export interface CleanerNotification {
   title: string;
   message: string;
   notification_type: string;
+  url?: string | null;
   is_read: boolean;
   created_at: string;
 }

@@ -7,6 +7,7 @@ import {
   rejectAssignment,
   startAssignment,
   updateCleanerAvailability,
+  updateCleanerLocation,
 } from "../../api/cleanerApi";
 import { getApiErrorMessage, type PaginationParams } from "../../api/client";
 import type {
@@ -51,6 +52,20 @@ export const setCleanerAvailability = createAsyncThunk(
   ) => {
     try {
       return await updateCleanerAvailability({ availability_status });
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error));
+    }
+  },
+);
+
+export const setCleanerLocation = createAsyncThunk(
+  "cleaner/setLocation",
+  async (
+    payload: { latitude: number; longitude: number },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await updateCleanerLocation(payload);
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error));
     }
@@ -120,6 +135,9 @@ const cleanerSlice = createSlice({
         state.profile = action.payload.cleaner;
       })
       .addCase(setCleanerAvailability.fulfilled, (state, action) => {
+        state.profile = action.payload.cleaner;
+      })
+      .addCase(setCleanerLocation.fulfilled, (state, action) => {
         state.profile = action.payload.cleaner;
       })
       .addCase(loadCleanerAssignments.pending, (state) => {

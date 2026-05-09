@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   assignBooking,
+  autoAssignBooking,
   fetchAllBookings,
   fetchBookingsByStatus,
   fetchCleaners,
@@ -88,6 +89,17 @@ export const assignAdminBooking = createAsyncThunk(
         cleaner_notes: payload.cleanerNotes,
       });
       return response;
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error));
+    }
+  },
+);
+
+export const autoAssignAdminBooking = createAsyncThunk(
+  "admin/autoAssignBooking",
+  async (bookingId: string, { rejectWithValue }) => {
+    try {
+      return await autoAssignBooking(bookingId);
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error));
     }

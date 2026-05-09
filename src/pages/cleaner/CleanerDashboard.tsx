@@ -5,9 +5,11 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   loadCleanerAssignments,
   loadCleanerProfile,
+  setCleanerLocation,
 } from "../../store/slices/cleanerSlice";
 import CleanerEarnings from "./CleanerEarnings";
 import { formatAddress } from "../../utils/addressUtils";
+import { getCurrentCoordinates } from "../../utils/locationUtils";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerDashboard.css";
 
@@ -22,6 +24,34 @@ export default function CleanerDashboard() {
     dispatch(loadCleanerProfile());
     dispatch(loadCleanerAssignments(undefined));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (
+      profile?.approval_status !== "approved" ||
+      profile.availability_status !== "available"
+    ) {
+      return;
+    }
+
+    let active = true;
+    const updateLocation = async () => {
+      try {
+        const coordinates = await getCurrentCoordinates();
+        if (active) {
+          void dispatch(setCleanerLocation(coordinates));
+        }
+      } catch {
+        // Location is best-effort here; availability page shows explicit errors.
+      }
+    };
+
+    void updateLocation();
+    const timer = window.setInterval(updateLocation, 5 * 60 * 1000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [dispatch, profile?.approval_status, profile?.availability_status]);
 
   const pendingJobs = assignments.filter(
     (assignment) => assignment.assignment_status === "assigned",

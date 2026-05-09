@@ -16,6 +16,7 @@ import { fetchBookingsByStatus } from "../../api/adminApi";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   assignAdminBooking,
+  autoAssignAdminBooking,
   loadAdminBookings,
   loadAdminCleaners,
 } from "../../store/slices/adminSlice";
@@ -32,6 +33,7 @@ export default function AdminBookings() {
   const query = useDashboardQueryState<FilterStatus>("all");
   const [selectedCleaner, setSelectedCleaner] = useState<string>("");
   const [assignError, setAssignError] = useState("");
+  const [autoAssignMessage, setAutoAssignMessage] = useState("");
   const [statusCounts, setStatusCounts] = useState<Record<BookingStatus, number>>({
     pending: 0,
     assigned: 0,
@@ -104,6 +106,28 @@ export default function AdminBookings() {
     }
   };
 
+  const handleAutoAssign = async (bookingId: string) => {
+    setAssignError("");
+    setAutoAssignMessage("");
+    try {
+      const response = await dispatch(autoAssignAdminBooking(bookingId)).unwrap();
+      setAutoAssignMessage(
+        response.assigned
+          ? `Auto assigned ${response.distance_km ?? ""} km away.`
+          : `Auto assignment skipped: ${response.reason.replaceAll("_", " ")}.`,
+      );
+      await dispatch(
+        loadAdminBookings({
+          status: query.status,
+          limit: query.pageSize,
+          offset: query.offset,
+        }),
+      ).unwrap();
+    } catch (error) {
+      setAssignError(String(error));
+    }
+  };
+
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       pending: "var(--brand-teal)",
@@ -168,6 +192,9 @@ export default function AdminBookings() {
         ) : visibleBookings.length > 0 ? (
           <>
           {assignError && <p className="form-alert error">{assignError}</p>}
+          {autoAssignMessage && (
+            <p className="form-alert success">{autoAssignMessage}</p>
+          )}
           <div className="bookings-list">
             {visibleBookings.map((booking) => (
               <div key={booking.id} className="booking-card">
@@ -248,6 +275,14 @@ export default function AdminBookings() {
                         </option>
                       ))}
                     </select>
+                    <LoadingButton
+                      className="btn-assign"
+                      onClick={() => handleAutoAssign(booking.id)}
+                      isLoading={loading}
+                      loadingText="Finding..."
+                    >
+                      Auto Assign
+                    </LoadingButton>
                     <LoadingButton
                       className="btn-assign"
                       onClick={() => handleAssign(booking.id)}
