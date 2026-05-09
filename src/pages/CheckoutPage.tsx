@@ -44,6 +44,10 @@ const emptyAddress: AddressPayload = {
 };
 
 const today = new Date().toISOString().split("T")[0];
+const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+  .toISOString()
+  .split("T")[0];
+const quickTimeOptions = ["09:00", "14:00", "18:00"];
 
 const compactAddressPayload = (payload: AddressPayload): AddressPayload => ({
   address_label: payload.address_label?.trim() || "Home",
@@ -84,6 +88,17 @@ const CheckoutPage: React.FC = () => {
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [instructions, setInstructions] = useState("");
+
+  const hasUnsavedAddress = !!(
+    formData.address_line1.trim() ||
+    formData.address_line2?.trim() ||
+    formData.landmark?.trim() ||
+    formData.city?.trim() ||
+    formData.state?.trim() ||
+    formData.pincode?.trim() ||
+    formData.latitude != null ||
+    formData.longitude != null
+  );
 
   useEffect(() => {
     if (!serviceData?.serviceId) {
@@ -205,11 +220,51 @@ const CheckoutPage: React.FC = () => {
     }
   };
 
+  const saveAddressIfNeeded = async (): Promise<string | null> => {
+    if (!hasUnsavedAddress) {
+      return selectedAddressId || null;
+    }
+
+    const payload = compactAddressPayload(formData);
+    const nextFieldErrors: CheckoutFieldErrors = {};
+
+    if (!payload.address_line1) {
+      nextFieldErrors.address_line1 = "Address line 1 is required.";
+    }
+
+    if (payload.latitude == null || payload.longitude == null) {
+      nextFieldErrors.location = "Tap Use My Live Location before booking.";
+    }
+
+    if (Object.keys(nextFieldErrors).length) {
+      setFieldErrors(nextFieldErrors);
+      setError("Fix the highlighted address field before booking.");
+      throw new Error("Address validation failed");
+    }
+
+    const response = await dispatch(saveAddress(payload)).unwrap();
+    setSelectedAddressId(response.address.id);
+    setFormData(emptyAddress);
+    setShowForm(false);
+    setSuccess("Address saved and selected for booking.");
+    return response.address.id;
+  };
+
   const handleBooking = async () => {
     if (!serviceData) return;
 
     const nextFieldErrors: CheckoutFieldErrors = {};
-    if (!selectedAddressId) {
+    let bookingAddressId = selectedAddressId;
+
+    try {
+      if (showForm && hasUnsavedAddress) {
+        bookingAddressId = await saveAddressIfNeeded();
+      }
+    } catch {
+      return;
+    }
+
+    if (!bookingAddressId) {
       nextFieldErrors.selectedAddress =
         "Choose a saved address or add a new one.";
     }
@@ -219,7 +274,7 @@ const CheckoutPage: React.FC = () => {
     }
 
     if (Object.keys(nextFieldErrors).length) {
-      setFieldErrors(nextFieldErrors);
+      setFieldErrors((prev) => ({ ...prev, ...nextFieldErrors }));
       setError("Fix the highlighted booking detail.");
       return;
     }
@@ -232,7 +287,7 @@ const CheckoutPage: React.FC = () => {
       await dispatch(
         bookService({
           service_category_id: serviceData.serviceId,
-          address_id: selectedAddressId,
+          address_id: bookingAddressId,
           vehicle_id: selectedVehicleId || null,
           scheduled_date: scheduledDate,
           scheduled_time: scheduledTime,
@@ -469,6 +524,26 @@ const CheckoutPage: React.FC = () => {
               </div>
             )}
 
+            <div className="quick-schedule-row">
+              <button
+                type="button"
+                onClick={() => {
+                  setScheduledDate(today);
+                  setFieldErrors((prev) => ({ ...prev, schedule: undefined }));
+                }}
+              >
+                Today
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setScheduledDate(tomorrow);
+                  setFieldErrors((prev) => ({ ...prev, schedule: undefined }));
+                }}
+              >
+                Tomorrow
+              </button>
+            </div>
             <label>
               Date
               <input
@@ -484,6 +559,23 @@ const CheckoutPage: React.FC = () => {
                 data-field-error={fieldErrors.schedule ? "true" : undefined}
               />
             </label>
+            <div className="quick-schedule-row">
+              {quickTimeOptions.map((timeOption) => (
+                <button
+                  key={timeOption}
+                  type="button"
+                  onClick={() => {
+                    setScheduledTime(timeOption);
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      schedule: undefined,
+                    }));
+                  }}
+                >
+                  {timeOption}
+                </button>
+              ))}
+            </div>
             <label>
               Time
               <input

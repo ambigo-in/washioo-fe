@@ -1,7 +1,12 @@
 .checkout-page {
   min-height: 100vh;
   padding: 60px 20px 90px;
-  background: linear-gradient(180deg, var(--brand-teal-soft) 0%, var(--brand-white) 45%, var(--brand-teal-soft) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--brand-teal-soft) 0%,
+    var(--brand-white) 45%,
+    var(--brand-teal-soft) 100%
+  );
 }
 
 .checkout-heading {
@@ -77,7 +82,11 @@
 }
 
 .address-card.selected {
-  background: linear-gradient(135deg, var(--brand-teal-soft), var(--brand-teal-soft));
+  background: linear-gradient(
+    135deg,
+    var(--brand-teal-soft),
+    var(--brand-teal-soft)
+  );
   border-color: var(--brand-teal-dark);
   box-shadow: 0 10px 25px rgba(var(--brand-teal-rgb), 0.1);
 }
@@ -105,7 +114,11 @@
 }
 
 .address-section > button {
-  background: linear-gradient(135deg, var(--brand-teal-light), var(--brand-teal-dark));
+  background: linear-gradient(
+    135deg,
+    var(--brand-teal-light),
+    var(--brand-teal-dark)
+  );
   border: none;
   border-radius: 999px;
   color: white;
@@ -199,7 +212,11 @@
 }
 
 .address-form button {
-  background: linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dark));
+  background: linear-gradient(
+    135deg,
+    var(--brand-teal),
+    var(--brand-teal-dark)
+  );
   border: none;
   border-radius: 16px;
   color: white;
@@ -261,6 +278,28 @@
   margin-top: 8px;
 }
 
+.quick-schedule-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.quick-schedule-row button {
+  background: transparent;
+  border: 1px solid var(--brand-teal-border);
+  border-radius: 999px;
+  color: var(--brand-teal-dark);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 14px;
+}
+
+.quick-schedule-row button:hover {
+  background: var(--brand-teal-soft);
+}
+
 .booking-summary textarea {
   margin-top: 18px;
   min-height: 120px;
@@ -298,7 +337,11 @@
 }
 
 .booking-summary button {
-  background: linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dark));
+  background: linear-gradient(
+    135deg,
+    var(--brand-teal),
+    var(--brand-teal-dark)
+  );
   border: none;
   border-radius: 999px;
   box-shadow: 0 15px 32px rgba(var(--brand-teal-rgb), 0.2);

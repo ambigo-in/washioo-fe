@@ -20,8 +20,8 @@ export const normalizeCoordinates = ({
 
 const geolocationOptions: PositionOptions = {
   enableHighAccuracy: true,
-  maximumAge: 0,
-  timeout: 20000,
+  maximumAge: 30000,
+  timeout: 10000,
 };
 
 export type LocationError = {
@@ -115,12 +115,12 @@ export const getCurrentCoordinates = async (): Promise<Coordinates> => {
   const readings: Coordinates[] = [];
   let lastError: LocationError | unknown = null;
 
-  for (let attempt = 0; attempt < 3; attempt += 1) {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
       const reading = await readCurrentPosition();
       readings.push(reading);
 
-      if ((reading.accuracy ?? Number.POSITIVE_INFINITY) <= 30) {
+      if ((reading.accuracy ?? Number.POSITIVE_INFINITY) <= 80) {
         return reading;
       }
     } catch (error) {
