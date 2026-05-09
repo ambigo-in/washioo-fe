@@ -94,6 +94,7 @@ export default function DashboardLayout({
 
     loadNotifications();
     const intervalId = window.setInterval(loadNotifications, 60000);
+    window.addEventListener("washioo:notifications-refresh", loadNotifications);
 
     if (activeRole === "cleaner" && !pushRegistrationAttempted.current) {
       pushRegistrationAttempted.current = true;
@@ -105,6 +106,7 @@ export default function DashboardLayout({
     return () => {
       cancelled = true;
       window.clearInterval(intervalId);
+      window.removeEventListener("washioo:notifications-refresh", loadNotifications);
     };
   }, [activeRole]);
 

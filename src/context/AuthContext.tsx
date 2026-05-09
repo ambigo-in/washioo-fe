@@ -9,6 +9,7 @@ import {
   setUser as setAuthUser,
 } from "../store/slices/authSlice";
 import { removeCleanerPushSubscription } from "../utils/pushNotifications";
+import RealtimeBridge from "../components/RealtimeBridge";
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -58,6 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser: (nextUser: UserProfile | null) => dispatch(setAuthUser(nextUser)),
       }}
     >
+      <RealtimeBridge isAuthenticated={isAuthenticated} activeRole={activeRole} />
       {children}
     </AuthContext.Provider>
   );
