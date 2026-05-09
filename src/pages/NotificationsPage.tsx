@@ -22,6 +22,38 @@ const getNotificationLandingPath = (role?: UserRole) => {
   }
 };
 
+const getFilteredNotifications = (
+  notifications: NotificationItem[],
+  role?: UserRole,
+) => {
+  if (!role) return notifications;
+
+  const cleanerKeywords = [
+    "assigned",
+    "scheduled",
+    "started",
+    "completed",
+    "rating",
+    "payment",
+  ];
+  const customerKeywords = [
+    "assigned",
+    "started",
+    "completed",
+    "rating",
+    "payment",
+  ];
+
+  const keywords = role === "cleaner" ? cleanerKeywords : customerKeywords;
+  return notifications.filter((n) =>
+    keywords.some(
+      (keyword) =>
+        n.title.toLowerCase().includes(keyword) ||
+        n.message.toLowerCase().includes(keyword),
+    ),
+  );
+};
+
 export default function NotificationsPage() {
   const { activeRole } = useAuth();
   const navigate = useNavigate();
@@ -38,7 +70,13 @@ export default function NotificationsPage() {
       setLoading(true);
       try {
         const response = await fetchNotifications(activeRole);
-        if (!cancelled) setNotifications(response.notifications);
+        if (!cancelled) {
+          const filtered = getFilteredNotifications(
+            response.notifications,
+            activeRole,
+          );
+          setNotifications(filtered);
+        }
       } catch {
         if (!cancelled) setNotifications([]);
       } finally {

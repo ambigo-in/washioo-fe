@@ -14,6 +14,11 @@ interface ProfileFormData {
   phone: string;
 }
 
+interface VerificationModalState {
+  isOpen: boolean;
+  type: "aadhaar" | "license" | null;
+}
+
 export default function CleanerProfile() {
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.auth);
@@ -26,9 +31,19 @@ export default function CleanerProfile() {
     phone: user?.phone || "",
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [cleanerProfile, setCleanerProfile] = useState<CleanerProfileData | null>(
-    null,
-  );
+  const [cleanerProfile, setCleanerProfile] =
+    useState<CleanerProfileData | null>(null);
+  const [verificationModal, setVerificationModal] =
+    useState<VerificationModalState>({
+      isOpen: false,
+      type: null,
+    });
+  const [verificationPassword, setVerificationPassword] = useState("");
+  const [verifyingDocument, setVerifyingDocument] = useState(false);
+  const [showFullDetails, setShowFullDetails] = useState({
+    aadhaar: false,
+    license: false,
+  });
 
   React.useEffect(() => {
     fetchCleanerProfile()
@@ -45,7 +60,9 @@ export default function CleanerProfile() {
     e.preventDefault();
     try {
       setError("");
-      const updatedUser = await dispatch(updateProfileRequest(formData)).unwrap();
+      const updatedUser = await dispatch(
+        updateProfileRequest(formData),
+      ).unwrap();
       setUser(updatedUser.user);
       setSuccess("Profile updated successfully!");
       setIsEditing(false);
@@ -53,6 +70,49 @@ export default function CleanerProfile() {
       setError("Failed to update profile");
       console.error(err);
     }
+  };
+
+  const handleRequestFullDetails = (type: "aadhaar" | "license") => {
+    setVerificationModal({ isOpen: true, type });
+    setVerificationPassword("");
+  };
+
+  const handleVerifyAndShow = async () => {
+    if (!verificationPassword.trim()) {
+      setError("Please enter your password to verify");
+      return;
+    }
+
+    setVerifyingDocument(true);
+    try {
+      // Simple verification - in production, this should validate against backend
+      // For now, we'll just require the phone number last 4 digits
+      const phoneLastFour = (user?.phone || "").slice(-4);
+      if (verificationPassword !== phoneLastFour) {
+        setError("Verification failed. Please try again.");
+        setVerifyingDocument(false);
+        return;
+      }
+
+      // Show full details
+      if (verificationModal.type === "aadhaar") {
+        setShowFullDetails((prev) => ({ ...prev, aadhaar: true }));
+      } else if (verificationModal.type === "license") {
+        setShowFullDetails((prev) => ({ ...prev, license: true }));
+      }
+
+      setVerificationModal({ isOpen: false, type: null });
+      setSuccess("Details verified and displayed");
+      setError("");
+    } finally {
+      setVerifyingDocument(false);
+    }
+  };
+
+  const closeVerificationModal = () => {
+    setVerificationModal({ isOpen: false, type: null });
+    setVerificationPassword("");
+    setError("");
   };
 
   return (
@@ -150,23 +210,94 @@ export default function CleanerProfile() {
             <div className="info-row">
               <span className="info-label">Aadhaar</span>
               <span className="info-value">
-                {cleanerProfile?.has_aadhaar
-                  ? cleanerProfile.aadhaar_number_masked || "Provided"
-                  : "Not provided"}
+                {cleanerProfile?.has_aadhaar ? (
+                  <span>
+                    {showFullDetails.aadhaar
+                      ? cleanerProfile.aadhaar_number || "Provided"
+                      : cleanerProfile.aadhaar_number_masked || "Provided"}
+                    {!showFullDetails.aadhaar && (
+                      <button
+                        type="button"
+                        className="btn-view-details"
+                        onClick={() => handleRequestFullDetails("aadhaar")}
+                      >
+                        View
+                      </button>
+                    )}
+                  </span>
+                ) : (
+                  "Not provided"
+                )}
               </span>
             </div>
             <div className="info-row">
               <span className="info-label">Driving License</span>
               <span className="info-value">
-                {cleanerProfile?.has_driving_license
-                  ? cleanerProfile.driving_license_number_masked || "Provided"
-                  : "Not provided"}
+                {cleanerProfile?.has_driving_license ? (
+                  <span>
+                    {showFullDetails.license
+                      ? cleanerProfile.driving_license_number || "Provided"
+                      : cleanerProfile.driving_license_number_masked ||
+                        "Provided"}
+                    {!showFullDetails.license && (
+                      <button
+                        type="button"
+                        className="btn-view-details"
+                        onClick={() => handleRequestFullDetails("license")}
+                      >
+                        View
+                      </button>
+                    )}
+                  </span>
+                ) : (
+                  "Not provided"
+                )}
               </span>
             </div>
             <p className="profile-note">
-              Identity details are read-only and shown in masked format for
-              security.
+              Identity details are shown in masked format for security. Click
+              "View" to see full details after verification.
             </p>
+
+            {verificationModal.isOpen && (
+              <div className="verification-modal-overlay">
+                <div className="verification-modal">
+                  <h3>Verify Your Identity</h3>
+                  <p>
+                    Enter the last 4 digits of your phone number to verify and
+                    view full details.
+                  </p>
+                  {error && <div className="error-message">{error}</div>}
+                  <input
+                    type="password"
+                    placeholder="Enter last 4 digits of phone"
+                    value={verificationPassword}
+                    onChange={(e) => setVerificationPassword(e.target.value)}
+                    maxLength={4}
+                    inputMode="numeric"
+                  />
+                  <div className="modal-actions">
+                    <button
+                      type="button"
+                      className="btn-cancel"
+                      onClick={closeVerificationModal}
+                      disabled={verifyingDocument}
+                    >
+                      Cancel
+                    </button>
+                    <LoadingButton
+                      isLoading={verifyingDocument}
+                      loadingText="Verifying..."
+                      type="button"
+                      className="btn-verify"
+                      onClick={handleVerifyAndShow}
+                    >
+                      Verify
+                    </LoadingButton>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

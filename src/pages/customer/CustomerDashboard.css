@@ -1,44 +1,50 @@
 .customer-dashboard {
-  max-width: 1200px;
+  max-width: 1000px;
 }
 
 .customer-dashboard h2 {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   color: var(--brand-text);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   font-weight: 600;
 }
 
 /* Quick Actions */
 .quick-actions {
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 
 .action-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
 }
 
 .action-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 12px;
   background: var(--brand-white);
-  border-radius: 12px;
+  border-radius: 8px;
   border: 1px solid var(--brand-border);
   text-decoration: none;
   color: inherit;
   transition: all 0.2s ease;
+  text-align: center;
 }
 
 .action-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .action-card.primary {
-  background: linear-gradient(135deg, var(--brand-teal) 0%, var(--brand-teal-light) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--brand-teal) 0%,
+    var(--brand-teal-light) 100%
+  );
   color: var(--brand-white);
   border: none;
 }
@@ -49,54 +55,55 @@
 }
 
 .action-icon {
-  font-size: 2rem;
-  margin-right: 16px;
+  font-size: 1.5rem;
+  margin-right: 0;
+  margin-bottom: 6px;
 }
 
 .action-content h3 {
-  margin: 0 0 4px;
-  font-size: 1rem;
+  margin: 0 0 2px;
+  font-size: 0.9rem;
   font-weight: 600;
 }
 
 .action-content p {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--brand-text-muted);
 }
 
 .action-card.primary .action-content p {
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* Stats Overview */
 .stats-overview {
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
 }
 
 .stat-card {
   background: var(--brand-white);
-  padding: 20px;
-  border-radius: 12px;
+  padding: 10px;
+  border-radius: 8px;
   border: 1px solid var(--brand-border);
   text-align: center;
 }
 
 .stat-value {
-  font-size: 2rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: var(--brand-teal);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .stat-label {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--brand-text-muted);
 }
 
@@ -178,7 +185,9 @@
   cursor: pointer;
   font: inherit;
   font-weight: 600;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .customer-book-service-btn:hover {

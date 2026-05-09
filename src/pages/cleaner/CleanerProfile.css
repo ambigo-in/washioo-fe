@@ -1,10 +1,10 @@
 .profile-page {
-  max-width: 800px;
+  max-width: 700px;
 }
 
 .profile-card {
   background: var(--brand-white);
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--brand-border);
   overflow: hidden;
 }
@@ -12,22 +12,27 @@
 .profile-header {
   display: flex;
   align-items: center;
-  padding: 24px;
-  background: linear-gradient(135deg, var(--brand-teal-dark) 0%, var(--brand-teal-light) 100%);
+  padding: 16px;
+  background: linear-gradient(
+    135deg,
+    var(--brand-teal-dark) 0%,
+    var(--brand-teal-light) 100%
+  );
   color: var(--brand-white);
 }
 
 .avatar {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  margin-right: 20px;
+  margin-right: 14px;
+  flex-shrink: 0;
 }
 
 .profile-info {
@@ -35,31 +40,32 @@
 }
 
 .profile-info h2 {
-  margin: 0 0 4px;
-  font-size: 1.5rem;
+  margin: 0 0 2px;
+  font-size: 1.2rem;
 }
 
 .user-email {
-  margin: 0 0 4px;
+  margin: 0 0 2px;
   opacity: 0.9;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 
 .user-phone {
   margin: 0;
   opacity: 0.9;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 
 .btn-edit {
-  padding: 8px 16px;
+  padding: 6px 12px;
   background: rgba(255, 255, 255, 0.2);
   color: var(--brand-white);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .btn-edit:hover {
@@ -67,29 +73,30 @@
 }
 
 .profile-form {
-  padding: 24px;
+  padding: 16px;
   border-bottom: 1px solid var(--brand-border);
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 6px;
-  font-size: 0.9rem;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
   color: var(--brand-text-muted);
   font-weight: 500;
 }
 
 .form-group input {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid var(--brand-border);
-  border-radius: 8px;
-  font-size: 0.95rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .form-group input:focus {
@@ -104,17 +111,17 @@
 }
 
 .form-actions {
-  margin-top: 20px;
+  margin-top: 14px;
 }
 
 .btn-primary {
-  padding: 10px 24px;
+  padding: 8px 16px;
   background: var(--brand-teal-dark);
   color: var(--brand-white);
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   transition: background 0.2s ease;
 }
 
@@ -128,38 +135,42 @@
 }
 
 .success-message {
-  padding: 12px 16px;
+  padding: 10px 12px;
   background: var(--brand-teal-soft);
   color: var(--brand-teal-dark);
   border: 1px solid var(--brand-teal-border);
-  border-radius: 8px;
-  margin: 16px 24px 0;
+  border-radius: 6px;
+  margin: 12px 16px 0;
+  font-size: 0.9rem;
 }
 
 .error-message {
-  padding: 12px 16px;
+  padding: 10px 12px;
   background: #fff5f5;
   color: #dc3545;
   border: 1px solid #ffcdd2;
-  border-radius: 8px;
-  margin: 16px 24px 0;
+  border-radius: 6px;
+  margin: 12px 16px 0;
+  font-size: 0.9rem;
 }
 
 .profile-section {
-  padding: 24px;
+  padding: 16px;
 }
 
 .profile-section h3 {
-  margin: 0 0 16px;
-  font-size: 1.1rem;
+  margin: 0 0 12px;
+  font-size: 1rem;
   color: var(--brand-text);
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0;
+  align-items: center;
+  padding: 10px 0;
   border-bottom: 1px solid var(--brand-border);
+  gap: 12px;
 }
 
 .info-row:last-child {
@@ -168,24 +179,33 @@
 
 .info-label {
   color: var(--brand-text-muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  flex: 0 0 auto;
 }
 
 .info-value {
   color: var(--brand-text);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
+  text-align: right;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
 }
 
 .profile-note {
   background: var(--brand-teal-soft);
   border: 1px solid var(--brand-teal-border);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--brand-teal-dark);
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin: 14px 0 0;
-  padding: 10px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  line-height: 1.4;
 }
 
 /* Responsive */
@@ -203,4 +223,112 @@
   .btn-edit {
     margin-top: 16px;
   }
+}
+
+.btn-view-details {
+  margin-left: 8px;
+  padding: 3px 8px;
+  background: var(--brand-teal);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-view-details:hover {
+  background: var(--brand-teal-dark);
+}
+
+.verification-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.verification-modal {
+  background: var(--brand-white);
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 360px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.verification-modal h3 {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+  color: var(--brand-text);
+}
+
+.verification-modal p {
+  margin: 0 0 14px;
+  color: var(--brand-text-muted);
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+.verification-modal input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--brand-border);
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-bottom: 14px;
+  box-sizing: border-box;
+}
+
+.verification-modal input:focus {
+  outline: none;
+  border-color: var(--brand-teal);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn-cancel {
+  padding: 6px 12px;
+  background: var(--brand-surface);
+  color: var(--brand-text);
+  border: 1px solid var(--brand-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: var(--brand-border);
+}
+
+.btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-verify {
+  padding: 6px 12px;
+  background: var(--brand-teal);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.btn-verify:hover {
+  background: var(--brand-teal-dark);
 }
