@@ -11,10 +11,8 @@ import {
 } from "../../store/slices/paymentSlice";
 import type { CustomerBooking } from "../../types/apiTypes";
 import { formatAddress } from "../../utils/addressUtils";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./CustomerBookingDetail.css";
-
-const formatStatus = (value?: string | null) =>
-  value ? value.replace("_", " ") : "Not available";
 
 const formatMoney = (value: number) =>
   value.toLocaleString(undefined, {
@@ -25,6 +23,7 @@ const formatMoney = (value: number) =>
 export default function CustomerBookingDetail() {
   const { bookingId } = useParams();
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { customerPaymentStatus } = useAppSelector((state) => state.payments);
   const [booking, setBooking] = useState<CustomerBooking | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,13 +61,13 @@ export default function CustomerBookingDetail() {
   const paymentType = customerPaymentStatus?.payment_type;
 
   return (
-    <DashboardLayout title="Booking Details">
+    <DashboardLayout title={t("booking.details")}>
       {loading ? (
-        <div className="customer-detail-state">Loading booking details...</div>
+        <div className="customer-detail-state">{t("booking.loadingDetails")}</div>
       ) : error ? (
         <div className="customer-detail-state error">
           <p>{error}</p>
-          <Link to="/my-bookings">Back to my bookings</Link>
+          <Link to="/my-bookings">{t("booking.backToMyBookings")}</Link>
         </div>
       ) : booking ? (
         <div className="customer-booking-detail">
@@ -79,68 +78,68 @@ export default function CustomerBookingDetail() {
               </span>
               <h2>{booking.service_name}</h2>
               <p>
-                {booking.scheduled_date} at {booking.scheduled_time.slice(0, 5)}
+                {booking.scheduled_date} {t("common.time")} {booking.scheduled_time.slice(0, 5)}
               </p>
             </div>
             <span className={`booking-status ${booking.booking_status}`}>
-              {formatStatus(booking.booking_status)}
+              {t(`booking.${booking.booking_status === "in_progress" ? "inProgress" : booking.booking_status}`)}
             </span>
           </section>
 
           <div className="customer-detail-grid">
             <section className="customer-detail-card">
-              <h3>Service</h3>
+              <h3>{t("common.service")}</h3>
               <dl>
                 <div>
-                  <dt>Price</dt>
+                  <dt>{t("common.price")}</dt>
                   <dd>
                     Rs. {formatMoney(booking.final_price ?? booking.estimated_price)}
                   </dd>
                 </div>
                 <div>
-                  <dt>Date</dt>
+                  <dt>{t("common.date")}</dt>
                   <dd>{booking.scheduled_date}</dd>
                 </div>
                 <div>
-                  <dt>Time</dt>
+                  <dt>{t("common.time")}</dt>
                   <dd>{booking.scheduled_time.slice(0, 5)}</dd>
                 </div>
               </dl>
             </section>
 
             <section className="customer-detail-card">
-              <h3>Vehicle</h3>
+              <h3>{t("common.vehicle")}</h3>
               <dl>
                 <div>
-                  <dt>Make</dt>
-                  <dd>{booking.vehicle_details?.make || "Not provided"}</dd>
+                  <dt>{t("common.make")}</dt>
+                  <dd>{booking.vehicle_details?.make || t("common.notProvided")}</dd>
                 </div>
                 <div>
-                  <dt>Model</dt>
-                  <dd>{booking.vehicle_details?.model || "Not provided"}</dd>
+                  <dt>{t("common.model")}</dt>
+                  <dd>{booking.vehicle_details?.model || t("common.notProvided")}</dd>
                 </div>
                 <div>
-                  <dt>License Plate</dt>
+                  <dt>{t("common.licensePlate")}</dt>
                   <dd>
-                    {booking.vehicle_details?.license_plate || "Not provided"}
+                    {booking.vehicle_details?.license_plate || t("common.notProvided")}
                   </dd>
                 </div>
               </dl>
             </section>
 
             <section className="customer-detail-card">
-              <h3>Address</h3>
+              <h3>{t("common.address")}</h3>
               <p>{formatAddress(address)}</p>
             </section>
 
             {booking.booking_status === "completed" && (
               <section className="customer-detail-card payment-card">
-                <h3>Payment</h3>
+                <h3>{t("booking.payment")}</h3>
                 {paymentStatus === "pending_collection" ? (
-                  <p className="payment-pending">Payment pending collection</p>
+                  <p className="payment-pending">{t("booking.paymentPending")}</p>
                 ) : (
                   <span className="customer-paid-pill">
-                    Paid via {paymentType === "upi" ? "UPI" : "Cash"}
+                    {t("booking.paidVia")} {paymentType === "upi" ? t("common.upi") : t("common.cash")}
                   </span>
                 )}
               </section>
@@ -148,7 +147,7 @@ export default function CustomerBookingDetail() {
 
             {booking.special_instructions && (
               <section className="customer-detail-card notes-card">
-                <h3>Instructions</h3>
+                <h3>{t("booking.instructions")}</h3>
                 <p>{booking.special_instructions}</p>
               </section>
             )}

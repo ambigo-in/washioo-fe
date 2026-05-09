@@ -7,6 +7,7 @@ import { ApiError, getApiErrorMessage } from "../api/client";
 import { LoadingButton } from "./ui";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { submitRating } from "../store/slices/ratingSlice";
+import { useLanguage } from "../i18n/LanguageContext";
 import type { BookingStatus } from "../types/apiTypes";
 import type { RatingResponse } from "../types/ratingTypes";
 import "./BookingRatingPanel.css";
@@ -22,22 +23,11 @@ interface BookingRatingPanelProps {
 
 const ratingOptions = [1, 2, 3, 4, 5];
 
-const getTitle = (perspective: RatingPerspective) =>
-  perspective === "customer" ? "Rate your cleaner" : "Rate this customer";
-
-const getPrompt = (perspective: RatingPerspective, subjectName?: string | null) =>
-  perspective === "customer"
-    ? `Share how ${subjectName || "your cleaner"} handled this service.`
-    : `Share how the visit went with ${subjectName || "this customer"}.`;
-
-const formatRole = (role: string) =>
-  role === "customer" ? "Customer rated cleaner" : "Cleaner rated customer";
-
-function StarMeter({ value }: { value: number }) {
+function StarMeter({ value, label }: { value: number; label: string }) {
   return (
     <span
       className="rating-stars"
-      aria-label={`${value.toFixed(1)} out of 5`}
+      aria-label={label}
       style={{ "--rating": String(value) } as CSSProperties}
     >
       ★★★★★
@@ -52,6 +42,7 @@ export default function BookingRatingPanel({
   subjectName,
 }: BookingRatingPanelProps) {
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { loading: submitting } = useAppSelector((state) => state.rating);
   const [ratings, setRatings] = useState<RatingResponse[]>([]);
   const [loading, setLoading] = useState(false);
@@ -61,10 +52,23 @@ export default function BookingRatingPanel({
   const [submitted, setSubmitted] = useState(false);
 
   const isCompleted = bookingStatus === "completed";
-  const title = useMemo(() => getTitle(perspective), [perspective]);
+  const title = useMemo(
+    () =>
+      perspective === "customer"
+        ? t("rating.rateCleaner")
+        : t("rating.rateCustomer"),
+    [perspective, t],
+  );
   const prompt = useMemo(
-    () => getPrompt(perspective, subjectName),
-    [perspective, subjectName],
+    () =>
+      perspective === "customer"
+        ? t("rating.shareCleaner", {
+            name: subjectName || t("rating.yourCleaner"),
+          })
+        : t("rating.shareCustomer", {
+            name: subjectName || t("rating.thisCustomer"),
+          }),
+    [perspective, subjectName, t],
   );
 
   const loadRatings = async () => {
@@ -133,22 +137,27 @@ export default function BookingRatingPanel({
           <h3>{title}</h3>
           <p>{prompt}</p>
         </div>
-        {submitted && <span className="rating-submitted-pill">Submitted</span>}
+        {submitted && (
+          <span className="rating-submitted-pill">{t("rating.submitted")}</span>
+        )}
       </div>
 
       {loading ? (
-        <p className="rating-muted">Loading ratings...</p>
+        <p className="rating-muted">{t("rating.loading")}</p>
       ) : showForm ? (
         <form className="rating-form" onSubmit={handleSubmit}>
           <div className="rating-picker">
-            <span>Your rating</span>
-            <div className="rating-buttons" role="radiogroup" aria-label="Rating">
+            <span>{t("rating.yourRating")}</span>
+            <div className="rating-buttons" role="radiogroup" aria-label={t("nav.ratings")}>
               {ratingOptions.map((option) => (
                 <button
                   key={option}
                   type="button"
                   className={rating >= option ? "active" : ""}
-                  aria-label={`${option} star${option > 1 ? "s" : ""}`}
+                  aria-label={t(
+                    option > 1 ? "rating.starsLabel" : "rating.starLabel",
+                    { count: option },
+                  )}
                   onClick={() => setRating(option)}
                 >
                   ★
@@ -156,7 +165,7 @@ export default function BookingRatingPanel({
               ))}
             </div>
             <label className="half-rating-control">
-              <span>{rating ? rating.toFixed(1) : "Select"} / 5</span>
+              <span>{rating ? rating.toFixed(1) : t("rating.select")} / 5</span>
               <input
                 type="range"
                 min="1"
@@ -169,12 +178,12 @@ export default function BookingRatingPanel({
           </div>
 
           <label className="rating-comment-field">
-            <span>Review comment</span>
+            <span>{t("rating.reviewComment")}</span>
             <textarea
               maxLength={500}
               value={comment}
               onChange={(event) => setComment(event.target.value)}
-              placeholder="Optional feedback"
+              placeholder={t("rating.optionalFeedback")}
             />
           </label>
 
@@ -185,10 +194,10 @@ export default function BookingRatingPanel({
             <LoadingButton
               type="submit"
               isLoading={submitting}
-              loadingText="Submitting..."
+              loadingText={t("rating.submitting")}
               disabled={!canSubmit}
             >
-              Submit rating
+              {t("rating.submit")}
             </LoadingButton>
           </div>
         </form>
@@ -197,10 +206,14 @@ export default function BookingRatingPanel({
           {ratings.map((entry) => (
             <article key={entry.id} className="rating-result">
               <div>
-                <span className="rating-role">{formatRole(entry.reviewer_role)}</span>
-                <strong>{entry.reviewee_name || "Reviewee"}</strong>
+                <span className="rating-role">
+                  {entry.reviewer_role === "customer"
+                    ? t("rating.customerRatedCleaner")
+                    : t("rating.cleanerRatedCustomer")}
+                </span>
+                <strong>{entry.reviewee_name || t("rating.reviewee")}</strong>
               </div>
-              <StarMeter value={entry.rating} />
+              <StarMeter value={entry.rating} label={`${entry.rating.toFixed(1)} / 5`} />
               {entry.comment && <p>{entry.comment}</p>}
               <time dateTime={entry.created_at}>
                 {new Date(entry.created_at).toLocaleString()}
@@ -210,8 +223,7 @@ export default function BookingRatingPanel({
         </div>
       ) : (
         <p className="rating-muted">
-          Your rating has been submitted. The other rating will appear here once
-          available.
+          {t("rating.availableLater")}
         </p>
       )}
 

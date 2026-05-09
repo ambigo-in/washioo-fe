@@ -20,10 +20,8 @@ import {
 import type { Payment, PaymentStatus, PaymentType } from "../../types/apiTypes";
 import type { CleanerBookingDetail } from "../../types/cleanerTypes";
 import { formatAddress } from "../../utils/addressUtils";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerBookingDetails.css";
-
-const formatStatus = (value?: string | null) =>
-  value ? value.replace("_", " ") : "Not available";
 
 const formatMoney = (value: number) =>
   value.toLocaleString(undefined, {
@@ -34,6 +32,7 @@ const formatMoney = (value: number) =>
 export default function CleanerBookingDetails() {
   const { bookingId } = useParams();
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { loading: paymentLoading } = useAppSelector((state) => state.payments);
   const [booking, setBooking] = useState<CleanerBookingDetail | null>(null);
   const [workflowPayment, setWorkflowPayment] = useState<Payment | null>(null);
@@ -128,7 +127,7 @@ export default function CleanerBookingDetails() {
 
     const parsedAmount = Number(collectedAmount);
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
-      setPaymentError("Enter a valid collected amount.");
+      setPaymentError(t("cleaner.validCollectedAmount"));
       return;
     }
 
@@ -143,7 +142,7 @@ export default function CleanerBookingDetails() {
         }),
       ).unwrap();
       setWorkflowPayment(response.payment);
-      setPaymentSuccess("Payment collection recorded successfully.");
+      setPaymentSuccess(t("cleaner.paymentCollected"));
       dispatch(loadCleanerEarnings());
       void dispatch(loadAdminPayments("collected"));
     } catch (err) {
@@ -152,16 +151,16 @@ export default function CleanerBookingDetails() {
   };
 
   return (
-    <DashboardLayout title="Booking Details">
+    <DashboardLayout title={t("booking.details")}>
       {loading ? (
         <div className="loading-container">
           <div className="loading-spinner" />
-          <p>Loading booking details...</p>
+          <p>{t("booking.loadingDetails")}</p>
         </div>
       ) : error ? (
         <div className="detail-state">
           <p>{error}</p>
-          <Link to="/cleaner/dashboard">Back to dashboard</Link>
+          <Link to="/cleaner/dashboard">{t("common.backToDashboard")}</Link>
         </div>
       ) : booking ? (
         <div className="cleaner-booking-detail">
@@ -170,14 +169,14 @@ export default function CleanerBookingDetails() {
               <span className="booking-reference">
                 {booking.booking_reference}
               </span>
-              <h2>{booking.service_name || "Service booking"}</h2>
+              <h2>{booking.service_name || t("booking.serviceBooking")}</h2>
               <p>
-                {booking.scheduled_date} at {booking.scheduled_time.slice(0, 5)}
+                {booking.scheduled_date} {t("common.time")} {booking.scheduled_time.slice(0, 5)}
               </p>
             </div>
             <div className="hero-actions">
               <span className={`status-pill ${booking.booking_status}`}>
-                {formatStatus(booking.booking_status)}
+                {t(`booking.${booking.booking_status === "in_progress" ? "inProgress" : booking.booking_status}`)}
               </span>
               <OpenInMapsButton
                 latitude={address?.latitude}
@@ -198,30 +197,30 @@ export default function CleanerBookingDetails() {
                   <LoadingButton
                     className="btn-accept"
                     isLoading={assignmentActionLoading}
-                    loadingText="Accepting..."
+                    loadingText={t("cleaner.accepting")}
                     onClick={() =>
                       refreshAfterAssignmentAction(
                         acceptCleanerAssignment,
-                        "Accepted",
+                        t("booking.accepted"),
                       )
                     }
                     type="button"
                   >
-                    Accept
+                    {t("cleaner.accept")}
                   </LoadingButton>
                   <LoadingButton
                     className="btn-reject"
                     isLoading={assignmentActionLoading}
-                    loadingText="Rejecting..."
+                    loadingText={t("cleaner.rejecting")}
                     onClick={() =>
                       refreshAfterAssignmentAction(
                         rejectCleanerAssignment,
-                        "Rejected",
+                        t("cleaner.rejected"),
                       )
                     }
                     type="button"
                   >
-                    Reject
+                    {t("cleaner.reject")}
                   </LoadingButton>
                 </>
               )}
@@ -229,16 +228,16 @@ export default function CleanerBookingDetails() {
                 <LoadingButton
                   className="btn-start"
                   isLoading={assignmentActionLoading}
-                  loadingText="Starting..."
+                  loadingText={t("cleaner.starting")}
                   onClick={() =>
                     refreshAfterAssignmentAction(
                       startCleanerAssignment,
-                      "Started",
+                      t("cleaner.starting"),
                     )
                   }
                   type="button"
                 >
-                  Start Service
+                  {t("cleaner.startService")}
                 </LoadingButton>
               )}
             </div>
@@ -246,67 +245,67 @@ export default function CleanerBookingDetails() {
 
           <div className="detail-grid">
             <section className="detail-card">
-              <h3>Customer</h3>
+              <h3>{t("cleaner.customer")}</h3>
               <dl>
                 <div>
-                  <dt>Name</dt>
-                  <dd>{booking.customer_name || "Not available"}</dd>
+                  <dt>{t("common.name")}</dt>
+                  <dd>{booking.customer_name || t("common.notAvailable")}</dd>
                 </div>
                 <div>
-                  <dt>Phone</dt>
-                  <dd>{booking.customer_phone || "Not available"}</dd>
+                  <dt>{t("common.phone")}</dt>
+                  <dd>{booking.customer_phone || t("common.notAvailable")}</dd>
                 </div>
               </dl>
             </section>
 
             <section className="detail-card">
-              <h3>Address</h3>
+              <h3>{t("common.address")}</h3>
               <p className="full-address">{formatAddress(address)}</p>
             </section>
 
             <section className="detail-card">
-              <h3>Service</h3>
+              <h3>{t("common.service")}</h3>
               <dl>
                 <div>
-                  <dt>Type</dt>
-                  <dd>{booking.service_name || "Not available"}</dd>
+                  <dt>{t("common.type")}</dt>
+                  <dd>{booking.service_name || t("common.notAvailable")}</dd>
                 </div>
                 <div>
-                  <dt>Date</dt>
+                  <dt>{t("common.date")}</dt>
                   <dd>{booking.scheduled_date}</dd>
                 </div>
                 <div>
-                  <dt>Time</dt>
+                  <dt>{t("common.time")}</dt>
                   <dd>{booking.scheduled_time.slice(0, 5)}</dd>
                 </div>
               </dl>
             </section>
 
             <section className="detail-card">
-              <h3>Vehicle</h3>
+              <h3>{t("common.vehicle")}</h3>
               <dl>
                 <div>
-                  <dt>Make</dt>
-                  <dd>{booking.vehicle_details.make || "Not provided"}</dd>
+                  <dt>{t("common.make")}</dt>
+                  <dd>{booking.vehicle_details.make || t("common.notProvided")}</dd>
                 </div>
                 <div>
-                  <dt>Model</dt>
-                  <dd>{booking.vehicle_details.model || "Not provided"}</dd>
+                  <dt>{t("common.model")}</dt>
+                  <dd>{booking.vehicle_details.model || t("common.notProvided")}</dd>
                 </div>
                 <div>
-                  <dt>License Plate</dt>
+                  <dt>{t("common.licensePlate")}</dt>
                   <dd>
-                    {booking.vehicle_details.license_plate || "Not provided"}
+                    {booking.vehicle_details.license_plate || t("common.notProvided")}
                   </dd>
                 </div>
               </dl>
             </section>
 
             <section className="detail-card">
-              <h3>Payment</h3>
+              <h3>{t("booking.payment")}</h3>
               <div className="payment-workflow">
                 <span className={`payment-status ${inferredPaymentStatus}`}>
-                  {formatStatus(inferredPaymentStatus)}
+                  {inferredPaymentStatus.replace("_", " ")}
                 </span>
 
                 {canRecordPayment ? (
@@ -315,7 +314,7 @@ export default function CleanerBookingDetails() {
                     onSubmit={handleCollectPayment}
                   >
                     <label>
-                      <span>Amount Collected (Rs.)</span>
+                      <span>{t("cleaner.amountCollected")}</span>
                       <input
                         type="number"
                         min="0"
@@ -328,15 +327,15 @@ export default function CleanerBookingDetails() {
                     </label>
 
                     <label>
-                      <span>Payment Type</span>
+                      <span>{t("cleaner.paymentType")}</span>
                       <select
                         value={paymentType}
                         onChange={(event) =>
                           setPaymentType(event.target.value as PaymentType)
                         }
                       >
-                        <option value="cash">Cash</option>
-                        <option value="upi">UPI</option>
+                        <option value="cash">{t("common.cash")}</option>
+                        <option value="upi">{t("common.upi")}</option>
                       </select>
                     </label>
 
@@ -353,12 +352,12 @@ export default function CleanerBookingDetails() {
                       type="submit"
                       className="mark-collected-btn"
                       isLoading={paymentLoading}
-                      loadingText="Updating payment..."
+                      loadingText={t("cleaner.updatePayment")}
                     >
-                      Mark as Collected
+                      {t("cleaner.markCollected")}
                     </LoadingButton>
                     <p className="earnings-note">
-                      Earnings update after admin reconciliation.
+                      {t("cleaner.earningsReconcileNote")}
                     </p>
                   </form>
                 ) : inferredPaymentStatus === "collected" ||
@@ -372,19 +371,21 @@ export default function CleanerBookingDetails() {
                       {inferredPaymentType?.toUpperCase() || "CASH"}
                     </span>
                     <strong>
-                      Rs. {formatMoney(collectedDisplayAmount)} collected via{" "}
-                      {inferredPaymentType?.toUpperCase() || "Cash"}
+                      {t("cleaner.paymentCollectedSummary", {
+                        amount: formatMoney(collectedDisplayAmount),
+                        type: inferredPaymentType?.toUpperCase() || t("common.cash"),
+                      })}
                     </strong>
                   </div>
                 ) : (
-                  <p className="payment-muted">Payment pending collection.</p>
+                  <p className="payment-muted">{t("cleaner.paymentPendingCollection")}</p>
                 )}
               </div>
             </section>
 
             {booking.special_instructions && (
               <section className="detail-card notes-card">
-                <h3>Instructions</h3>
+                <h3>{t("booking.instructions")}</h3>
                 <p>{booking.special_instructions}</p>
               </section>
             )}

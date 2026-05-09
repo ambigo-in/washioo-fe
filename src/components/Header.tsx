@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { useLanguage } from "../i18n/LanguageContext";
 import MobileMenu from "./MobileMenu";
 import "../styles/header.css";
 
 const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated, logout, activeRole } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const dashboardPath = activeRole === "admin"
@@ -18,14 +20,14 @@ const Header: React.FC = () => {
   const navLinks =
     activeRole === "admin"
       ? [
-          { label: "Bookings", path: "/admin/bookings" },
-          { label: "Ratings", path: "/admin/ratings" },
+          { labelKey: "nav.bookings", path: "/admin/bookings" },
+          { labelKey: "nav.ratings", path: "/admin/ratings" },
         ]
       : activeRole === "cleaner"
-        ? [{ label: "My Jobs", path: "/cleaner/assignments" }]
+        ? [{ labelKey: "nav.myJobs", path: "/cleaner/assignments" }]
         : [
-            { label: "Services", path: "/bookings" },
-            { label: "My Bookings", path: "/my-bookings" },
+            { labelKey: "nav.services", path: "/bookings" },
+            { labelKey: "nav.myBookings", path: "/my-bookings" },
           ];
 
   const handlePrimaryAction = async () => {
@@ -57,11 +59,11 @@ const Header: React.FC = () => {
         {/* <h1 className="logo-text">WashNow</h1> */}
       </div>
 
-      <nav className="header-nav" aria-label="Primary navigation">
+      <nav className="header-nav" aria-label={t("header.primaryNavigation")}>
         {isAuthenticated && (
           <>
             <button type="button" onClick={() => handleNavigate(dashboardPath)}>
-              Dashboard
+              {t("common.dashboard")}
             </button>
             {navLinks.map((link) => (
               <button
@@ -69,14 +71,14 @@ const Header: React.FC = () => {
                 type="button"
                 onClick={() => handleNavigate(link.path)}
               >
-                {link.label}
+                {t(link.labelKey)}
               </button>
             ))}
           </>
         )}
 
         <button className="auth-button" onClick={handlePrimaryAction}>
-          {isAuthenticated ? "Logout" : "Book Now"}
+          {isAuthenticated ? t("common.logout") : t("customer.bookNow")}
         </button>
       </nav>
 

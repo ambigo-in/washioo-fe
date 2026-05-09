@@ -16,6 +16,7 @@ import {
   type LocationError,
 } from "../../utils/locationUtils";
 import { formatAddress } from "../../utils/addressUtils";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./CustomerAddresses.css";
 
 interface AddressFormData {
@@ -54,6 +55,7 @@ const emptyFormData: AddressFormData = {
 
 export default function CustomerAddresses() {
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { addresses, loading } = useAppSelector((state) => state.customer);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -67,7 +69,7 @@ export default function CustomerAddresses() {
   useEffect(() => {
     dispatch(loadAddresses())
       .unwrap()
-      .catch(() => setError("Failed to load addresses"));
+      .catch(() => setError(t("address.failedLoad")));
   }, [dispatch]);
 
   useEffect(() => {
@@ -91,27 +93,27 @@ export default function CustomerAddresses() {
 
     const nextFieldErrors: AddressFieldErrors = {};
     if (!formData.address_label.trim()) {
-      nextFieldErrors.address_label = "Add a simple label like Home or Office.";
+      nextFieldErrors.address_label = t("address.labelRequired");
     }
     if (!formData.address_line1.trim()) {
-      nextFieldErrors.address_line1 = "Street address is required.";
+      nextFieldErrors.address_line1 = t("address.addressLine1Required");
     }
     if (!formData.city.trim()) {
-      nextFieldErrors.city = "City is required.";
+      nextFieldErrors.city = t("address.cityRequired");
     }
     if (!formData.state.trim()) {
-      nextFieldErrors.state = "State is required.";
+      nextFieldErrors.state = t("address.stateRequired");
     }
     if (!formData.pincode.trim()) {
-      nextFieldErrors.pincode = "Pincode is required.";
+      nextFieldErrors.pincode = t("address.pincodeRequired");
     }
     if (formData.latitude == null || formData.longitude == null) {
-      nextFieldErrors.location = "Tap Use My Live Location before saving.";
+      nextFieldErrors.location = t("address.locationBeforeSaving");
     }
 
     if (Object.keys(nextFieldErrors).length) {
       setFieldErrors(nextFieldErrors);
-      setError("Fix the highlighted address fields.");
+      setError(t("address.fixFields"));
       return;
     }
 
@@ -137,9 +139,9 @@ export default function CustomerAddresses() {
       setShowForm(false);
       setEditingAddress(null);
       setFormData(emptyFormData);
-      setSuccess("Address saved.");
+      setSuccess(t("address.addressSaved"));
     } catch (err) {
-      setError("Failed to save address");
+      setError(t("address.failedSave"));
       console.error(err);
     }
   };
@@ -162,14 +164,14 @@ export default function CustomerAddresses() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Remove this address?")) {
+    if (!window.confirm(t("address.confirmRemove"))) {
       return;
     }
     try {
       await dispatch(removeAddress(id)).unwrap();
-      setSuccess("Address removed.");
+      setSuccess(t("address.removed"));
     } catch (err) {
-      setError("Failed to remove address");
+      setError(t("address.failedRemove"));
       console.error(err);
     }
   };
@@ -183,7 +185,7 @@ export default function CustomerAddresses() {
         }),
       ).unwrap();
     } catch (err) {
-      setError("Failed to set default address");
+      setError(t("address.failedDefault"));
       console.error(err);
     }
   };
@@ -214,7 +216,7 @@ export default function CustomerAddresses() {
         }
       } else {
         setError(
-          err instanceof Error ? err.message : "Unable to capture location.",
+          err instanceof Error ? err.message : t("address.unableCapture"),
         );
       }
     } finally {
@@ -223,10 +225,10 @@ export default function CustomerAddresses() {
   };
 
   return (
-    <DashboardLayout title="My Addresses">
+    <DashboardLayout title={t("nav.addresses")}>
       <div className="addresses-page">
         <div className="page-header">
-          <h2>Manage Your Addresses</h2>
+          <h2>{t("address.manage")}</h2>
           <button
             className="btn-primary"
             onClick={() => {
@@ -237,7 +239,7 @@ export default function CustomerAddresses() {
               setError("");
             }}
           >
-            + Add New Address
+            {t("address.addNewWithPlus")}
           </button>
         </div>
 
@@ -252,12 +254,12 @@ export default function CustomerAddresses() {
         {loading && addresses.length === 0 ? (
           <div className="loading-container">
             <div className="loading-spinner" />
-            <p>Loading addresses...</p>
+            <p>{t("address.loading")}</p>
           </div>
         ) : addresses.length === 0 ? (
           <div className="empty-state">
-            <p>No addresses added yet.</p>
-            <p>Add your first address to get started!</p>
+            <p>{t("address.noAddresses")}</p>
+            <p>{t("address.addFirst")}</p>
           </div>
         ) : (
           <div className="addresses-grid">
@@ -267,16 +269,16 @@ export default function CustomerAddresses() {
                 className={`address-card ${address.is_default ? "default" : ""}`}
               >
                 {address.is_default && (
-                  <span className="default-badge">Default</span>
+                  <span className="default-badge">{t("common.default")}</span>
                 )}
-                <h3>{address.address_label || "Address"}</h3>
+                <h3>{address.address_label || t("common.address")}</h3>
                 <p className="address-text">{formatAddress(address)}</p>
                 {address.latitude != null && address.longitude != null && (
                   <div className="address-location-link">
                     <OpenInMapsButton
                       latitude={address.latitude}
                       longitude={address.longitude}
-                      label="Open address location"
+                      label={t("address.openLocation")}
                     />
                   </div>
                 )}
@@ -285,25 +287,25 @@ export default function CustomerAddresses() {
                     <LoadingButton
                       className="btn-link"
                       isLoading={loading}
-                      loadingText="Saving..."
+                      loadingText={t("common.saving")}
                       onClick={() => handleSetDefault(address)}
                     >
-                      Set as Default
+                      {t("address.setDefault")}
                     </LoadingButton>
                   )}
                   <button
                     className="btn-link"
                     onClick={() => handleEdit(address)}
                   >
-                    Edit
+                    {t("common.edit")}
                   </button>
                   <LoadingButton
                     className="btn-link danger"
                     isLoading={loading}
-                    loadingText="Removing..."
+                    loadingText={t("address.remove")}
                     onClick={() => handleDelete(String(address.id))}
                   >
-                    Remove address
+                    {t("address.remove")}
                   </LoadingButton>
                 </div>
               </div>
@@ -314,10 +316,10 @@ export default function CustomerAddresses() {
         {showForm && (
           <div className="modal-overlay" onClick={() => setShowForm(false)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <h3>{editingAddress ? "Edit Address" : "Add New Address"}</h3>
+              <h3>{editingAddress ? t("address.editAddress") : t("address.addNew")}</h3>
               <form onSubmit={handleSubmit} noValidate>
                 <div className="form-group">
-                  <label>Label (e.g., Home, Office)</label>
+                  <label>{t("address.labelHint")}</label>
                   <input
                     type="text"
                     value={formData.address_label}
@@ -337,7 +339,7 @@ export default function CustomerAddresses() {
                   )}
                 </div>
                 <div className="form-group">
-                  <label>Street Address</label>
+                  <label>{t("address.street")}</label>
                   <input
                     type="text"
                     value={formData.address_line1}
@@ -358,7 +360,7 @@ export default function CustomerAddresses() {
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>City</label>
+                    <label>{t("common.city")}</label>
                     <input
                       type="text"
                       value={formData.city}
@@ -372,7 +374,7 @@ export default function CustomerAddresses() {
                     )}
                   </div>
                   <div className="form-group">
-                    <label>State</label>
+                    <label>{t("common.state")}</label>
                     <input
                       type="text"
                       value={formData.state}
@@ -390,7 +392,7 @@ export default function CustomerAddresses() {
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Pincode</label>
+                    <label>{t("common.pincode")}</label>
                     <input
                       type="text"
                       value={formData.pincode}
@@ -418,7 +420,7 @@ export default function CustomerAddresses() {
                           updateFormField("is_default", e.target.checked)
                         }
                       />
-                      Set as default address
+                      {t("address.defaultAddress")}
                     </label>
                   </div>
                 </div>
@@ -429,7 +431,7 @@ export default function CustomerAddresses() {
                   isLoading={false}
                   onClick={handleUseLiveLocation}
                 >
-                  {locating ? "Capturing Location..." : "Use My Live Location"}
+                  {locating ? t("address.capturingLocation") : t("address.useLiveLocation")}
                 </LoadingButton>
                 {fieldErrors.location && (
                   <div
@@ -442,7 +444,7 @@ export default function CustomerAddresses() {
                 )}
                 {formData.latitude != null && formData.longitude != null && (
                   <div className="location-preview">
-                    Location captured. It will be used for directions.
+                    {t("address.locationCaptured")}
                   </div>
                 )}
                 <div className="form-actions">
@@ -451,15 +453,15 @@ export default function CustomerAddresses() {
                     className="btn-secondary"
                     onClick={() => setShowForm(false)}
                   >
-                    Cancel
+                    {t("common.cancel")}
                   </button>
                   <LoadingButton
                     type="submit"
                     className="btn-primary"
                     isLoading={loading}
-                    loadingText="Saving address..."
+                    loadingText={t("address.savingAddress")}
                   >
-                    {editingAddress ? "Update" : "Add"} Address
+                    {editingAddress ? t("common.update") : t("address.addNew")}
                   </LoadingButton>
                 </div>
               </form>

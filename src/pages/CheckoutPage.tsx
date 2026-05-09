@@ -16,6 +16,7 @@ import {
   type LocationError,
 } from "../utils/locationUtils";
 import { formatAddress } from "../utils/addressUtils";
+import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/checkout.css";
 
 type CheckoutState = {
@@ -47,7 +48,7 @@ const today = new Date().toISOString().split("T")[0];
 const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
   .toISOString()
   .split("T")[0];
-const quickTimeOptions = ["Now", "09:00", "14:00", "18:00"];
+const quickTimeOptions = ["now", "09:00", "14:00", "18:00"];
 
 const formatCurrentTime = () => new Date().toTimeString().slice(0, 5);
 
@@ -69,6 +70,7 @@ const compactAddressPayload = (payload: AddressPayload): AddressPayload => ({
 const CheckoutPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const serviceData = useMemo(
     () => location.state as CheckoutState | null,
     [location.state],
@@ -180,7 +182,7 @@ const CheckoutPage: React.FC = () => {
         }
       } else {
         setError(
-          err instanceof Error ? err.message : "Unable to capture location.",
+          err instanceof Error ? err.message : t("address.unableCapture"),
         );
       }
     } finally {
@@ -194,16 +196,16 @@ const CheckoutPage: React.FC = () => {
     const nextFieldErrors: CheckoutFieldErrors = {};
 
     if (!payload.address_line1) {
-      nextFieldErrors.address_line1 = "Address line 1 is required.";
+      nextFieldErrors.address_line1 = t("address.addressLine1Required");
     }
 
     if (payload.latitude == null || payload.longitude == null) {
-      nextFieldErrors.location = "Tap Use My Live Location before saving.";
+      nextFieldErrors.location = t("address.locationBeforeSaving");
     }
 
     if (Object.keys(nextFieldErrors).length) {
       setFieldErrors(nextFieldErrors);
-      setError("Fix the highlighted address field.");
+      setError(t("address.fixField"));
       return;
     }
 
@@ -216,7 +218,7 @@ const CheckoutPage: React.FC = () => {
       setSelectedAddressId(response.address.id);
       setFormData(emptyAddress);
       setShowForm(false);
-      setSuccess("Address saved.");
+      setSuccess(t("address.addressSaved"));
     } catch (err) {
       setError(String(err));
     }
@@ -231,16 +233,16 @@ const CheckoutPage: React.FC = () => {
     const nextFieldErrors: CheckoutFieldErrors = {};
 
     if (!payload.address_line1) {
-      nextFieldErrors.address_line1 = "Address line 1 is required.";
+      nextFieldErrors.address_line1 = t("address.addressLine1Required");
     }
 
     if (payload.latitude == null || payload.longitude == null) {
-      nextFieldErrors.location = "Tap Use My Live Location before booking.";
+      nextFieldErrors.location = t("address.locationBeforeBooking");
     }
 
     if (Object.keys(nextFieldErrors).length) {
       setFieldErrors(nextFieldErrors);
-      setError("Fix the highlighted address field before booking.");
+      setError(t("booking.fixBeforeBooking"));
       throw new Error("Address validation failed");
     }
 
@@ -248,7 +250,7 @@ const CheckoutPage: React.FC = () => {
     setSelectedAddressId(response.address.id);
     setFormData(emptyAddress);
     setShowForm(false);
-    setSuccess("Address saved and selected for booking.");
+    setSuccess(t("address.addressSavedSelected"));
     return response.address.id;
   };
 
@@ -268,16 +270,16 @@ const CheckoutPage: React.FC = () => {
 
     if (!bookingAddressId) {
       nextFieldErrors.selectedAddress =
-        "Choose a saved address or add a new one.";
+        t("booking.addressRequired");
     }
 
     if (!scheduledDate || !scheduledTime) {
-      nextFieldErrors.schedule = "Choose both service date and time.";
+      nextFieldErrors.schedule = t("booking.scheduleRequired");
     }
 
     if (Object.keys(nextFieldErrors).length) {
       setFieldErrors((prev) => ({ ...prev, ...nextFieldErrors }));
-      setError("Fix the highlighted booking detail.");
+      setError(t("booking.fixBookingDetail"));
       return;
     }
 
@@ -316,13 +318,13 @@ const CheckoutPage: React.FC = () => {
       <Header />
       <section className="checkout-page">
         <div className="checkout-heading">
-          <span>CONFIRM BOOKING</span>
-          <h1>Checkout</h1>
+          <span>{t("booking.confirmBookingKicker")}</span>
+          <h1>{t("booking.checkout")}</h1>
         </div>
 
         <div className="checkout-layout">
           <div className="address-section">
-            <h2>Select Address</h2>
+            <h2>{t("booking.selectAddress")}</h2>
 
             {error && <p className="form-alert error">{error}</p>}
             {locationInstructions && (
@@ -333,7 +335,7 @@ const CheckoutPage: React.FC = () => {
             {success && <p className="form-alert success">{success}</p>}
 
             {loading ? (
-              <p>Loading addresses...</p>
+              <p>{t("address.loading")}</p>
             ) : addresses.length ? (
               <div className="address-list">
                 {addresses.map((address) => (
@@ -351,13 +353,13 @@ const CheckoutPage: React.FC = () => {
                     }}
                     type="button"
                   >
-                    <h3>{address.address_label || "Saved address"}</h3>
+                    <h3>{address.address_label || t("address.selectedFallback")}</h3>
                     <p>{formatAddress(address)}</p>
                   </button>
                 ))}
               </div>
             ) : (
-              <p>No saved addresses yet.</p>
+              <p>{t("address.noSaved")}</p>
             )}
             {fieldErrors.selectedAddress && (
               <p
@@ -373,20 +375,20 @@ const CheckoutPage: React.FC = () => {
               type="button"
               onClick={() => setShowForm((value) => !value)}
             >
-              {showForm ? "Close Address Form" : "+ Add New Address"}
+              {showForm ? t("address.closeForm") : t("address.addNewWithPlus")}
             </button>
 
             {showForm && (
               <form className="address-form" onSubmit={handleCreateAddress}>
                 <input
-                  placeholder="Label"
+                  placeholder={t("address.label")}
                   value={formData.address_label || ""}
                   onChange={(event) =>
                     updateForm("address_label", event.target.value)
                   }
                 />
                 <input
-                  placeholder="Address Line 1"
+                  placeholder={t("address.addressLine1")}
                   value={formData.address_line1}
                   onChange={(event) =>
                     updateForm("address_line1", event.target.value)
@@ -403,14 +405,14 @@ const CheckoutPage: React.FC = () => {
                   <p className="field-error">{fieldErrors.address_line1}</p>
                 )}
                 <input
-                  placeholder="Address Line 2"
+                  placeholder={t("address.line2")}
                   value={formData.address_line2 || ""}
                   onChange={(event) =>
                     updateForm("address_line2", event.target.value)
                   }
                 />
                 <input
-                  placeholder="Landmark"
+                  placeholder={t("common.landmark")}
                   value={formData.landmark || ""}
                   onChange={(event) =>
                     updateForm("landmark", event.target.value)
@@ -418,12 +420,12 @@ const CheckoutPage: React.FC = () => {
                 />
                 <div className="form-row">
                   <input
-                    placeholder="City"
+                    placeholder={t("common.city")}
                     value={formData.city || ""}
                     onChange={(event) => updateForm("city", event.target.value)}
                   />
                   <input
-                    placeholder="State"
+                    placeholder={t("common.state")}
                     value={formData.state || ""}
                     onChange={(event) =>
                       updateForm("state", event.target.value)
@@ -432,7 +434,7 @@ const CheckoutPage: React.FC = () => {
                 </div>
                 <div className="form-row">
                   <input
-                    placeholder="Pincode"
+                    placeholder={t("common.pincode")}
                     value={formData.pincode || ""}
                     onChange={(event) =>
                       updateForm("pincode", event.target.value)
@@ -446,7 +448,7 @@ const CheckoutPage: React.FC = () => {
                       }
                       type="checkbox"
                     />
-                    Default
+                    {t("common.default")}
                   </label>
                 </div>
                 <button
@@ -454,7 +456,7 @@ const CheckoutPage: React.FC = () => {
                   onClick={getLiveLocation}
                   type="button"
                 >
-                  {locating ? "Capturing Location..." : "Use My Live Location"}
+                  {locating ? t("address.capturingLocation") : t("address.useLiveLocation")}
                 </button>
                 {fieldErrors.location && (
                   <p
@@ -467,41 +469,41 @@ const CheckoutPage: React.FC = () => {
                 )}
                 {formData.latitude != null && formData.longitude != null && (
                   <p className="location-captured">
-                    Location captured. It will be used for service directions.
+                    {t("address.locationCapturedService")}
                   </p>
                 )}
                 <LoadingButton
                   isLoading={loading}
-                  loadingText="Saving address..."
+                  loadingText={t("address.savingAddress")}
                   type="submit"
                 >
-                  Save Address
+                  {t("address.saveAddress")}
                 </LoadingButton>
               </form>
             )}
           </div>
 
           <aside className="booking-summary">
-            <h2>{serviceData?.serviceName || "Selected service"}</h2>
+            <h2>{serviceData?.serviceName || t("booking.selectedService")}</h2>
             <div className="summary-price">Rs. {serviceData?.price || 0}</div>
             <p>{serviceData?.duration || 0} mins estimated</p>
 
             {selectedAddress && (
               <div className="selected-address-summary">
-                <span>Service address</span>
-                <strong>{selectedAddress.address_label || "Address"}</strong>
+                <span>{t("booking.serviceAddress")}</span>
+                <strong>{selectedAddress.address_label || t("common.address")}</strong>
                 <p>{formatAddress(selectedAddress)}</p>
               </div>
             )}
 
             {vehicles.length > 0 && (
               <label>
-                Vehicle
+                {t("common.vehicle")}
                 <select
                   value={selectedVehicleId}
                   onChange={(event) => setSelectedVehicleId(event.target.value)}
                 >
-                  <option value="">No vehicle selected</option>
+                  <option value="">{t("booking.noVehicle")}</option>
                   {vehicles.map((vehicle) => (
                     <option key={vehicle.id} value={vehicle.id}>
                       {[vehicle.make, vehicle.model]
@@ -518,13 +520,13 @@ const CheckoutPage: React.FC = () => {
 
             {selectedVehicle && (
               <div className="selected-address-summary">
-                <span>Vehicle</span>
+                <span>{t("common.vehicle")}</span>
                 <strong>
                   {[selectedVehicle.make, selectedVehicle.model]
                     .filter(Boolean)
                     .join(" ") || selectedVehicle.vehicle_type}
                 </strong>
-                <p>{selectedVehicle.license_plate || "No plate added"}</p>
+                <p>{selectedVehicle.license_plate || t("booking.noPlate")}</p>
               </div>
             )}
 
@@ -536,7 +538,7 @@ const CheckoutPage: React.FC = () => {
                   setFieldErrors((prev) => ({ ...prev, schedule: undefined }));
                 }}
               >
-                Today
+                {t("booking.today")}
               </button>
               <button
                 type="button"
@@ -545,11 +547,11 @@ const CheckoutPage: React.FC = () => {
                   setFieldErrors((prev) => ({ ...prev, schedule: undefined }));
                 }}
               >
-                Tomorrow
+                {t("booking.tomorrow")}
               </button>
             </div>
             <label>
-              Date
+              {t("common.date")}
               <input
                 min={today}
                 type="date"
@@ -570,7 +572,7 @@ const CheckoutPage: React.FC = () => {
                   type="button"
                   onClick={() => {
                     setScheduledTime(
-                      timeOption === "Now" ? formatCurrentTime() : timeOption,
+                      timeOption === "now" ? formatCurrentTime() : timeOption,
                     );
                     setFieldErrors((prev) => ({
                       ...prev,
@@ -578,12 +580,12 @@ const CheckoutPage: React.FC = () => {
                     }));
                   }}
                 >
-                  {timeOption}
+                  {timeOption === "now" ? t("booking.now") : timeOption}
                 </button>
               ))}
             </div>
             <label>
-              Time
+              {t("common.time")}
               <input
                 type="time"
                 value={scheduledTime}
@@ -599,18 +601,18 @@ const CheckoutPage: React.FC = () => {
               <p className="field-error">{fieldErrors.schedule}</p>
             )}
             <textarea
-              placeholder="Special instructions optional"
+              placeholder={t("booking.specialInstructionsOptional")}
               value={instructions}
               onChange={(event) => setInstructions(event.target.value)}
             />
 
             <LoadingButton
               isLoading={loading}
-              loadingText="Confirming booking..."
+              loadingText={t("booking.confirming")}
               onClick={handleBooking}
               type="button"
             >
-              Confirm Booking
+              {t("booking.confirmBooking")}
             </LoadingButton>
           </aside>
         </div>

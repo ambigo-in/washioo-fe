@@ -19,15 +19,16 @@ import {
   patchBooking,
 } from "../store/slices/customerSlice";
 import { formatAddress } from "../utils/addressUtils";
+import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/myBookings.css";
 
-const statusLabel: Record<BookingStatus, string> = {
-  pending: "Pending",
-  assigned: "Assigned",
-  accepted: "Accepted",
-  in_progress: "In Progress",
-  completed: "Completed",
-  cancelled: "Cancelled",
+const statusLabelKey: Record<BookingStatus, string> = {
+  pending: "booking.pending",
+  assigned: "cleaner.assignedBookings",
+  accepted: "booking.accepted",
+  in_progress: "booking.inProgress",
+  completed: "booking.completed",
+  cancelled: "common.cancelled",
 };
 
 const canCancel = (status: BookingStatus) => status === "pending";
@@ -40,22 +41,9 @@ const formatMoney = (value: number) =>
     maximumFractionDigits: 2,
   });
 
-const formatPaymentMethod = (booking: CustomerBooking) => {
-  const payment = booking.payment;
-  if (payment?.payment_type) return payment.payment_type.toUpperCase();
-  if (payment?.payment_status === "pending") return "Awaiting collection";
-  return "N/A";
-};
-
-const formatPaymentStatus = (booking: CustomerBooking) => {
-  const status = booking.payment?.payment_status;
-  if (status === "done") return "Done";
-  if (status === "failed") return "Failed";
-  return "Pending";
-};
-
 const MyBookingsPage: React.FC = () => {
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const {
     bookings,
     bookingsTotal,
@@ -78,6 +66,22 @@ const MyBookingsPage: React.FC = () => {
   const [dateRangeFilter, setDateRangeFilter] = useState<
     "all" | "today" | "week" | "month"
   >("all");
+
+  const formatPaymentMethod = (booking: CustomerBooking) => {
+    const payment = booking.payment;
+    if (payment?.payment_type) return payment.payment_type.toUpperCase();
+    if (payment?.payment_status === "pending") {
+      return t("booking.awaitingCollection");
+    }
+    return "N/A";
+  };
+
+  const formatPaymentStatus = (booking: CustomerBooking) => {
+    const status = booking.payment?.payment_status;
+    if (status === "done") return t("booking.done");
+    if (status === "failed") return t("booking.failed");
+    return t("booking.pending");
+  };
 
   useEffect(() => {
     dispatch(
@@ -251,9 +255,9 @@ const MyBookingsPage: React.FC = () => {
   );
   const tabOptions: Array<StatusTabOption<"all" | BookingStatus>> = [
     { value: "all", label: "All", count: bookingsTotal || bookings.length },
-    ...Object.entries(statusLabel).map(([value, label]) => ({
+    ...Object.entries(statusLabelKey).map(([value, labelKey]) => ({
       value: value as BookingStatus,
-      label,
+      label: t(labelKey),
       count: counts[value as BookingStatus],
     })),
   ];
@@ -263,9 +267,9 @@ const MyBookingsPage: React.FC = () => {
       <Header />
       <section className="my-bookings-page">
         <div className="my-bookings-heading">
-          <span>YOUR WASHES</span>
-          <h1>My Bookings</h1>
-          <p>Track active bookings and manage pending requests.</p>
+          <span>{t("booking.washesKicker")}</span>
+          <h1>{t("booking.myBookings")}</h1>
+          <p>{t("booking.trackHint")}</p>
         </div>
 
         {(error || storeError) && (
@@ -275,7 +279,7 @@ const MyBookingsPage: React.FC = () => {
           <SearchInput
             value={query.search}
             onChange={query.setSearch}
-            placeholder="Search by reference, service, address..."
+            placeholder={t("booking.searchPlaceholder")}
           />
           <div className="toolbar-filters">
             <select
@@ -283,10 +287,10 @@ const MyBookingsPage: React.FC = () => {
               value={dateRangeFilter}
               onChange={(e) => setDateRangeFilter(e.target.value as any)}
             >
-              <option value="all">All Dates</option>
-              <option value="today">Today</option>
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
+              <option value="all">{t("booking.allDates")}</option>
+              <option value="today">{t("booking.today")}</option>
+              <option value="week">{t("booking.thisWeek")}</option>
+              <option value="month">{t("booking.thisMonth")}</option>
             </select>
 
             <select
@@ -294,7 +298,7 @@ const MyBookingsPage: React.FC = () => {
               value={priceFilter}
               onChange={(e) => setPriceFilter(e.target.value as any)}
             >
-              <option value="all">All Prices</option>
+              <option value="all">{t("booking.allPrices")}</option>
               <option value="0-5000">Rs. 0 - 5,000</option>
               <option value="5000-10000">Rs. 5,000 - 10,000</option>
               <option value="10000+">Rs. 10,000+</option>
@@ -305,10 +309,10 @@ const MyBookingsPage: React.FC = () => {
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
             >
-              <option value="date-desc">Newest First</option>
-              <option value="date-asc">Oldest First</option>
-              <option value="price-desc">Highest Price</option>
-              <option value="price-asc">Lowest Price</option>
+              <option value="date-desc">{t("booking.newestFirst")}</option>
+              <option value="date-asc">{t("booking.oldestFirst")}</option>
+              <option value="price-desc">{t("booking.highestPrice")}</option>
+              <option value="price-asc">{t("booking.lowestPrice")}</option>
             </select>
 
             <select
@@ -316,10 +320,10 @@ const MyBookingsPage: React.FC = () => {
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
             >
-              <option value="5">5 per page</option>
-              <option value="10">10 per page</option>
-              <option value="15">15 per page</option>
-              <option value="20">20 per page</option>
+              <option value="5">{t("booking.pageSize", { count: 5 })}</option>
+              <option value="10">{t("booking.pageSize", { count: 10 })}</option>
+              <option value="15">{t("booking.pageSize", { count: 15 })}</option>
+              <option value="20">{t("booking.pageSize", { count: 20 })}</option>
             </select>
           </div>
         </div>
@@ -330,11 +334,11 @@ const MyBookingsPage: React.FC = () => {
         />
 
         {loading && bookings.length === 0 ? (
-          <div className="loading-state">Loading bookings...</div>
+          <div className="loading-state">{t("booking.loadingList")}</div>
         ) : visibleBookings.length === 0 ? (
           <div className="empty-state">
-            <h2>No bookings yet</h2>
-            <p>Your confirmed wash bookings will appear here.</p>
+            <h2>{t("booking.noBookings")}</h2>
+            <p>{t("customer.noBookings")}</p>
           </div>
         ) : (
           <div className="bookings-list">
@@ -348,21 +352,21 @@ const MyBookingsPage: React.FC = () => {
                     <h2>{booking.service_name}</h2>
                   </div>
                   <span className={`status-badge ${booking.booking_status}`}>
-                    {statusLabel[booking.booking_status]}
+                    {t(statusLabelKey[booking.booking_status])}
                   </span>
                 </div>
 
                 <div className="booking-details-grid">
                   <div>
-                    <span>Date</span>
+                    <span>{t("common.date")}</span>
                     <strong>{booking.scheduled_date}</strong>
                   </div>
                   <div>
-                    <span>Time</span>
+                    <span>{t("common.time")}</span>
                     <strong>{booking.scheduled_time.slice(0, 5)}</strong>
                   </div>
                   <div>
-                    <span>Price</span>
+                    <span>{t("common.price")}</span>
                     <strong>
                       Rs.{" "}
                       {formatMoney(
@@ -375,11 +379,11 @@ const MyBookingsPage: React.FC = () => {
                   {booking.payment && (
                     <>
                       <div>
-                        <span>Payment Status</span>
+                        <span>{t("booking.paymentStatus")}</span>
                         <strong>{formatPaymentStatus(booking)}</strong>
                       </div>
                       <div>
-                        <span>Payment Method</span>
+                        <span>{t("booking.paymentMethod")}</span>
                         <strong>{formatPaymentMethod(booking)}</strong>
                       </div>
                     </>
@@ -387,13 +391,13 @@ const MyBookingsPage: React.FC = () => {
                 </div>
 
                 <div className="booking-address">
-                  <span>Address</span>
+                  <span>{t("common.address")}</span>
                   <p>{formatAddress(booking.address)}</p>
                 </div>
 
                 {booking.special_instructions && (
                   <div className="booking-address">
-                    <span>Instructions</span>
+                    <span>{t("booking.instructions")}</span>
                     <p>{booking.special_instructions}</p>
                   </div>
                 )}
@@ -411,7 +415,7 @@ const MyBookingsPage: React.FC = () => {
                       onChange={(event) => setEditTime(event.target.value)}
                     />
                     <textarea
-                      placeholder="Special instructions"
+                      placeholder={t("booking.specialInstructions")}
                       value={editInstructions}
                       onChange={(event) =>
                         setEditInstructions(event.target.value)
@@ -420,18 +424,18 @@ const MyBookingsPage: React.FC = () => {
                     <div className="booking-actions">
                       <LoadingButton
                         isLoading={loading}
-                        loadingText="Saving..."
+                        loadingText={t("common.saving")}
                         onClick={() => handleUpdate(booking)}
                         type="button"
                       >
-                        Save
+                        {t("common.save")}
                       </LoadingButton>
                       <button
                         className="secondary-action"
                         onClick={() => setEditingId("")}
                         type="button"
                       >
-                        Cancel Edit
+                        {t("booking.cancelEdit")}
                       </button>
                     </div>
                   </div>
@@ -441,22 +445,22 @@ const MyBookingsPage: React.FC = () => {
                       className="secondary-action"
                       to={`/customer/bookings/${booking.id}`}
                     >
-                      View Details
+                      {t("actions.viewDetails")}
                     </Link>
                     {canEdit(booking.booking_status) && (
                       <button onClick={() => startEdit(booking)} type="button">
-                        Edit Pending Booking
+                        {t("booking.editPending")}
                       </button>
                     )}
                     {canCancel(booking.booking_status) && (
                       <LoadingButton
                         className="danger-action"
                         isLoading={loading}
-                        loadingText="Cancelling..."
+                        loadingText={t("booking.cancelling")}
                         onClick={() => handleCancel(booking)}
                         type="button"
                       >
-                        Cancel
+                        {t("common.cancel")}
                       </LoadingButton>
                     )}
                   </div>
