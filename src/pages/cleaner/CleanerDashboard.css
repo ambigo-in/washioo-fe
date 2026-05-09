@@ -487,3 +487,96 @@
     font-size: 1.2rem;
   }
 }
+
+/* Compact dashboard fitment */
+.cleaner-dashboard h2 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.profile-status,
+.quick-stats,
+.pending-assignments,
+.quick-actions,
+.today-live-services {
+  margin-bottom: 12px;
+}
+
+.status-card,
+.stat-card,
+.assignment-card,
+.action-card,
+.live-service-card,
+.empty-state {
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.status-header,
+.section-header,
+.today-live-services .section-header {
+  margin-bottom: 8px;
+}
+
+.status-details {
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.detail-item .label,
+.stat-label,
+.action-content p,
+.customer-address,
+.booking-ref,
+.booking-date {
+  font-size: 0.76rem;
+}
+
+.detail-item .value,
+.assignment-info h4,
+.action-content h3 {
+  font-size: 0.9rem;
+}
+
+.manage-btn,
+.btn-primary {
+  padding: 8px 14px;
+}
+
+.stats-grid {
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.stat-value {
+  font-size: 1.25rem;
+}
+
+.assignments-list,
+.action-cards,
+.live-services-list {
+  gap: 8px;
+}
+
+.action-cards {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.action-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.action-icon {
+  font-size: 1.25rem;
+  margin-right: 10px;
+}
+
+.today-live-services .section-header h2,
+.live-service-info h3 {
+  font-size: 0.95rem;
+}
+
+.live-service-card {
+  gap: 10px;
+}

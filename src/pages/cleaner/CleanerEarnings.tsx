@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loadCleanerEarnings } from "../../store/slices/paymentSlice";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerEarnings.css";
 
 const formatMoney = (value?: number | null) =>
@@ -14,6 +15,7 @@ const formatDate = (value?: string | null) =>
 
 export default function CleanerEarnings() {
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { earnings } = useAppSelector((state) => state.payments);
 
   useEffect(() => {
@@ -24,31 +26,31 @@ export default function CleanerEarnings() {
     <section className="cleaner-earnings">
       <div className="section-header">
         <div>
-          <h2>Earnings</h2>
-          <p>Earnings update after admin reconciliation.</p>
+          <h2>{t("earnings.earnings")}</h2>
+          <p>{t("earnings.subtitle")}</p>
         </div>
       </div>
 
       <div className="earnings-grid">
         <article className="earnings-card">
-          <span>Total Earned</span>
+          <span>{t("earnings.totalEarned")}</span>
           <strong>{formatMoney(earnings?.total_earned)}</strong>
-          <small>Your share after admin split.</small>
+          <small>{t("earnings.totalEarnedHint")}</small>
         </article>
         <article className="earnings-card due">
-          <span>Due to Admin</span>
+          <span>{t("earnings.adminDue")}</span>
           <strong>{formatMoney(earnings?.admin_due)}</strong>
-          <small>Cash/UPI you need to hand over to admin.</small>
+          <small>{t("earnings.adminDueHint")}</small>
         </article>
         <article className="earnings-card settled">
-          <span>Settled</span>
+          <span>{t("earnings.settled")}</span>
           <strong>{formatMoney(earnings?.settled)}</strong>
-          <small>Admin share already handed over.</small>
+          <small>{t("earnings.settledHint")}</small>
         </article>
       </div>
 
       <p className="earnings-updated">
-        Last updated: {formatDate(earnings?.last_updated)}
+        {t("earnings.updated")}: {formatDate(earnings?.last_updated)}
       </p>
     </section>
   );

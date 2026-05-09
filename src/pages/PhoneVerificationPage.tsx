@@ -5,10 +5,12 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { sendOtpRequest } from "../store/slices/authSlice";
 import type { AccountType } from "../types/authTypes";
 import { isValidIndianPhone, normalizeIndianPhone } from "../utils/phoneUtils";
+import { useLanguage, type LanguageCode } from "../i18n/LanguageContext";
 import "../styles/PhoneVerificationPage.css";
 
 export default function PhoneVerificationPage() {
   const dispatch = useAppDispatch();
+  const { language, setLanguage, t } = useLanguage();
   const { loading } = useAppSelector((state) => state.auth);
   const location = useLocation();
   const state = location.state as {
@@ -65,17 +67,26 @@ export default function PhoneVerificationPage() {
   return (
     <main className="signin-page-wrapper">
       <form className="auth-container" onSubmit={handleSubmit}>
-        <h2>Verify Your Phone</h2>
-        <p className="signin-subtitle">
-          Enter your mobile number to login or sign up for a Washioo account.
-        </p>
+        <label className="auth-language-select">
+          <span>{t("language.label")}</span>
+          <select
+            value={language}
+            onChange={(event) => setLanguage(event.target.value as LanguageCode)}
+          >
+            <option value="en">{t("language.english")}</option>
+            <option value="te">{t("language.telugu")}</option>
+            <option value="hi">{t("language.hindi")}</option>
+          </select>
+        </label>
+        <h2>{t("auth.verifyPhone")}</h2>
+        <p className="signin-subtitle">{t("auth.verifySubtitle")}</p>
 
         {error && <p className="signin-error">{error}</p>}
 
         <input
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
-          placeholder="Enter 10-digit mobile number"
+          placeholder={t("auth.phonePlaceholder")}
           autoComplete="tel"
           inputMode="tel"
           maxLength={14}
@@ -95,7 +106,7 @@ export default function PhoneVerificationPage() {
           loadingText="Sending OTP..."
           type="submit"
         >
-          Continue
+          {t("auth.continue")}
         </LoadingButton>
       </form>
     </main>

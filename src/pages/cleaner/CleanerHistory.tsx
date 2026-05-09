@@ -11,9 +11,11 @@ import {
   useDashboardQueryState,
 } from "../../components/dashboard/DashboardControls";
 import { formatAddress } from "../../utils/addressUtils";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerHistory.css";
 
 export default function CleanerHistory() {
+  const { t } = useLanguage();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -57,9 +59,9 @@ export default function CleanerHistory() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return <span className="status-badge completed">Completed</span>;
+        return <span className="status-badge completed">{t("common.completed")}</span>;
       case "rejected":
-        return <span className="status-badge cancelled">Cancelled</span>;
+        return <span className="status-badge cancelled">{t("common.cancelled")}</span>;
       default:
         return <span className="status-badge">{status}</span>;
     }
@@ -81,25 +83,25 @@ export default function CleanerHistory() {
     })}`;
 
   const formatPaymentStatus = (status?: string | null) =>
-    status ? status.replace("_", " ") : "Payment not collected";
+    status ? status.replace("_", " ") : t("history.paymentNotCollected");
 
   const renderEarningValue = (assignment: Assignment) => {
     const payment = assignment.booking?.payment;
     if (!payment || payment.payment_status === "pending_collection") {
-      return <span className="earning-state muted">Payment not collected</span>;
+      return <span className="earning-state muted">{t("history.paymentNotCollected")}</span>;
     }
     if (payment.payment_status === "collected") {
-      return <span className="earning-state pending">Split pending</span>;
+      return <span className="earning-state pending">{t("history.splitPending")}</span>;
     }
     if (payment.payment_status === "split_done" && payment.cleaner_share != null) {
       return (
         <span className="earning-confirmed">
           <strong>{formatMoney(payment.cleaner_share)}</strong>
-          <small>Your share</small>
+          <small>{t("history.yourShare")}</small>
         </span>
       );
     }
-    return <span className="earning-state pending">Split pending</span>;
+    return <span className="earning-state pending">{t("history.splitPending")}</span>;
   };
 
   // Calculate stats
@@ -131,26 +133,26 @@ export default function CleanerHistory() {
   const visibleTotal = query.debouncedSearch ? filteredAssignments.length : total;
 
   return (
-    <DashboardLayout title="Work History">
+    <DashboardLayout title={t("history.workHistory")}>
       <div className="history-page">
         <div className="stats-row">
           <div className="stat-card">
             <span className="stat-value">{totalJobs}</span>
-            <span className="stat-label">Total Jobs</span>
+            <span className="stat-label">{t("history.totalJobs")}</span>
           </div>
           <div className="stat-card">
             <span className="stat-value completed">{completedJobs}</span>
-            <span className="stat-label">Completed</span>
+            <span className="stat-label">{t("common.completed")}</span>
           </div>
           <div className="stat-card">
             <span className="stat-value cancelled">{cancelledJobs}</span>
-            <span className="stat-label">Cancelled</span>
+            <span className="stat-label">{t("common.cancelled")}</span>
           </div>
           <div className="stat-card revenue">
             <span className="stat-value">
               {formatMoney(totalEarnings)}
             </span>
-            <span className="stat-label">Total Earnings</span>
+            <span className="stat-label">{t("history.totalEarnings")}</span>
           </div>
         </div>
 
@@ -158,16 +160,16 @@ export default function CleanerHistory() {
           <SearchInput
             value={query.search}
             onChange={query.setSearch}
-            placeholder="Search history, service, location..."
+            placeholder={t("history.searchPlaceholder")}
           />
           <FilterSelect
-            label="Filter by"
+            label={t("common.filterBy")}
             value={query.status}
             onChange={query.setStatus}
             options={[
-              { value: "all", label: "All" },
-              { value: "completed", label: "Completed" },
-              { value: "cancelled", label: "Cancelled" },
+              { value: "all", label: t("common.all") },
+              { value: "completed", label: t("common.completed") },
+              { value: "cancelled", label: t("common.cancelled") },
             ]}
           />
         </div>
@@ -177,12 +179,12 @@ export default function CleanerHistory() {
         {loading ? (
           <div className="loading-container">
             <div className="loading-spinner" />
-            <p>Loading history...</p>
+            <p>{t("common.loadingHistory")}</p>
           </div>
         ) : visibleAssignments.length === 0 ? (
           <div className="empty-state">
-            <p>No work history found.</p>
-            <p>Your completed jobs will appear here.</p>
+            <p>{t("history.noHistory")}</p>
+            <p>{t("history.noHistoryHint")}</p>
           </div>
         ) : (
           <div className="history-list">
@@ -200,13 +202,13 @@ export default function CleanerHistory() {
 
                 <div className="history-details">
                   <div className="detail-row">
-                    <span className="detail-label">Service</span>
+                    <span className="detail-label">{t("history.service")}</span>
                     <span className="detail-value">
                       {assignment.booking?.service_name || "Car Wash"}
                     </span>
                   </div>
                   <div className="detail-row">
-                    <span className="detail-label">Vehicle</span>
+                    <span className="detail-label">{t("history.vehicle")}</span>
                     <span className="detail-value">
                       {assignment.booking?.address?.city || "N/A"}
                     </span>
@@ -218,20 +220,20 @@ export default function CleanerHistory() {
                     </span>
                   </div>
                   <div className="detail-row">
-                    <span className="detail-label">Time</span>
+                    <span className="detail-label">{t("history.time")}</span>
                     <span className="detail-value">
                       {assignment.booking?.scheduled_time || "N/A"}
                     </span>
                   </div>
                   <div className="detail-row">
-                    <span className="detail-label">Amount Earned</span>
+                    <span className="detail-label">{t("history.amountEarned")}</span>
                     <span className="detail-value price">
                       {renderEarningValue(assignment)}
                     </span>
                   </div>
                   {assignment.booking?.payment?.payment_status && (
                     <div className="detail-row">
-                      <span className="detail-label">Payment Status</span>
+                      <span className="detail-label">{t("history.paymentStatus")}</span>
                       <span className="detail-value">
                         {formatPaymentStatus(
                           assignment.booking.payment.payment_status,
@@ -241,7 +243,7 @@ export default function CleanerHistory() {
                   )}
                   {assignment.booking?.payment?.admin_share != null && (
                     <div className="detail-row">
-                      <span className="detail-label">Admin Share</span>
+                      <span className="detail-label">{t("history.adminShare")}</span>
                       <span className="detail-value">
                         {formatMoney(assignment.booking.payment.admin_share)}
                       </span>
@@ -249,7 +251,7 @@ export default function CleanerHistory() {
                   )}
                   {assignment.booking?.payment?.payment_method && (
                     <div className="detail-row">
-                      <span className="detail-label">Payment Mode</span>
+                      <span className="detail-label">{t("history.paymentMode")}</span>
                       <span className="detail-value">
                         {assignment.booking.payment.payment_method}
                       </span>

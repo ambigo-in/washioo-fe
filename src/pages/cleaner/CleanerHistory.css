@@ -1,17 +1,17 @@
 .history-page {
-  max-width: 1000px;
+  max-width: 1120px;
 }
 
 .stats-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .stat-card {
   background: var(--brand-white);
-  padding: 12px;
+  padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid var(--brand-border);
   text-align: center;
@@ -19,7 +19,7 @@
 
 .stat-value {
   display: block;
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--brand-text);
   margin-bottom: 2px;
@@ -47,8 +47,8 @@
 .filter-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .filter-row label {
@@ -115,7 +115,7 @@
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 7px;
 }
 
 .history-card {
@@ -129,7 +129,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 14px;
+  padding: 7px 10px;
   background: var(--brand-surface);
   border-bottom: 1px solid var(--brand-border);
 }
@@ -137,17 +137,17 @@
 .booking-info {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .booking-info h3 {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   color: var(--brand-text);
 }
 
 .status-badge {
-  padding: 3px 8px;
+  padding: 2px 7px;
   border-radius: 16px;
   font-size: 0.7rem;
   font-weight: 600;
@@ -165,20 +165,24 @@
 }
 
 .booking-date {
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   color: var(--brand-text-muted);
 }
 
 .history-details {
-  padding: 10px 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
+  padding: 8px 10px;
+  gap: 6px 10px;
 }
 
 .detail-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--brand-border);
-  font-size: 0.85rem;
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 0;
+  border-bottom: 0;
+  font-size: 0.78rem;
 }
 
 .detail-row:last-child {
@@ -189,14 +193,18 @@
   color: var(--brand-text-muted);
   font-weight: 500;
   flex: 0 0 auto;
+  font-size: 0.7rem;
 }
 
 .detail-value {
   color: var(--brand-text);
   font-weight: 500;
-  text-align: right;
+  text-align: left;
   flex: 1;
-  margin-left: 12px;
+  margin-left: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .detail-value.price {
@@ -245,14 +253,11 @@
   }
 
   .history-header {
-    flex-direction: column;
-    align-items: flex-start;
     gap: 6px;
   }
 
-  .detail-row {
-    flex-direction: column;
-    gap: 2px;
+  .history-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .detail-value {

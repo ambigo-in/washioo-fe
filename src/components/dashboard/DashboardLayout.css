@@ -6,7 +6,7 @@
 
 /* Sidebar */
 .dashboard-sidebar {
-  width: 260px;
+  width: 224px;
   background: var(--brand-white);
   border-right: 1px solid var(--brand-border);
   display: flex;
@@ -19,7 +19,7 @@
 }
 
 .sidebar-header {
-  padding: 24px 20px;
+  padding: 16px 16px;
   border-bottom: 1px solid var(--brand-border);
   display: flex;
   align-items: center;
@@ -28,12 +28,12 @@
 
 .sidebar-header h2 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--brand-text);
 }
 
 .role-badge {
-  padding: 4px 12px;
+  padding: 3px 9px;
   background: var(--brand-teal-soft);
   color: var(--brand-teal);
   border-radius: 20px;
@@ -44,15 +44,15 @@
 
 .sidebar-nav {
   flex: 1;
-  padding: 16px 12px;
+  padding: 10px 10px;
   overflow-y: auto;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  margin-bottom: 4px;
+  padding: 9px 11px;
+  margin-bottom: 3px;
   border-radius: 8px;
   color: var(--brand-text-muted);
   text-decoration: none;
@@ -71,45 +71,47 @@
 }
 
 .nav-icon {
-  margin-right: 12px;
-  font-size: 1.1rem;
+  margin-right: 9px;
+  font-size: 1rem;
+  width: 1rem;
+  text-align: center;
 }
 
 .nav-label {
-  font-size: 0.95rem;
+  font-size: 0.88rem;
 }
 
 .sidebar-footer {
-  padding: 16px 20px;
+  padding: 12px 14px;
   border-top: 1px solid var(--brand-border);
 }
 
 .user-info {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .user-name {
   margin: 0;
   font-weight: 600;
   color: var(--brand-text);
-  font-size: 0.95rem;
+  font-size: 0.88rem;
 }
 
 .user-phone {
   margin: 4px 0 0;
   color: var(--brand-text-muted);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
 }
 
 .logout-btn {
   width: 100%;
-  padding: 10px 16px;
+  padding: 8px 12px;
   background: #fff5f5;
   color: #dc3545;
   border: 1px solid #ffcdd2;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.86rem;
   transition: all 0.2s ease;
 }
 
@@ -119,8 +121,8 @@
 
 .dashboard-main {
   flex: 1;
-  margin-left: 260px;
-  padding: 24px 32px;
+  margin-left: 224px;
+  padding: 16px 20px;
   min-height: 100vh;
 }
 
@@ -128,12 +130,39 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 12px;
+  margin-bottom: 14px;
 }
 
 .dashboard-header h1 {
   margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+
+.language-select {
+  align-items: center;
+  color: var(--brand-text-muted);
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px 4px;
+}
+
+.language-select span {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.language-select select {
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  color: var(--brand-text);
+  font: inherit;
+  font-size: 0.8rem;
+  min-height: 32px;
+  padding: 4px 8px;
+  width: 100%;
 }
 
 .notification-wrapper {
@@ -143,8 +172,8 @@
 
 .notification-button {
   position: relative;
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   border: 1px solid var(--brand-border);
   border-radius: 8px;
   background: var(--brand-white);
@@ -230,7 +259,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--brand-border);
   color: var(--brand-text);
 }
@@ -275,7 +304,7 @@
   cursor: pointer;
   display: grid;
   gap: 5px;
-  padding: 12px 16px;
+  padding: 9px 12px;
   text-align: left;
 }
 
@@ -289,12 +318,12 @@
 
 .notification-title {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
 }
 
 .notification-message {
   color: var(--brand-text-muted);
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   line-height: 1.35;
 }
 
@@ -317,7 +346,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 54px;
   background: var(--brand-white);
   border-bottom: 1px solid var(--brand-border);
   z-index: 999;
@@ -367,12 +396,12 @@
 /* Responsive - Tablet */
 @media (max-width: 1024px) {
   .dashboard-sidebar {
-    width: 220px;
+    width: 208px;
   }
 
   .dashboard-main {
-    margin-left: 220px;
-    padding: 20px 24px;
+    margin-left: 208px;
+    padding: 14px 16px;
   }
 }
 
@@ -389,7 +418,7 @@
 
   .dashboard-main {
     margin-left: 0;
-    padding: 80px 16px 20px;
+    padding: 68px 12px 16px;
   }
 
   .dashboard-header {
@@ -413,11 +442,11 @@
   }
 
   .nav-item {
-    padding: 14px 16px;
+    padding: 11px 14px;
   }
 
   .nav-label {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .sidebar-footer {
@@ -428,7 +457,7 @@
 /* Extra small devices */
 @media (max-width: 480px) {
   .dashboard-main {
-    padding: 76px 12px 16px;
+    padding: 64px 10px 14px;
   }
 
   .mobile-logo {

@@ -7,88 +7,52 @@ import {
   fetchNotifications,
   markNotificationRead,
 } from "../../api/notificationApi";
-import type { UserRole } from "../../types/apiTypes";
-import type { NotificationItem } from "../../types/apiTypes";
+import type { NotificationItem, UserRole } from "../../types/apiTypes";
 import { registerCleanerPushNotifications } from "../../utils/pushNotifications";
+import {
+  useLanguage,
+  type LanguageCode,
+  type TranslationKey,
+} from "../../i18n/LanguageContext";
 import "./DashboardLayout.css";
 
 interface NavItem {
   path: string;
-  label: string;
+  labelKey: TranslationKey;
   icon: string;
   roles: UserRole[];
 }
 
 const navItems: NavItem[] = [
-  // Customer routes
-  { path: "/dashboard", label: "Dashboard", icon: "🏠", roles: ["customer"] },
-  { path: "/bookings", label: "Book Service", icon: "🚗", roles: ["customer"] },
-  {
-    path: "/my-bookings",
-    label: "My Bookings",
-    icon: "📋",
-    roles: ["customer"],
-  },
-  {
-    path: "/addresses",
-    label: "My Addresses",
-    icon: "📍",
-    roles: ["customer"],
-  },
-  {
-    path: "/vehicles",
-    label: "My Vehicles",
-    icon: "🚘",
-    roles: ["customer"],
-  },
-  { path: "/profile", label: "Profile", icon: "👤", roles: ["customer"] },
-
-  // Cleaner routes
+  { path: "/dashboard", labelKey: "common.dashboard", icon: "⌂", roles: ["customer"] },
+  { path: "/bookings", labelKey: "nav.bookService", icon: "▣", roles: ["customer"] },
+  { path: "/my-bookings", labelKey: "nav.myBookings", icon: "≡", roles: ["customer"] },
+  { path: "/addresses", labelKey: "nav.addresses", icon: "⌖", roles: ["customer"] },
+  { path: "/vehicles", labelKey: "nav.vehicles", icon: "◇", roles: ["customer"] },
+  { path: "/profile", labelKey: "nav.profile", icon: "○", roles: ["customer"] },
   {
     path: "/cleaner/dashboard",
-    label: "Dashboard",
-    icon: "🏠",
+    labelKey: "common.dashboard",
+    icon: "⌂",
     roles: ["cleaner"],
   },
-  {
-    path: "/cleaner/assignments",
-    label: "My Jobs",
-    icon: "📋",
-    roles: ["cleaner"],
-  },
+  { path: "/cleaner/assignments", labelKey: "nav.myJobs", icon: "≡", roles: ["cleaner"] },
   {
     path: "/cleaner/history",
-    label: "Work History",
-    icon: "📜",
+    labelKey: "history.workHistory",
+    icon: "◷",
     roles: ["cleaner"],
   },
-  {
-    path: "/cleaner/availability",
-    label: "Availability",
-    icon: "⏰",
-    roles: ["cleaner"],
-  },
-  {
-    path: "/cleaner/profile",
-    label: "Profile",
-    icon: "👤",
-    roles: ["cleaner"],
-  },
-
-  // Admin routes
-  {
-    path: "/admin/dashboard",
-    label: "Dashboard",
-    icon: "📊",
-    roles: ["admin"],
-  },
-  { path: "/admin/bookings", label: "Bookings", icon: "📋", roles: ["admin"] },
-  { path: "/admin/payments", label: "Payments", icon: "💳", roles: ["admin"] },
-  { path: "/admin/ratings", label: "Ratings", icon: "★", roles: ["admin"] },
-  { path: "/admin/cleaners", label: "Cleaners", icon: "🧹", roles: ["admin"] },
-  { path: "/admin/services", label: "Services", icon: "🔧", roles: ["admin"] },
-  { path: "/admin/users", label: "Users", icon: "👥", roles: ["admin"] },
-  { path: "/admin/settings", label: "Settings", icon: "⚙️", roles: ["admin"] },
+  { path: "/cleaner/availability", labelKey: "nav.availability", icon: "◌", roles: ["cleaner"] },
+  { path: "/cleaner/profile", labelKey: "nav.profile", icon: "○", roles: ["cleaner"] },
+  { path: "/admin/dashboard", labelKey: "common.dashboard", icon: "▥", roles: ["admin"] },
+  { path: "/admin/bookings", labelKey: "nav.bookings", icon: "≡", roles: ["admin"] },
+  { path: "/admin/payments", labelKey: "nav.payments", icon: "□", roles: ["admin"] },
+  { path: "/admin/ratings", labelKey: "nav.ratings", icon: "☆", roles: ["admin"] },
+  { path: "/admin/cleaners", labelKey: "nav.cleaners", icon: "◍", roles: ["admin"] },
+  { path: "/admin/services", labelKey: "nav.services", icon: "⚙", roles: ["admin"] },
+  { path: "/admin/users", labelKey: "nav.users", icon: "◎", roles: ["admin"] },
+  { path: "/admin/settings", labelKey: "nav.settings", icon: "⚙", roles: ["admin"] },
 ];
 
 interface DashboardLayoutProps {
@@ -101,6 +65,7 @@ export default function DashboardLayout({
   title,
 }: DashboardLayoutProps) {
   const { user, logout, activeRole } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const { loading } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -149,7 +114,7 @@ export default function DashboardLayout({
   };
 
   const getRoleDisplay = (role?: UserRole | null) =>
-    role ? role.charAt(0).toUpperCase() + role.slice(1) : "User";
+    role ? role.charAt(0).toUpperCase() + role.slice(1) : t("common.user");
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -201,7 +166,6 @@ export default function DashboardLayout({
 
   return (
     <div className="dashboard-layout">
-      {/* Mobile Header */}
       <header className="mobile-header">
         <button className="mobile-menu-btn" onClick={toggleSidebar}>
           ☰
@@ -210,7 +174,6 @@ export default function DashboardLayout({
         <div className="mobile-user">{user?.full_name?.charAt(0) || "U"}</div>
       </header>
 
-      {/* Overlay for mobile */}
       <div
         className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`}
         onClick={closeSidebar}
@@ -221,6 +184,20 @@ export default function DashboardLayout({
           <h2>Washioo</h2>
           <span className="role-badge">{getRoleDisplay(activeRole)}</span>
         </div>
+
+        {activeRole !== "admin" && (
+          <label className="language-select">
+            <span>{t("language.label")}</span>
+            <select
+              value={language}
+              onChange={(event) => setLanguage(event.target.value as LanguageCode)}
+            >
+              <option value="en">{t("language.english")}</option>
+              <option value="te">{t("language.telugu")}</option>
+              <option value="hi">{t("language.hindi")}</option>
+            </select>
+          </label>
+        )}
 
         <nav className="sidebar-nav">
           {filteredNavItems.map((item) => (
@@ -233,7 +210,7 @@ export default function DashboardLayout({
               onClick={closeSidebar}
             >
               <span className="nav-icon">{item.icon}</span>
-              <span className="nav-label">{item.label}</span>
+              <span className="nav-label">{t(item.labelKey)}</span>
             </NavLink>
           ))}
         </nav>
@@ -241,7 +218,7 @@ export default function DashboardLayout({
         <div className="sidebar-footer">
           {user && (
             <div className="user-info">
-              <p className="user-name">{user.full_name || "User"}</p>
+              <p className="user-name">{user.full_name || t("common.user")}</p>
               <p className="user-phone">{user.phone}</p>
             </div>
           )}
@@ -251,7 +228,7 @@ export default function DashboardLayout({
             loadingText="Logging out..."
             onClick={handleLogout}
           >
-            Logout
+            {t("common.logout")}
           </LoadingButton>
         </div>
       </aside>
@@ -265,7 +242,7 @@ export default function DashboardLayout({
                 <button
                   className="notification-button"
                   type="button"
-                  aria-label="Cleaner notifications"
+                  aria-label="Notifications"
                   onClick={() => setNotificationOpen((current) => !current)}
                 >
                   <span className="notification-bell" aria-hidden="true" />
@@ -277,8 +254,10 @@ export default function DashboardLayout({
                   <div className="notification-menu">
                     <div className="notification-menu-header">
                       <div>
-                        <strong>Notifications</strong>
-                        <div>{unreadCount} unread</div>
+                        <strong>{t("common.notifications")}</strong>
+                        <div>
+                          {unreadCount} {t("common.unread")}
+                        </div>
                       </div>
                       <button
                         type="button"
@@ -288,7 +267,7 @@ export default function DashboardLayout({
                           navigate("/notifications");
                         }}
                       >
-                        View all
+                        {t("actions.viewAll")}
                       </button>
                     </div>
                     {notifications.length ? (

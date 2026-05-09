@@ -6,6 +6,8 @@ import { fetchCleanerProfile } from "../../api/cleanerApi";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { updateProfileRequest } from "../../store/slices/authSlice";
 import type { CleanerProfile as CleanerProfileData } from "../../types/cleanerTypes";
+import { normalizeIndianPhone } from "../../utils/phoneUtils";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerProfile.css";
 
 interface ProfileFormData {
@@ -21,6 +23,7 @@ interface VerificationModalState {
 
 export default function CleanerProfile() {
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { loading } = useAppSelector((state) => state.auth);
   const { user, setUser } = useAuth();
   const [success, setSuccess] = useState("");
@@ -64,10 +67,10 @@ export default function CleanerProfile() {
         updateProfileRequest(formData),
       ).unwrap();
       setUser(updatedUser.user);
-      setSuccess("Profile updated successfully!");
+      setSuccess(t("profile.updated"));
       setIsEditing(false);
     } catch (err) {
-      setError("Failed to update profile");
+      setError(t("profile.failed"));
       console.error(err);
     }
   };
@@ -79,17 +82,16 @@ export default function CleanerProfile() {
 
   const handleVerifyAndShow = async () => {
     if (!verificationPassword.trim()) {
-      setError("Please enter your password to verify");
+      setError(t("profile.verifyPlaceholder"));
       return;
     }
 
     setVerifyingDocument(true);
     try {
-      // Simple verification - in production, this should validate against backend
-      // For now, we'll just require the phone number last 4 digits
-      const phoneLastFour = (user?.phone || "").slice(-4);
-      if (verificationPassword !== phoneLastFour) {
-        setError("Verification failed. Please try again.");
+      const phoneLastFour = normalizeIndianPhone(user?.phone || "").slice(-4);
+      const enteredDigits = verificationPassword.replace(/\D/g, "");
+      if (enteredDigits !== phoneLastFour) {
+        setError(t("profile.verifyFailed"));
         setVerifyingDocument(false);
         return;
       }
@@ -102,7 +104,7 @@ export default function CleanerProfile() {
       }
 
       setVerificationModal({ isOpen: false, type: null });
-      setSuccess("Details verified and displayed");
+      setSuccess(t("profile.detailsDisplayed"));
       setError("");
     } finally {
       setVerifyingDocument(false);
@@ -116,21 +118,21 @@ export default function CleanerProfile() {
   };
 
   return (
-    <DashboardLayout title="My Profile">
+    <DashboardLayout title={t("profile.myProfile")}>
       <div className="profile-page">
         <div className="profile-card">
           <div className="profile-header">
             <div className="avatar">{user?.full_name?.charAt(0) || "C"}</div>
             <div className="profile-info">
               <h2>{user?.full_name || "Cleaner"}</h2>
-              <p className="user-email">{user?.email || "No email"}</p>
+              <p className="user-email">{user?.email || t("profile.noEmail")}</p>
               <p className="user-phone">{user?.phone}</p>
             </div>
             <button
               className="btn-edit"
               onClick={() => setIsEditing(!isEditing)}
             >
-              {isEditing ? "Cancel" : "Edit Profile"}
+              {isEditing ? t("profile.cancel") : t("profile.editProfile")}
             </button>
           </div>
 
@@ -140,7 +142,7 @@ export default function CleanerProfile() {
           <div className="profile-form">
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label>Full Name</label>
+                <label>{t("profile.fullName")}</label>
                 <input
                   type="text"
                   name="full_name"
@@ -152,7 +154,7 @@ export default function CleanerProfile() {
               </div>
 
               <div className="form-group">
-                <label>Email</label>
+                <label>{t("profile.email")}</label>
                 <input
                   type="email"
                   name="email"
@@ -163,7 +165,7 @@ export default function CleanerProfile() {
               </div>
 
               <div className="form-group">
-                <label>Phone Number</label>
+                <label>{t("profile.phoneNumber")}</label>
                 <input
                   type="tel"
                   name="phone"
@@ -180,9 +182,9 @@ export default function CleanerProfile() {
                     type="submit"
                     className="btn-primary"
                     isLoading={loading}
-                    loadingText="Saving..."
+                    loadingText={t("profile.saving")}
                   >
-                    Save Changes
+                    {t("profile.saveChanges")}
                   </LoadingButton>
                 </div>
               )}
@@ -190,13 +192,13 @@ export default function CleanerProfile() {
           </div>
 
           <div className="profile-section">
-            <h3>Account Information</h3>
+            <h3>{t("profile.accountInformation")}</h3>
             <div className="info-row">
-              <span className="info-label">Role</span>
+              <span className="info-label">{t("profile.role")}</span>
               <span className="info-value">Cleaner</span>
             </div>
             <div className="info-row">
-              <span className="info-label">Member Since</span>
+              <span className="info-label">{t("profile.memberSince")}</span>
               <span className="info-value">
                 {user?.created_at
                   ? new Date(user.created_at).toLocaleDateString()
@@ -206,27 +208,27 @@ export default function CleanerProfile() {
           </div>
 
           <div className="profile-section">
-            <h3>Identity Verification</h3>
+            <h3>{t("profile.identityVerification")}</h3>
             <div className="info-row">
               <span className="info-label">Aadhaar</span>
               <span className="info-value">
                 {cleanerProfile?.has_aadhaar ? (
                   <span>
                     {showFullDetails.aadhaar
-                      ? cleanerProfile.aadhaar_number || "Provided"
-                      : cleanerProfile.aadhaar_number_masked || "Provided"}
+                      ? cleanerProfile.aadhaar_number || t("profile.provided")
+                      : cleanerProfile.aadhaar_number_masked || t("profile.provided")}
                     {!showFullDetails.aadhaar && (
                       <button
                         type="button"
                         className="btn-view-details"
                         onClick={() => handleRequestFullDetails("aadhaar")}
                       >
-                        View
+                        {t("profile.view")}
                       </button>
                     )}
                   </span>
                 ) : (
-                  "Not provided"
+                  t("profile.notProvided")
                 )}
               </span>
             </div>
@@ -236,43 +238,41 @@ export default function CleanerProfile() {
                 {cleanerProfile?.has_driving_license ? (
                   <span>
                     {showFullDetails.license
-                      ? cleanerProfile.driving_license_number || "Provided"
+                      ? cleanerProfile.driving_license_number || t("profile.provided")
                       : cleanerProfile.driving_license_number_masked ||
-                        "Provided"}
+                        t("profile.provided")}
                     {!showFullDetails.license && (
                       <button
                         type="button"
                         className="btn-view-details"
                         onClick={() => handleRequestFullDetails("license")}
                       >
-                        View
+                        {t("profile.view")}
                       </button>
                     )}
                   </span>
                 ) : (
-                  "Not provided"
+                  t("profile.notProvided")
                 )}
               </span>
             </div>
             <p className="profile-note">
-              Identity details are shown in masked format for security. Click
-              "View" to see full details after verification.
+              {t("profile.identityNote")}
             </p>
 
             {verificationModal.isOpen && (
               <div className="verification-modal-overlay">
                 <div className="verification-modal">
-                  <h3>Verify Your Identity</h3>
-                  <p>
-                    Enter the last 4 digits of your phone number to verify and
-                    view full details.
-                  </p>
+                  <h3>{t("profile.verifyIdentity")}</h3>
+                  <p>{t("profile.verifyDigits")}</p>
                   {error && <div className="error-message">{error}</div>}
                   <input
                     type="password"
-                    placeholder="Enter last 4 digits of phone"
+                    placeholder={t("profile.verifyPlaceholder")}
                     value={verificationPassword}
-                    onChange={(e) => setVerificationPassword(e.target.value)}
+                    onChange={(e) =>
+                      setVerificationPassword(e.target.value.replace(/\D/g, ""))
+                    }
                     maxLength={4}
                     inputMode="numeric"
                   />
@@ -283,16 +283,16 @@ export default function CleanerProfile() {
                       onClick={closeVerificationModal}
                       disabled={verifyingDocument}
                     >
-                      Cancel
+                      {t("profile.cancel")}
                     </button>
                     <LoadingButton
                       isLoading={verifyingDocument}
-                      loadingText="Verifying..."
+                      loadingText={t("profile.verifying")}
                       type="button"
                       className="btn-verify"
                       onClick={handleVerifyAndShow}
                     >
-                      Verify
+                      {t("profile.verify")}
                     </LoadingButton>
                   </div>
                 </div>

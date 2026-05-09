@@ -7,11 +7,13 @@ import {
   loadCustomerBookings,
 } from "../../store/slices/customerSlice";
 import { loadServices } from "../../store/slices/servicesSlice";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./CustomerDashboard.css";
 
 export default function CustomerDashboard() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { bookings, addresses, loading: customerLoading } = useAppSelector(
     (state) => state.customer,
   );
@@ -19,10 +21,7 @@ export default function CustomerDashboard() {
     (state) => state.services,
   );
   const loading = customerLoading || servicesLoading;
-  const serviceImages =[
-    "/p2.png",
-    "/p1.png"
-  ]
+  const serviceImages = ["/p2.png", "/p1.png"];
 
   useEffect(() => {
     dispatch(loadCustomerBookings());
@@ -58,59 +57,57 @@ export default function CustomerDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout title="Dashboard">
+      <DashboardLayout title={t("common.dashboard")}>
         <div className="loading-container">
           <div className="loading-spinner"></div>
-          <p>Loading your dashboard...</p>
+          <p>{t("customer.loadingDashboard")}</p>
         </div>
       </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout title="Dashboard">
+    <DashboardLayout title={t("common.dashboard")}>
       <div className="customer-dashboard">
-        {/* Quick Actions */}
         <section className="quick-actions">
-          <h2>Quick Actions</h2>
+          <h2>{t("customer.quickActions")}</h2>
           <div className="action-cards">
             <Link to="/bookings" className="action-card primary">
-              <div className="action-icon">🚗</div>
+              <div className="action-icon">▣</div>
               <div className="action-content">
-                <h3>Book a Service</h3>
-                <p>Schedule your car or bike wash</p>
+                <h3>{t("customer.bookService")}</h3>
+                <p>{t("customer.bookServiceHint")}</p>
               </div>
             </Link>
             <Link to="/my-bookings" className="action-card">
-              <div className="action-icon">📋</div>
+              <div className="action-icon">≡</div>
               <div className="action-content">
-                <h3>View Bookings</h3>
-                <p>Track your current bookings</p>
+                <h3>{t("actions.viewBookings")}</h3>
+                <p>{t("customer.viewBookingsHint")}</p>
               </div>
             </Link>
             <Link to="/addresses" className="action-card">
-              <div className="action-icon">📍</div>
+              <div className="action-icon">⌖</div>
               <div className="action-content">
-                <h3>Manage Addresses</h3>
-                <p>Add or edit locations</p>
+                <h3>{t("actions.manageAddresses")}</h3>
+                <p>{t("customer.manageAddressesHint")}</p>
               </div>
             </Link>
           </div>
         </section>
 
-        {/* Stats Overview */}
         <section className="stats-overview">
-          <h2>Overview</h2>
+          <h2>{t("customer.overview")}</h2>
           <div className="stats-grid">
             <div className="stat-card">
               <div className="stat-value">{bookings.length}</div>
-              <div className="stat-label">Total Bookings</div>
+              <div className="stat-label">{t("customer.bookingsTotal")}</div>
             </div>
             <div className="stat-card">
               <div className="stat-value">
                 {bookings.filter((b) => b.booking_status === "pending").length}
               </div>
-              <div className="stat-label">Pending</div>
+              <div className="stat-label">{t("customer.pending")}</div>
             </div>
             <div className="stat-card">
               <div className="stat-value">
@@ -119,18 +116,17 @@ export default function CustomerDashboard() {
                     .length
                 }
               </div>
-              <div className="stat-label">Completed</div>
+              <div className="stat-label">{t("customer.completed")}</div>
             </div>
             <div className="stat-card">
               <div className="stat-value">{addresses.length}</div>
-              <div className="stat-label">Saved Addresses</div>
+              <div className="stat-label">{t("customer.savedAddresses")}</div>
             </div>
           </div>
         </section>
 
-        {/* Available Services */}
         <section className="available-services">
-          <h2>Available Services</h2>
+          <h2>{t("customer.availableServices")}</h2>
           <div className="customer-services-grid">
             {activeServices.map((service, index) => (
               <div key={service.id} className="customer-service-card">
@@ -152,19 +148,18 @@ export default function CustomerDashboard() {
                   onClick={() => handleBookNow(service)}
                   type="button"
                 >
-                  Book Now
+                  {t("customer.bookNow")}
                 </button>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Recent Bookings */}
         <section className="recent-bookings">
           <div className="section-header">
-            <h2>Recent Bookings</h2>
+            <h2>{t("customer.recentBookings")}</h2>
             <Link to="/my-bookings" className="view-all">
-              View All →
+              {t("actions.viewAll")} →
             </Link>
           </div>
           {recentBookings.length > 0 ? (
@@ -194,9 +189,9 @@ export default function CustomerDashboard() {
             </div>
           ) : (
             <div className="empty-state">
-              <p>No bookings yet.</p>
+              <p>{t("customer.noBookings")}</p>
               <Link to="/bookings" className="btn-primary">
-                Book Your First Service
+                {t("customer.firstBooking")}
               </Link>
             </div>
           )}

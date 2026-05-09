@@ -4,6 +4,7 @@ import { LoadingButton } from "../../components/ui";
 import { useAuth } from "../../context/useAuth";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { updateProfileRequest } from "../../store/slices/authSlice";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./CustomerProfile.css";
 
 interface ProfileFormData {
@@ -14,6 +15,7 @@ interface ProfileFormData {
 
 export default function CustomerProfile() {
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { loading } = useAppSelector((state) => state.auth);
   const { user, setUser } = useAuth();
   const [success, setSuccess] = useState("");
@@ -36,30 +38,30 @@ export default function CustomerProfile() {
       setError("");
       const updatedUser = await dispatch(updateProfileRequest(formData)).unwrap();
       setUser(updatedUser.user);
-      setSuccess("Profile updated successfully!");
+      setSuccess(t("profile.updated"));
       setIsEditing(false);
     } catch (err) {
-      setError("Failed to update profile");
+      setError(t("profile.failed"));
       console.error(err);
     }
   };
 
   return (
-    <DashboardLayout title="My Profile">
+    <DashboardLayout title={t("profile.myProfile")}>
       <div className="profile-page">
         <div className="profile-card">
           <div className="profile-header">
             <div className="avatar">{user?.full_name?.charAt(0) || "U"}</div>
             <div className="profile-info">
-              <h2>{user?.full_name || "User"}</h2>
-              <p className="user-email">{user?.email || "No email"}</p>
+              <h2>{user?.full_name || t("common.user")}</h2>
+              <p className="user-email">{user?.email || t("profile.noEmail")}</p>
               <p className="user-phone">{user?.phone}</p>
             </div>
             <button
               className="btn-edit"
               onClick={() => setIsEditing(!isEditing)}
             >
-              {isEditing ? "Cancel" : "Edit Profile"}
+              {isEditing ? t("profile.cancel") : t("profile.editProfile")}
             </button>
           </div>
 
@@ -69,7 +71,7 @@ export default function CustomerProfile() {
           <div className="profile-form">
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label>Full Name</label>
+                <label>{t("profile.fullName")}</label>
                 <input
                   type="text"
                   name="full_name"
@@ -81,7 +83,7 @@ export default function CustomerProfile() {
               </div>
 
               <div className="form-group">
-                <label>Email</label>
+                <label>{t("profile.email")}</label>
                 <input
                   type="email"
                   name="email"
@@ -92,7 +94,7 @@ export default function CustomerProfile() {
               </div>
 
               <div className="form-group">
-                <label>Phone Number</label>
+                <label>{t("profile.phoneNumber")}</label>
                 <input
                   type="tel"
                   name="phone"
@@ -109,9 +111,9 @@ export default function CustomerProfile() {
                     type="submit"
                     className="btn-primary"
                     isLoading={loading}
-                    loadingText="Saving..."
+                    loadingText={t("profile.saving")}
                   >
-                    Save Changes
+                    {t("profile.saveChanges")}
                   </LoadingButton>
                 </div>
               )}
@@ -119,13 +121,13 @@ export default function CustomerProfile() {
           </div>
 
           <div className="profile-section">
-            <h3>Account Information</h3>
+            <h3>{t("profile.accountInformation")}</h3>
             <div className="info-row">
-              <span className="info-label">Role</span>
+              <span className="info-label">{t("profile.role")}</span>
               <span className="info-value">Customer</span>
             </div>
             <div className="info-row">
-              <span className="info-label">Member Since</span>
+              <span className="info-label">{t("profile.memberSince")}</span>
               <span className="info-value">
                 {user?.created_at
                   ? new Date(user.created_at).toLocaleDateString()

@@ -25,6 +25,7 @@ import {
 import { loadCleanerEarnings } from "../../store/slices/paymentSlice";
 import type { PaymentType } from "../../types/apiTypes";
 import { formatAddress } from "../../utils/addressUtils";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerAssignments.css";
 
 type FilterStatus =
@@ -42,6 +43,7 @@ const formatMoney = (value: number) =>
 
 export default function CleanerAssignments() {
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { assignments, total, loading } = useAppSelector(
     (state) => state.cleaner,
   );
@@ -175,9 +177,7 @@ export default function CleanerAssignments() {
     const type = paymentType[assignmentId] ?? "cash";
 
     if (!amount || amount <= 0) {
-      setActionError(
-        "Enter a valid collected amount before completing the job.",
-      );
+      setActionError(t("cleaner.validAmount"));
       return;
     }
 
@@ -230,7 +230,7 @@ export default function CleanerAssignments() {
     ] as FilterStatus[]
   ).map((status) => ({
     value: status,
-    label: status === "all" ? "All" : status.replace("_", " "),
+    label: status === "all" ? t("common.all") : status.replace("_", " "),
     count:
       status === "all"
         ? Object.values(counts).reduce((sum, count) => sum + count, 0)
@@ -253,13 +253,13 @@ export default function CleanerAssignments() {
     : total;
 
   return (
-    <DashboardLayout title="My Assignments">
+    <DashboardLayout title={t("cleaner.myAssignments")}>
       <div className="cleaner-assignments">
         <div className="dashboard-toolbar">
           <SearchInput
             value={query.search}
             onChange={query.setSearch}
-            placeholder="Search assignment, customer, location..."
+            placeholder={t("cleaner.searchAssignments")}
           />
         </div>
         <StatusTabs
@@ -271,7 +271,7 @@ export default function CleanerAssignments() {
         {loading && assignments.length === 0 ? (
           <div className="loading-container">
             <div className="loading-spinner"></div>
-            <p>Loading assignments...</p>
+            <p>{t("cleaner.loadingAssignments")}</p>
           </div>
         ) : visibleAssignments.length > 0 ? (
           <>
@@ -326,14 +326,14 @@ export default function CleanerAssignments() {
                       className="btn-details"
                       to={`/cleaner/bookings/${assignment.booking_id}`}
                     >
-                      View Details
+                      {t("actions.viewDetails")}
                     </Link>
 
                     {(assignment.assignment_status === "accepted" ||
                       assignment.assignment_status === "in_progress") && (
                       <OpenInMapsButton
                         address={assignment.booking.address}
-                        label="📍 Start Route"
+                        label={t("cleaner.route")}
                         className="btn-start-route"
                       />
                     )}
@@ -344,17 +344,17 @@ export default function CleanerAssignments() {
                           className="btn-accept"
                           onClick={() => handleAccept(assignment.id)}
                           isLoading={loading}
-                          loadingText="Accepting..."
+                          loadingText={t("cleaner.accepting")}
                         >
-                          ✓ Accept
+                          ✓ {t("cleaner.accept")}
                         </LoadingButton>
                         <LoadingButton
                           className="btn-reject"
                           onClick={() => handleReject(assignment.id)}
                           isLoading={loading}
-                          loadingText="Rejecting..."
+                          loadingText={t("cleaner.rejecting")}
                         >
-                          ✕ Reject
+                          × {t("cleaner.reject")}
                         </LoadingButton>
                       </>
                     )}
@@ -364,16 +364,16 @@ export default function CleanerAssignments() {
                           className="btn-start"
                           onClick={() => handleStart(assignment.id)}
                           isLoading={loading}
-                          loadingText="Starting..."
+                          loadingText={t("cleaner.starting")}
                         >
-                          ▶ Start Service
+                          ▶ {t("cleaner.startService")}
                         </LoadingButton>
                       )}
                     {assignment.assignment_status === "in_progress" && (
                       <div className="complete-section">
                         <div className="payment-collect-fields">
                           <div className="field-row">
-                            <label>Amount Collected (Rs.)</label>
+                            <label>{t("cleaner.amountCollected")}</label>
                             <input
                               type="number"
                               min="0"
@@ -392,7 +392,7 @@ export default function CleanerAssignments() {
                             />
                           </div>
                           <div className="field-row">
-                            <label>Payment Type</label>
+                            <label>{t("cleaner.paymentType")}</label>
                             <select
                               value={paymentType[assignment.id] ?? "cash"}
                               onChange={(event) =>
@@ -412,15 +412,15 @@ export default function CleanerAssignments() {
                           className="btn-complete"
                           onClick={() => handleComplete(assignment.id)}
                           isLoading={loading}
-                          loadingText="Completing..."
+                          loadingText={t("cleaner.completing")}
                         >
-                          ✓ Complete Service
+                          ✓ {t("cleaner.completeService")}
                         </LoadingButton>
                       </div>
                     )}
                     {assignment.assignment_status === "completed" && (
                       <>
-                        <span className="completed-badge">✅ Completed</span>
+                        <span className="completed-badge">✓ {t("common.completed")}</span>
                         <button
                           type="button"
                           className="btn-rate-customer"
@@ -432,13 +432,13 @@ export default function CleanerAssignments() {
                           }
                         >
                           {showRating[assignment.id]
-                            ? "Hide Rating"
-                            : "Rate Customer"}
+                            ? t("cleaner.hideRating")
+                            : t("cleaner.rateCustomer")}
                         </button>
                       </>
                     )}
                     {assignment.assignment_status === "rejected" && (
-                      <span className="rejected-badge">❌ Rejected</span>
+                      <span className="rejected-badge">× {t("cleaner.rejected")}</span>
                     )}
                   </div>
 
@@ -465,7 +465,7 @@ export default function CleanerAssignments() {
           </>
         ) : (
           <div className="empty-state">
-            <p>No assignments found.</p>
+            <p>{t("cleaner.noAssignments")}</p>
           </div>
         )}
       </div>

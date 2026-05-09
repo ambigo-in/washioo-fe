@@ -13,7 +13,7 @@ export type FilterOption<T extends string> = {
   value: T;
 };
 
-export const DEFAULT_PAGE_SIZE = 10;
+export const DEFAULT_PAGE_SIZE = 12;
 
 export function useDebouncedValue<T>(value: T, delay = 350) {
   const [debounced, setDebounced] = useState(value);

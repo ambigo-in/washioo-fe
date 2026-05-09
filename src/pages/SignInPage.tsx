@@ -6,10 +6,12 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { resendOtp, signInRequest } from "../store/slices/authSlice";
 import type { AccountType } from "../types/authTypes";
 import { formatIndianPhoneForDisplay } from "../utils/phoneUtils";
+import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/SignInPage.css";
 
 export default function SignInPage() {
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { loading, resendLoading } = useAppSelector((state) => state.auth);
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
@@ -36,7 +38,7 @@ const accountType = state?.accountType || "customer";
     event.preventDefault();
 
     if (otpCode.trim().length < 4) {
-      setError("Enter the OTP sent to your phone.");
+      setError(t("auth.welcomeSubtitle"));
       return;
     }
 
@@ -72,31 +74,29 @@ const accountType = state?.accountType || "customer";
   return (
     <main className="signin-page-wrapper">
       <form className="auth-container" onSubmit={handleSignIn}>
-        <h2>Welcome Back</h2>
-        <p className="signin-subtitle">
-          Enter the OTP sent to your phone to continue booking.
-        </p>
+        <h2>{t("auth.welcomeBack")}</h2>
+        <p className="signin-subtitle">{t("auth.welcomeSubtitle")}</p>
 
         {error && <p className="signin-error">{error}</p>}
 
         <input
           value={formatIndianPhoneForDisplay(phone)}
           disabled
-          aria-label="Phone number"
+          aria-label={t("auth.phoneAria")}
         />
         <input
           value={otpCode}
           onChange={(event) => setOtpCode(event.target.value)}
-          placeholder="Enter OTP"
+          placeholder={t("auth.enterOtp")}
           autoComplete="one-time-code"
           inputMode="numeric"
         />
-        <LoadingButton isLoading={loading} loadingText="Signing in..." type="submit">
-          Login
+        <LoadingButton isLoading={loading} loadingText={t("auth.signingIn")} type="submit">
+          {t("auth.login")}
         </LoadingButton>
 
         <p className="signin-footer-text">
-          Did not receive it?{" "}
+          {t("auth.didNotReceive")}{" "}
           <LoadingButton
             className="link-button"
             isLoading={resendLoading}
@@ -104,7 +104,7 @@ const accountType = state?.accountType || "customer";
             onClick={handleResend}
             type="button"
           >
-            Resend OTP
+            {t("auth.resendOtp")}
           </LoadingButton>
         </p>
       </form>

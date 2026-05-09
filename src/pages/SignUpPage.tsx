@@ -6,10 +6,12 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { resendOtp, signUpRequest } from "../store/slices/authSlice";
 import type { AccountType } from "../types/authTypes";
 import { formatIndianPhoneForDisplay } from "../utils/phoneUtils";
+import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/SignUpPage.css";
 
 export default function SignUpPage() {
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { loading, resendLoading } = useAppSelector((state) => state.auth);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -37,17 +39,17 @@ export default function SignUpPage() {
     event.preventDefault();
 
     if (!fullName.trim()) {
-      setError("Enter your full name.");
+      setError(t("auth.fullName"));
       return;
     }
 
     if (otpCode.trim().length < 4) {
-      setError("Enter the OTP sent to your phone.");
+      setError(t("auth.welcomeSubtitle"));
       return;
     }
 
     if (accountType === "cleaner" && !aadhaarNumber.trim()) {
-      setError("Aadhaar number is required for cleaner signup.");
+      setError(t("auth.aadhaarRequired"));
       return;
     }
 
@@ -102,36 +104,36 @@ export default function SignUpPage() {
     <main className="signup-page-wrapper">
       <form className="auth-container" onSubmit={handleSignUp}>
         <h2>
-          {accountType === "cleaner" ? "Create Cleaner Account" : "Create Account"}
+          {accountType === "cleaner"
+            ? t("auth.createCleanerAccount")
+            : t("auth.createAccount")}
         </h2>
-        <p className="signup-subtitle">
-          We need a few details before your first doorstep wash.
-        </p>
+        <p className="signup-subtitle">{t("auth.firstDetails")}</p>
 
         {error && <p className="signup-error">{error}</p>}
 
         <input
           value={fullName}
           onChange={(event) => setFullName(event.target.value)}
-          placeholder="Full name"
+          placeholder={t("auth.fullName")}
           autoComplete="name"
         />
         <input
           value={formatIndianPhoneForDisplay(phone)}
           disabled
-          aria-label="Phone number"
+          aria-label={t("auth.phoneAria")}
         />
         <input
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="Email address optional"
+          placeholder={t("auth.emailOptional")}
           autoComplete="email"
           type="email"
         />
         <input
           value={otpCode}
           onChange={(event) => setOtpCode(event.target.value)}
-          placeholder="Enter OTP"
+          placeholder={t("auth.enterOtp")}
           autoComplete="one-time-code"
           inputMode="numeric"
         />
@@ -147,17 +149,17 @@ export default function SignUpPage() {
             <input
               value={drivingLicenseNumber}
               onChange={(event) => setDrivingLicenseNumber(event.target.value)}
-              placeholder="Driving license optional"
+              placeholder={t("auth.drivingLicenseOptional")}
               autoComplete="off"
             />
           </>
         )}
-        <LoadingButton isLoading={loading} loadingText="Sending OTP..." type="submit">
-          Create Account
+        <LoadingButton isLoading={loading} loadingText={t("auth.signupLoading")} type="submit">
+          {t("auth.createAccount")}
         </LoadingButton>
 
         <p className="signup-footer-text">
-          Need a fresh code?{" "}
+          {t("auth.freshCode")}{" "}
           <LoadingButton
             className="link-button"
             isLoading={resendLoading}
@@ -165,7 +167,7 @@ export default function SignUpPage() {
             onClick={handleResend}
             type="button"
           >
-            Resend OTP
+            {t("auth.resendOtp")}
           </LoadingButton>
         </p>
       </form>
