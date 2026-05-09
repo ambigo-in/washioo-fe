@@ -1,4 +1,10 @@
 import { apiRequest, withQuery, type PaginationParams } from "./client";
+import {
+  isValidAadhaarNumber,
+  isValidDrivingLicenseNumber,
+  normalizeAadhaarNumber,
+  normalizeDrivingLicenseNumber,
+} from "../utils/identityValidation";
 import type {
   AdminBooking,
   AdminServiceCategory,
@@ -191,20 +197,36 @@ export const createCleanerProfile = (payload: {
   service_radius_km?: number;
   approval_status?: string;
   availability_status?: string;
-}) =>
-  apiRequest<{ message: string; cleaner: CleanerProfile }>(
+}) => {
+  const aadhaarNumber = normalizeAadhaarNumber(payload.aadhaar_number);
+  const drivingLicenseNumber = normalizeDrivingLicenseNumber(
+    payload.driving_license_number || "",
+  );
+
+  if (!isValidAadhaarNumber(aadhaarNumber)) {
+    throw new Error("Aadhaar number must contain exactly 12 digits.");
+  }
+
+  if (
+    drivingLicenseNumber &&
+    !isValidDrivingLicenseNumber(drivingLicenseNumber)
+  ) {
+    throw new Error("Driving license must contain 15 to 16 characters.");
+  }
+
+  return apiRequest<{ message: string; cleaner: CleanerProfile }>(
     "/services/admin/cleaners",
     {
       method: "POST",
       auth: true,
       body: {
         ...payload,
-        aadhaar_number: payload.aadhaar_number.replace(/\D/g, ""),
-        driving_license_number:
-          payload.driving_license_number?.trim() || undefined,
+        aadhaar_number: aadhaarNumber,
+        driving_license_number: drivingLicenseNumber || undefined,
       },
     },
   );
+};
 
 export const updateCleanerProfile = (
   cleanerId: string,

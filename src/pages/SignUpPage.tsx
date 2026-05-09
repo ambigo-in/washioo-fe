@@ -6,6 +6,12 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { resendOtp, signUpRequest } from "../store/slices/authSlice";
 import type { AccountType } from "../types/authTypes";
 import { formatIndianPhoneForDisplay } from "../utils/phoneUtils";
+import {
+  isValidAadhaarNumber,
+  isValidDrivingLicenseNumber,
+  normalizeAadhaarNumber,
+  normalizeDrivingLicenseNumber,
+} from "../utils/identityValidation";
 import { useLanguage } from "../i18n/LanguageContext";
 import { useOtpResendCooldown } from "../hooks/useOtpResendCooldown";
 import "../styles/SignUpPage.css";
@@ -62,9 +68,17 @@ export default function SignUpPage() {
 
     if (
       accountType === "cleaner" &&
-      !/^\d{12}$/.test(aadhaarNumber.replace(/\D/g, ""))
+      !isValidAadhaarNumber(aadhaarNumber)
     ) {
-      setError("Enter a valid 12-digit Aadhaar number.");
+      setError(t("auth.aadhaarInvalid"));
+      return;
+    }
+
+    if (
+      accountType === "cleaner" &&
+      !isValidDrivingLicenseNumber(drivingLicenseNumber)
+    ) {
+      setError(t("auth.drivingLicenseInvalid"));
       return;
     }
 
@@ -80,11 +94,12 @@ export default function SignUpPage() {
             otp_code: otpCode.trim(),
             aadhaar_number:
               accountType === "cleaner"
-                ? aadhaarNumber.replace(/\D/g, "")
+                ? normalizeAadhaarNumber(aadhaarNumber)
                 : undefined,
             driving_license_number:
               accountType === "cleaner"
-                ? drivingLicenseNumber.trim() || undefined
+                ? normalizeDrivingLicenseNumber(drivingLicenseNumber) ||
+                  undefined
                 : undefined,
           },
           accountType,
@@ -152,15 +167,19 @@ export default function SignUpPage() {
             <input
               value={aadhaarNumber}
               onChange={(event) => setAadhaarNumber(event.target.value)}
-              placeholder="Aadhaar number"
+              placeholder={t("auth.aadhaarNumber")}
               inputMode="numeric"
               autoComplete="off"
+              maxLength={12}
             />
             <input
               value={drivingLicenseNumber}
-              onChange={(event) => setDrivingLicenseNumber(event.target.value)}
+              onChange={(event) =>
+                setDrivingLicenseNumber(event.target.value.toUpperCase())
+              }
               placeholder={t("auth.drivingLicenseOptional")}
               autoComplete="off"
+              maxLength={16}
             />
           </>
         )}

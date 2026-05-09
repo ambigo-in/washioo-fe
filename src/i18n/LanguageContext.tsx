@@ -1054,6 +1054,9 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
 
 const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
   en: {
+    "auth.aadhaarInvalid": "Aadhaar number must contain exactly 12 digits.",
+    "auth.aadhaarNumber": "Aadhaar number",
+    "auth.drivingLicenseInvalid": "Driving license must contain 15 to 16 characters.",
     "booking.rejected": "Rejected",
     "common.add": "Add",
     "common.cleaner": "Cleaner",
@@ -1089,6 +1092,9 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
     "vehicles.vehicleType": "Vehicle Type",
   },
   te: {
+    "auth.aadhaarInvalid": "ఆధార్ నంబర్ ఖచ్చితంగా 12 అంకెలు ఉండాలి.",
+    "auth.aadhaarNumber": "ఆధార్ నంబర్",
+    "auth.drivingLicenseInvalid": "డ్రైవింగ్ లైసెన్స్ 15 నుండి 16 అక్షరాలు ఉండాలి.",
     "booking.rejected": "తిరస్కరించబడింది",
     "common.add": "జోడించండి",
     "common.cleaner": "క్లీనర్",
@@ -1124,6 +1130,9 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
     "vehicles.vehicleType": "వాహనం రకం",
   },
   hi: {
+    "auth.aadhaarInvalid": "आधार नंबर ठीक 12 अंकों का होना चाहिए.",
+    "auth.aadhaarNumber": "आधार नंबर",
+    "auth.drivingLicenseInvalid": "ड्राइविंग लाइसेंस 15 से 16 अक्षरों का होना चाहिए.",
     "booking.rejected": "अस्वीकार किया गया",
     "common.add": "जोड़ें",
     "common.cleaner": "क्लीनर",
