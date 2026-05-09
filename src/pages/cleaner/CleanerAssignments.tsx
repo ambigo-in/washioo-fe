@@ -41,6 +41,9 @@ const formatMoney = (value: number) =>
     maximumFractionDigits: 2,
   });
 
+const statusKey = (status: Exclude<FilterStatus, "all">) =>
+  status === "in_progress" ? "booking.inProgress" : `booking.${status}`;
+
 export default function CleanerAssignments() {
   const dispatch = useAppDispatch();
   const { t } = useLanguage();
@@ -230,7 +233,7 @@ export default function CleanerAssignments() {
     ] as FilterStatus[]
   ).map((status) => ({
     value: status,
-    label: status === "all" ? t("common.all") : status.replace("_", " "),
+    label: status === "all" ? t("common.all") : t(statusKey(status)),
     count:
       status === "all"
         ? Object.values(counts).reduce((sum, count) => sum + count, 0)
@@ -294,7 +297,11 @@ export default function CleanerAssignments() {
                         ),
                       }}
                     >
-                      {assignment.assignment_status.replace("_", " ")}
+                      {t(
+                        assignment.assignment_status === "in_progress"
+                          ? "booking.inProgress"
+                          : `booking.${assignment.assignment_status}`,
+                      )}
                     </span>
                   </div>
 

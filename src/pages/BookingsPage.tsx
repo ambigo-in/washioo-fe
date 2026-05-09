@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import type { ServiceCategory } from "../types/apiTypes";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { loadServices } from "../store/slices/servicesSlice";
+import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/BookNowSection.css";
 
 type DisplayService = ServiceCategory & { image: string };
@@ -18,6 +19,7 @@ const serviceImageFor = (serviceName: string) => {
 const BookingsPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { t } = useLanguage();
   const { items, loading, error } = useAppSelector((state) => state.services);
   const services: DisplayService[] = items.map((service) => ({
     ...service,
@@ -45,20 +47,17 @@ const BookingsPage: React.FC = () => {
 
       <section className="bookings-page">
         <div className="bookings-header">
-          <span>PREMIUM SERVICES</span>
-          <h1>Select Your Vehicle Wash Service</h1>
-          <p>
-            Choose a professional doorstep wash, pick your address and time, and
-            track the booking from pending to completion.
-          </p>
+          <span>{t("services.premium")}</span>
+          <h1>{t("services.selectWash")}</h1>
+          <p>{t("services.selectWashHint")}</p>
         </div>
 
         {loading ? (
-          <div className="loading-state">Loading services...</div>
+          <div className="loading-state">{t("services.loading")}</div>
         ) : error ? (
           <div className="error-state">{error}</div>
         ) : services.length === 0 ? (
-          <div className="empty-state">No active services are available.</div>
+          <div className="empty-state">{t("services.noneActive")}</div>
         ) : (
           <div className="services-grid">
             {services.map((service) => (
@@ -73,12 +72,14 @@ const BookingsPage: React.FC = () => {
 
                 <div className="service-details">
                   <h2>{service.service_name}</h2>
-                  <p>{service.description || "Premium doorstep wash service."}</p>
+                  <p>{service.description || t("services.defaultDescription")}</p>
 
                   <div className="service-meta">
                     <span>Rs. {service.base_price}</span>
                     <span>
-                      {service.estimated_duration_minutes || 0} mins
+                      {t("services.minutes", {
+                        minutes: service.estimated_duration_minutes || 0,
+                      })}
                     </span>
                   </div>
 
@@ -87,7 +88,7 @@ const BookingsPage: React.FC = () => {
                     onClick={() => handleBookNow(service)}
                     type="button"
                   >
-                    Book Now
+                    {t("customer.bookNow")}
                   </button>
                 </div>
               </article>

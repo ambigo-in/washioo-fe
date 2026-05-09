@@ -12,6 +12,7 @@ import type {
   CustomerVehiclePayload,
   CustomerVehicleType,
 } from "../../types/apiTypes";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./CustomerVehicles.css";
 
 const emptyVehicle: CustomerVehiclePayload = {
@@ -31,6 +32,7 @@ const cleanPayload = (payload: CustomerVehiclePayload): CustomerVehiclePayload =
 });
 
 export default function CustomerVehicles() {
+  const { t } = useLanguage();
   const [vehicles, setVehicles] = useState<CustomerVehicle[]>([]);
   const [formData, setFormData] = useState<CustomerVehiclePayload>(emptyVehicle);
   const [editingVehicle, setEditingVehicle] = useState<CustomerVehicle | null>(null);
@@ -85,10 +87,10 @@ export default function CustomerVehicles() {
       const payload = cleanPayload(formData);
       if (editingVehicle) {
         await updateCustomerVehicle(editingVehicle.id, payload);
-        setSuccess("Vehicle updated.");
+        setSuccess(t("vehicles.updated"));
       } else {
         await createCustomerVehicle(payload);
-        setSuccess("Vehicle added.");
+        setSuccess(t("vehicles.added"));
       }
       resetForm();
       await loadVehicles();
@@ -104,7 +106,7 @@ export default function CustomerVehicles() {
     setSuccess("");
     try {
       await updateCustomerVehicle(vehicle.id, { is_default: true });
-      setSuccess("Default vehicle updated.");
+      setSuccess(t("vehicles.defaultUpdated"));
       await loadVehicles();
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -112,12 +114,12 @@ export default function CustomerVehicles() {
   };
 
   const handleDelete = async (vehicle: CustomerVehicle) => {
-    if (!window.confirm("Delete this vehicle?")) return;
+    if (!window.confirm(t("vehicles.deleteConfirm"))) return;
     setError("");
     setSuccess("");
     try {
       await deleteCustomerVehicle(vehicle.id);
-      setSuccess("Vehicle deleted.");
+      setSuccess(t("vehicles.deleted"));
       await loadVehicles();
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -125,12 +127,12 @@ export default function CustomerVehicles() {
   };
 
   return (
-    <DashboardLayout title="My Vehicles">
+    <DashboardLayout title={t("vehicles.myVehicles")}>
       <div className="vehicles-page">
         <div className="vehicles-header">
           <div>
-            <h2>Manage Your Vehicles</h2>
-            <p>Save your bike or car details once and reuse them while booking.</p>
+            <h2>{t("vehicles.manage")}</h2>
+            <p>{t("vehicles.manageHint")}</p>
           </div>
           <button
             className="btn-primary"
@@ -141,7 +143,7 @@ export default function CustomerVehicles() {
               setFormData(emptyVehicle);
             }}
           >
-            + Add Vehicle
+            + {t("vehicles.addVehicle")}
           </button>
         </div>
 
@@ -149,9 +151,9 @@ export default function CustomerVehicles() {
         {success && <p className="vehicle-alert success">{success}</p>}
 
         {loading ? (
-          <div className="vehicles-state">Loading vehicles...</div>
+          <div className="vehicles-state">{t("vehicles.loading")}</div>
         ) : vehicles.length === 0 ? (
-          <div className="vehicles-state">No vehicles added yet.</div>
+          <div className="vehicles-state">{t("vehicles.none")}</div>
         ) : (
           <div className="vehicles-grid">
             {vehicles.map((vehicle) => (
@@ -159,28 +161,32 @@ export default function CustomerVehicles() {
                 key={vehicle.id}
                 className={`vehicle-card ${vehicle.is_default ? "default" : ""}`}
               >
-                {vehicle.is_default && <span className="default-badge">Default</span>}
-                <span className="vehicle-type">{vehicle.vehicle_type}</span>
+                {vehicle.is_default && (
+                  <span className="default-badge">{t("common.default")}</span>
+                )}
+                <span className="vehicle-type">
+                  {t(`vehicles.${vehicle.vehicle_type}`)}
+                </span>
                 <h3>
                   {[vehicle.make, vehicle.model].filter(Boolean).join(" ") ||
-                    "Vehicle"}
+                    t("common.vehicle")}
                 </h3>
-                <p>{vehicle.license_plate || "No license plate added"}</p>
+                <p>{vehicle.license_plate || t("vehicles.noPlate")}</p>
                 <div className="vehicle-actions">
                   {!vehicle.is_default && (
                     <button type="button" onClick={() => handleSetDefault(vehicle)}>
-                      Set Default
+                      {t("vehicles.setDefault")}
                     </button>
                   )}
                   <button type="button" onClick={() => handleEdit(vehicle)}>
-                    Edit
+                    {t("common.edit")}
                   </button>
                   <button
                     type="button"
                     className="danger"
                     onClick={() => handleDelete(vehicle)}
                   >
-                    Delete
+                    {t("common.delete")}
                   </button>
                 </div>
               </article>
@@ -191,10 +197,12 @@ export default function CustomerVehicles() {
         {showForm && (
           <div className="modal-overlay" onClick={resetForm}>
             <div className="vehicle-modal" onClick={(event) => event.stopPropagation()}>
-              <h3>{editingVehicle ? "Edit Vehicle" : "Add Vehicle"}</h3>
+              <h3>
+                {editingVehicle ? t("vehicles.editVehicle") : t("vehicles.addVehicle")}
+              </h3>
               <form onSubmit={handleSubmit}>
                 <label>
-                  Vehicle Type
+                  {t("vehicles.vehicleType")}
                   <select
                     value={formData.vehicle_type}
                     onChange={(event) =>
@@ -204,12 +212,12 @@ export default function CustomerVehicles() {
                       }))
                     }
                   >
-                    <option value="bike">Bike</option>
-                    <option value="car">Car</option>
+                    <option value="bike">{t("vehicles.bike")}</option>
+                    <option value="car">{t("vehicles.car")}</option>
                   </select>
                 </label>
                 <label>
-                  Make
+                  {t("common.make")}
                   <input
                     value={formData.make || ""}
                     onChange={(event) =>
@@ -222,7 +230,7 @@ export default function CustomerVehicles() {
                   />
                 </label>
                 <label>
-                  Model
+                  {t("common.model")}
                   <input
                     value={formData.model || ""}
                     onChange={(event) =>
@@ -235,7 +243,7 @@ export default function CustomerVehicles() {
                   />
                 </label>
                 <label>
-                  License Plate
+                  {t("common.licensePlate")}
                   <input
                     value={formData.license_plate || ""}
                     onChange={(event) =>
@@ -258,14 +266,18 @@ export default function CustomerVehicles() {
                       }))
                     }
                   />
-                  Set as default vehicle
+                  {t("vehicles.setAsDefault")}
                 </label>
                 <div className="vehicle-form-actions">
                   <button type="button" className="btn-secondary" onClick={resetForm}>
-                    Cancel
+                    {t("common.cancel")}
                   </button>
                   <button type="submit" className="btn-primary" disabled={saving}>
-                    {saving ? "Saving..." : editingVehicle ? "Update" : "Add"}
+                    {saving
+                      ? t("common.saving")
+                      : editingVehicle
+                        ? t("common.update")
+                        : t("common.add")}
                   </button>
                 </div>
               </form>

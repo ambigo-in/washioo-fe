@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { LoadingButton } from "../../components/ui";
 import { useAuth } from "../../context/useAuth";
-import { fetchCleanerProfile } from "../../api/cleanerApi";
+import { fetchCleanerProfile, verifyCleanerIdentity } from "../../api/cleanerApi";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { updateProfileRequest } from "../../store/slices/authSlice";
 import type { CleanerProfile as CleanerProfileData } from "../../types/cleanerTypes";
-import { normalizeIndianPhone } from "../../utils/phoneUtils";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerProfile.css";
 
@@ -88,15 +87,10 @@ export default function CleanerProfile() {
 
     setVerifyingDocument(true);
     try {
-      const phoneLastFour = normalizeIndianPhone(user?.phone || "").slice(-4);
       const enteredDigits = verificationPassword.replace(/\D/g, "");
-      if (enteredDigits !== phoneLastFour) {
-        setError(t("profile.verifyFailed"));
-        setVerifyingDocument(false);
-        return;
-      }
+      const response = await verifyCleanerIdentity(enteredDigits);
+      setCleanerProfile(response.cleaner);
 
-      // Show full details
       if (verificationModal.type === "aadhaar") {
         setShowFullDetails((prev) => ({ ...prev, aadhaar: true }));
       } else if (verificationModal.type === "license") {
@@ -106,6 +100,8 @@ export default function CleanerProfile() {
       setVerificationModal({ isOpen: false, type: null });
       setSuccess(t("profile.detailsDisplayed"));
       setError("");
+    } catch (err) {
+      setError(t("profile.verifyFailed"));
     } finally {
       setVerifyingDocument(false);
     }
@@ -124,7 +120,7 @@ export default function CleanerProfile() {
           <div className="profile-header">
             <div className="avatar">{user?.full_name?.charAt(0) || "C"}</div>
             <div className="profile-info">
-              <h2>{user?.full_name || "Cleaner"}</h2>
+              <h2>{user?.full_name || t("common.cleaner")}</h2>
               <p className="user-email">{user?.email || t("profile.noEmail")}</p>
               <p className="user-phone">{user?.phone}</p>
             </div>
@@ -195,14 +191,14 @@ export default function CleanerProfile() {
             <h3>{t("profile.accountInformation")}</h3>
             <div className="info-row">
               <span className="info-label">{t("profile.role")}</span>
-              <span className="info-value">Cleaner</span>
+              <span className="info-value">{t("common.cleaner")}</span>
             </div>
             <div className="info-row">
               <span className="info-label">{t("profile.memberSince")}</span>
               <span className="info-value">
                 {user?.created_at
                   ? new Date(user.created_at).toLocaleDateString()
-                  : "N/A"}
+                  : t("common.notAvailable")}
               </span>
             </div>
           </div>
@@ -210,7 +206,7 @@ export default function CleanerProfile() {
           <div className="profile-section">
             <h3>{t("profile.identityVerification")}</h3>
             <div className="info-row">
-              <span className="info-label">Aadhaar</span>
+              <span className="info-label">{t("profile.aadhaar")}</span>
               <span className="info-value">
                 {cleanerProfile?.has_aadhaar ? (
                   <span>
@@ -233,7 +229,7 @@ export default function CleanerProfile() {
               </span>
             </div>
             <div className="info-row">
-              <span className="info-label">Driving License</span>
+              <span className="info-label">{t("profile.drivingLicense")}</span>
               <span className="info-value">
                 {cleanerProfile?.has_driving_license ? (
                   <span>

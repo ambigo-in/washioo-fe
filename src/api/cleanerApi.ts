@@ -18,6 +18,16 @@ export const fetchCleanerProfile = () =>
     { auth: true },
   );
 
+export const verifyCleanerIdentity = (phoneLastFour: string) =>
+  apiRequest<{ message: string; cleaner: CleanerProfile }>(
+    "/services/cleaner/profile/verify-identity",
+    {
+      method: "POST",
+      auth: true,
+      body: { phone_last_four: phoneLastFour },
+    },
+  );
+
 export const updateCleanerAvailability = (payload: AvailabilityPayload) =>
   apiRequest<{ message: string; cleaner: CleanerProfile }>(
     "/services/cleaner/availability",

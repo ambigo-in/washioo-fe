@@ -102,8 +102,8 @@ export default function PhoneVerificationPage() {
             setAccountType(nextType);
           }}
         >
-          <option value="customer">Customer</option>
-          <option value="cleaner">Cleaner</option>
+          <option value="customer">{t("common.customer")}</option>
+          <option value="cleaner">{t("common.cleaner")}</option>
         </select>
         <LoadingButton
           isLoading={loading}
