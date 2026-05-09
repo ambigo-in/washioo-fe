@@ -116,13 +116,13 @@
   background: var(--brand-white);
   border-radius: 12px;
   border: 1px solid var(--brand-border);
-  overflow-x: auto;
+  max-height: 68vh;
+  overflow-y: auto;
   max-width: 100%;
 }
 
 .users-table table {
   border-collapse: collapse;
-  min-width: 940px;
   width: 100%;
 }
 
@@ -150,7 +150,7 @@
   color: var(--brand-text);
   border-bottom: 1px solid var(--brand-border);
   vertical-align: middle;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .users-table td:nth-child(4) {
@@ -218,16 +218,6 @@
 }
 
 /* Responsive */
-@media (max-width: 1024px) {
-  .users-table {
-    overflow-x: scroll;
-  }
-
-  .users-table table {
-    min-width: 760px;
-  }
-}
-
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;

@@ -122,12 +122,12 @@
 .bookings-table {
   border: 1px solid var(--brand-border);
   border-radius: 10px;
-  overflow-x: auto;
+  max-height: 360px;
+  overflow-y: auto;
 }
 
 .bookings-table table {
   border-collapse: collapse;
-  min-width: 760px;
   width: 100%;
 }
 
@@ -137,7 +137,6 @@
   color: var(--brand-text);
   padding: 11px 12px;
   text-align: left;
-  white-space: nowrap;
 }
 
 .bookings-table th {

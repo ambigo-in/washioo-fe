@@ -65,15 +65,15 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 4px;
+  max-height: 68vh;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .cleaner-card {
   background: var(--brand-white);
   border-radius: 12px;
   border: 1px solid var(--brand-border);
-  min-width: 820px;
   padding: 20px;
 }
 
@@ -116,7 +116,7 @@
 /* Cleaner Details */
 .cleaner-details {
   display: grid;
-  grid-template-columns: repeat(5, minmax(135px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
   gap: 10px;
   padding: 16px;
   background: var(--brand-surface);
@@ -422,8 +422,38 @@
 }
 
 .modal-actions button {
-  min-width: 128px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 800;
+  min-height: 42px;
+  min-width: 136px;
+  padding: 10px 18px;
   text-align: center;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.modal-actions button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.modal-actions .btn-approve {
+  background: var(--brand-teal-dark);
+  border: 1px solid var(--brand-teal-dark);
+  color: var(--brand-white);
+}
+
+.modal-actions .btn-reject {
+  background: #fff5f5;
+  border: 1px solid #dc3545;
+  color: #b91c1c;
+}
+
+.modal-actions .btn-secondary {
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border-strong);
+  color: var(--brand-text);
 }
 
 .btn-view-details {
@@ -447,10 +477,6 @@
 }
 
 @media (max-width: 720px) {
-  .cleaner-card {
-    min-width: 760px;
-  }
-
   .modal-actions {
     align-items: stretch;
     flex-direction: column;

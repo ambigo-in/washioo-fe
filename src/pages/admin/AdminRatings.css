@@ -54,12 +54,12 @@
   background: var(--brand-white);
   border: 1px solid var(--brand-border);
   border-radius: 12px;
-  overflow-x: auto;
+  max-height: 68vh;
+  overflow-y: auto;
 }
 
 .ratings-table table {
   border-collapse: collapse;
-  min-width: 900px;
   width: 100%;
 }
 
@@ -70,6 +70,7 @@
   padding: 14px;
   text-align: left;
   vertical-align: top;
+  overflow-wrap: anywhere;
 }
 
 .ratings-table th {

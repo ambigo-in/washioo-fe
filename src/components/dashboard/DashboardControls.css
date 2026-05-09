@@ -46,12 +46,9 @@
 
 .dashboard-status-tabs {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 0.45rem;
   margin: 0 0 0.75rem;
-  overflow-x: auto;
-  padding-bottom: 0.25rem;
-  scrollbar-width: thin;
 }
 
 .dashboard-status-tab {

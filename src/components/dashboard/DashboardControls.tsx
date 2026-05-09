@@ -188,8 +188,6 @@ export function PaginationControls({
     return Array.from({ length: end - start + 1 }, (_, index) => start + index);
   }, [page, totalPages]);
 
-  if (total <= pageSize && page === 1) return null;
-
   return (
     <nav className="dashboard-pagination" aria-label="Pagination">
       <span>

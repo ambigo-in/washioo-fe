@@ -93,15 +93,15 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 4px;
+  max-height: 68vh;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .booking-card {
   background: var(--brand-white);
   border-radius: 12px;
   border: 1px solid var(--brand-border);
-  min-width: 760px;
   padding: 20px;
 }
 
@@ -142,7 +142,7 @@
 /* Booking Details */
 .booking-details {
   display: grid;
-  grid-template-columns: repeat(7, minmax(145px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 10px;
   padding: 16px;
   background: var(--brand-surface);
@@ -224,9 +224,6 @@
     width: 100%;
   }
 
-  .booking-card {
-    min-width: 680px;
-  }
 }
 
 /* Empty State */
