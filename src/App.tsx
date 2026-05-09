@@ -54,6 +54,7 @@ const AdminServices = lazy(() => import("./pages/admin/AdminServices"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminSettings = lazy(() => import("./pages/admin/AdminSettings"));
 const AdminRatings = lazy(() => import("./pages/admin/AdminRatings"));
+const AdminLoginPage = lazy(() => import("./pages/admin/AdminLoginPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 
 function App() {
@@ -204,6 +205,7 @@ function App() {
             />
 
             {/* Admin Routes */}
+            <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route
               path="/admin/dashboard"
               element={

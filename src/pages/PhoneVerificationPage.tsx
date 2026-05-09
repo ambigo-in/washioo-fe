@@ -89,7 +89,6 @@ export default function PhoneVerificationPage() {
         >
           <option value="customer">Customer</option>
           <option value="cleaner">Cleaner</option>
-          <option value="admin">Admin</option>
         </select>
         <LoadingButton
           isLoading={loading}

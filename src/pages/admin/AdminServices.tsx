@@ -33,6 +33,9 @@ export default function AdminServices() {
     description: "",
     base_price: 0,
     estimated_duration_minutes: 60,
+    allow_extra_payment: false,
+    max_extra_amount: 0,
+    extra_payment_instructions: "",
     is_active: true,
   });
 
@@ -76,6 +79,9 @@ export default function AdminServices() {
       description: service.description || "",
       base_price: service.base_price,
       estimated_duration_minutes: service.estimated_duration_minutes || 60,
+      allow_extra_payment: service.allow_extra_payment,
+      max_extra_amount: service.max_extra_amount ?? 0,
+      extra_payment_instructions: service.extra_payment_instructions || "",
       is_active: service.is_active,
     });
     setEditingId(service.id);
@@ -129,7 +135,11 @@ export default function AdminServices() {
         (item) => item.base_price,
       ]),
     );
-  const visibleServices = paginateItems(filteredServices, query.page, query.pageSize);
+  const visibleServices = paginateItems(
+    filteredServices,
+    query.page,
+    query.pageSize,
+  );
 
   return (
     <DashboardLayout title="Manage Services">
@@ -222,6 +232,56 @@ export default function AdminServices() {
                 </div>
               </div>
               <div className="form-row">
+                <div className="form-group checkbox-field">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={formData.allow_extra_payment ?? false}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          allow_extra_payment: e.target.checked,
+                        })
+                      }
+                    />
+                    Allow extra payment collection above base price
+                  </label>
+                </div>
+                <div className="form-group">
+                  <label>Max Extra Amount (₹)</label>
+                  <input
+                    type="number"
+                    value={formData.max_extra_amount ?? 0}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        max_extra_amount: parseFloat(e.target.value),
+                      })
+                    }
+                    min="0"
+                    placeholder="0"
+                    disabled={!formData.allow_extra_payment}
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Extra Payment Instructions</label>
+                  <textarea
+                    value={formData.extra_payment_instructions ?? ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        extra_payment_instructions: e.target.value,
+                      })
+                    }
+                    placeholder="e.g., collect difference only with admin approval"
+                    rows={3}
+                    disabled={!formData.allow_extra_payment}
+                  />
+                </div>
+              </div>
+              <div className="form-row">
                 <label className="checkbox-label">
                   <input
                     type="checkbox"
@@ -287,7 +347,25 @@ export default function AdminServices() {
                       <strong>Duration</strong>
                       {service.estimated_duration_minutes || 0} min
                     </span>
+                    <span>
+                      <strong>Extra payment</strong>
+                      {service.allow_extra_payment ? "Allowed" : "Not allowed"}
+                    </span>
+                    {service.allow_extra_payment &&
+                      service.max_extra_amount != null && (
+                        <span>
+                          <strong>Max extra</strong>
+                          Rs. {service.max_extra_amount.toLocaleString()}
+                        </span>
+                      )}
                   </div>
+                  {service.allow_extra_payment &&
+                    service.extra_payment_instructions && (
+                      <div className="service-extra-note">
+                        <strong>Admin note</strong>
+                        <p>{service.extra_payment_instructions}</p>
+                      </div>
+                    )}
 
                   <div className="service-actions">
                     <button

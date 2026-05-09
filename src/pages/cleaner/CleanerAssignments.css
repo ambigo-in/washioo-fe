@@ -130,6 +130,22 @@
   min-height: 40px;
 }
 
+.btn-rate-customer {
+  background: #2563eb;
+  color: var(--brand-white);
+  border: none;
+}
+
+.btn-rate-customer:hover {
+  background: #1d4ed8;
+}
+
+.assignment-rating-panel {
+  margin-top: 14px;
+  padding: 14px;
+  border-top: 1px solid var(--brand-border);
+}
+
 /* Accept Button - Green */
 .btn-accept {
   background: #22c55e;

@@ -10,6 +10,7 @@ import {
   useDashboardQueryState,
   type StatusTabOption,
 } from "../../components/dashboard/DashboardControls";
+import BookingRatingPanel from "../../components/BookingRatingPanel";
 import { LoadingButton } from "../../components/ui";
 import OpenInMapsButton from "../../components/OpenInMapsButton";
 import { fetchCleanerAssignments } from "../../api/cleanerApi";
@@ -59,6 +60,7 @@ export default function CleanerAssignments() {
   const [paymentType, setPaymentType] = useState<Record<string, PaymentType>>(
     {},
   );
+  const [showRating, setShowRating] = useState<Record<string, boolean>>({});
   const [actionError, setActionError] = useState("");
 
   useEffect(() => {
@@ -417,12 +419,40 @@ export default function CleanerAssignments() {
                       </div>
                     )}
                     {assignment.assignment_status === "completed" && (
-                      <span className="completed-badge">✅ Completed</span>
+                      <>
+                        <span className="completed-badge">✅ Completed</span>
+                        <button
+                          type="button"
+                          className="btn-rate-customer"
+                          onClick={() =>
+                            setShowRating((current) => ({
+                              ...current,
+                              [assignment.id]: !current[assignment.id],
+                            }))
+                          }
+                        >
+                          {showRating[assignment.id]
+                            ? "Hide Rating"
+                            : "Rate Customer"}
+                        </button>
+                      </>
                     )}
                     {assignment.assignment_status === "rejected" && (
                       <span className="rejected-badge">❌ Rejected</span>
                     )}
                   </div>
+
+                  {assignment.assignment_status === "completed" &&
+                    showRating[assignment.id] && (
+                      <div className="assignment-rating-panel">
+                        <BookingRatingPanel
+                          bookingId={assignment.booking_id}
+                          bookingStatus="completed"
+                          perspective="cleaner"
+                          subjectName={assignment.booking.customer_name}
+                        />
+                      </div>
+                    )}
                 </div>
               ))}
             </div>
