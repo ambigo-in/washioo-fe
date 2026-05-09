@@ -11,6 +11,7 @@ import {
   type StatusTabOption,
 } from "../../components/dashboard/DashboardControls";
 import { LoadingButton } from "../../components/ui";
+import OpenInMapsButton from "../../components/OpenInMapsButton";
 import { fetchCleanerAssignments } from "../../api/cleanerApi";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -40,9 +41,13 @@ const formatMoney = (value: number) =>
 
 export default function CleanerAssignments() {
   const dispatch = useAppDispatch();
-  const { assignments, total, loading } = useAppSelector((state) => state.cleaner);
+  const { assignments, total, loading } = useAppSelector(
+    (state) => state.cleaner,
+  );
   const query = useDashboardQueryState<FilterStatus>("all");
-  const [counts, setCounts] = useState<Record<Exclude<FilterStatus, "all">, number>>({
+  const [counts, setCounts] = useState<
+    Record<Exclude<FilterStatus, "all">, number>
+  >({
     assigned: 0,
     accepted: 0,
     in_progress: 0,
@@ -81,7 +86,12 @@ export default function CleanerAssignments() {
     )
       .then((entries) => {
         if (active) {
-          setCounts(Object.fromEntries(entries) as Record<Exclude<FilterStatus, "all">, number>);
+          setCounts(
+            Object.fromEntries(entries) as Record<
+              Exclude<FilterStatus, "all">,
+              number
+            >,
+          );
         }
       })
       .catch(() => undefined);
@@ -209,7 +219,13 @@ export default function CleanerAssignments() {
   };
 
   const statusOptions: Array<StatusTabOption<FilterStatus>> = (
-    ["all", "assigned", "accepted", "in_progress", "completed"] as FilterStatus[]
+    [
+      "all",
+      "assigned",
+      "accepted",
+      "in_progress",
+      "completed",
+    ] as FilterStatus[]
   ).map((status) => ({
     value: status,
     label: status === "all" ? "All" : status.replace("_", " "),
@@ -230,7 +246,9 @@ export default function CleanerAssignments() {
   const visibleAssignments = query.debouncedSearch
     ? paginateItems(filteredAssignments, query.page, query.pageSize)
     : filteredAssignments;
-  const visibleTotal = query.debouncedSearch ? filteredAssignments.length : total;
+  const visibleTotal = query.debouncedSearch
+    ? filteredAssignments.length
+    : total;
 
   return (
     <DashboardLayout title="My Assignments">
@@ -274,47 +292,31 @@ export default function CleanerAssignments() {
                         ),
                       }}
                     >
-                      {assignment.assignment_status}
+                      {assignment.assignment_status.replace("_", " ")}
                     </span>
                   </div>
 
                   <div className="assignment-details">
                     <div className="detail-row">
-                      <span className="label">📅 Date:</span>
+                      <span className="label">📅</span>
                       <span>
                         {new Date(
                           assignment.booking.scheduled_date,
                         ).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="label">⏰ Time:</span>
-                      <span>
+                        {" at "}
                         {assignment.booking.scheduled_time.slice(0, 5)}
                       </span>
                     </div>
                     <div className="detail-row">
-                      <span className="label">🚗 Vehicle:</span>
-                      <span>{assignment.booking.service_name}</span>
+                      <span className="label">📍</span>
+                      <span>{formatAddress(assignment.booking.address)}</span>
                     </div>
                     <div className="detail-row">
-                      <span className="label">💰 Price:</span>
+                      <span className="label">💰</span>
                       <span>
                         Rs. {formatMoney(assignment.booking.estimated_price)}
                       </span>
                     </div>
-                    <div className="detail-row">
-                      <span className="label">📍 Location:</span>
-                      <span>
-                        {formatAddress(assignment.booking.address)}
-                      </span>
-                    </div>
-                    {assignment.booking.special_instructions && (
-                      <div className="detail-row">
-                        <span className="label">📝 Notes:</span>
-                        <span>{assignment.booking.special_instructions}</span>
-                      </div>
-                    )}
                   </div>
 
                   <div className="assignment-actions">
@@ -324,23 +326,33 @@ export default function CleanerAssignments() {
                     >
                       View Details
                     </Link>
+
+                    {(assignment.assignment_status === "accepted" ||
+                      assignment.assignment_status === "in_progress") && (
+                      <OpenInMapsButton
+                        address={assignment.booking.address}
+                        label="📍 Start Route"
+                        className="btn-start-route"
+                      />
+                    )}
+
                     {assignment.assignment_status === "assigned" && (
                       <>
                         <LoadingButton
                           className="btn-accept"
                           onClick={() => handleAccept(assignment.id)}
                           isLoading={loading}
-                          loadingText="Processing..."
+                          loadingText="Accepting..."
                         >
-                          Accept
+                          ✓ Accept
                         </LoadingButton>
                         <LoadingButton
                           className="btn-reject"
                           onClick={() => handleReject(assignment.id)}
                           isLoading={loading}
-                          loadingText="Processing..."
+                          loadingText="Rejecting..."
                         >
-                          Reject
+                          ✕ Reject
                         </LoadingButton>
                       </>
                     )}
@@ -352,7 +364,7 @@ export default function CleanerAssignments() {
                           isLoading={loading}
                           loadingText="Starting..."
                         >
-                          Start Job
+                          ▶ Start Service
                         </LoadingButton>
                       )}
                     {assignment.assignment_status === "in_progress" && (
@@ -396,21 +408,19 @@ export default function CleanerAssignments() {
                         </div>
                         <LoadingButton
                           className="btn-complete"
-                          onClick={() =>
-                            handleComplete(assignment.id)
-                          }
+                          onClick={() => handleComplete(assignment.id)}
                           isLoading={loading}
                           loadingText="Completing..."
                         >
-                          Complete Job
+                          ✓ Complete Service
                         </LoadingButton>
                       </div>
                     )}
                     {assignment.assignment_status === "completed" && (
-                      <span className="completed-badge">Job Completed ✅</span>
+                      <span className="completed-badge">✅ Completed</span>
                     )}
                     {assignment.assignment_status === "rejected" && (
-                      <span className="rejected-badge">Job Rejected ❌</span>
+                      <span className="rejected-badge">❌ Rejected</span>
                     )}
                   </div>
                 </div>

@@ -139,6 +139,42 @@ export default function CleanerDashboard() {
           )}
         </section>
 
+        {pendingJobs.length > 0 && (
+          <section className="today-live-services">
+            <div className="section-header">
+              <h2>🔴 Today's Live Services</h2>
+              <span className="live-badge">Active</span>
+            </div>
+            <div className="live-services-list">
+              {pendingJobs.map((assignment) => (
+                <Link
+                  key={assignment.id}
+                  to={`/cleaner/bookings/${assignment.booking_id}`}
+                  className={`live-service-card ${assignment.assignment_status}`}
+                >
+                  <div className="live-indicator"></div>
+                  <div className="live-service-info">
+                    <h3>{assignment.booking.service_name}</h3>
+                    <p className="customer-name">
+                      {assignment.booking.customer_name}
+                    </p>
+                    <p className="booking-time">
+                      ⏰ {assignment.booking.scheduled_date} at{" "}
+                      {assignment.booking.scheduled_time.slice(0, 5)}
+                    </p>
+                    <p className="booking-location">
+                      📍 {formatAddress(assignment.booking.address)}
+                    </p>
+                  </div>
+                  <div className="live-action-hint">
+                    <span>→</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         <section className="quick-actions">
           <h2>Quick Actions</h2>
           <div className="action-cards">
