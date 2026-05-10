@@ -10,6 +10,10 @@ import {
 import type { NotificationItem, UserRole } from "../../types/apiTypes";
 import { registerCleanerPushNotifications } from "../../utils/pushNotifications";
 import {
+  getFilteredNotifications,
+  getNotificationTargetPath,
+} from "../../utils/notificationUtils";
+import {
   useLanguage,
   type LanguageCode,
   type TranslationKey,
@@ -86,7 +90,11 @@ export default function DashboardLayout({
     const loadNotifications = async () => {
       try {
         const response = await fetchNotifications(activeRole);
-        if (!cancelled) setNotifications(response.notifications);
+        if (!cancelled) {
+          setNotifications(
+            getFilteredNotifications(response.notifications, activeRole),
+          );
+        }
       } catch {
         if (!cancelled) setNotifications([]);
       }
@@ -126,19 +134,6 @@ export default function DashboardLayout({
     setSidebarOpen(false);
   };
 
-  const getNotificationLandingPath = (role?: UserRole) => {
-    switch (role) {
-      case "cleaner":
-        return "/cleaner/assignments";
-      case "admin":
-        return "/admin/bookings";
-      case "customer":
-        return "/my-bookings";
-      default:
-        return "/";
-    }
-  };
-
   const handleNotificationClick = async (notification: NotificationItem) => {
     if (!notification.is_read && activeRole) {
       try {
@@ -161,9 +156,7 @@ export default function DashboardLayout({
     }
 
     setNotificationOpen(false);
-    navigate(
-      notification.url || getNotificationLandingPath(activeRole || "customer"),
-    );
+    navigate(getNotificationTargetPath(notification, activeRole));
   };
 
   return (

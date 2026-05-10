@@ -187,6 +187,12 @@ export default function SignUpPage() {
           {t("auth.createAccount")}
         </LoadingButton>
 
+        {isCoolingDown && (
+          <p className="auth-resend-timer">
+            {t("auth.resendIn", { seconds: secondsRemaining })}
+          </p>
+        )}
+
         <p className="signup-footer-text">
           {t("auth.freshCode")}{" "}
           <LoadingButton

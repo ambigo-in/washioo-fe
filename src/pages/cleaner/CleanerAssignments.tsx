@@ -105,6 +105,10 @@ export default function CleanerAssignments() {
     {},
   );
   const [showRating, setShowRating] = useState<Record<string, boolean>>({});
+  const [actionLoading, setActionLoading] = useState<{
+    assignmentId: string;
+    action: "accept" | "reject" | "start" | "complete";
+  } | null>(null);
   const [actionError, setActionError] = useState("");
 
   useEffect(() => {
@@ -113,6 +117,7 @@ export default function CleanerAssignments() {
 
   const handleAccept = async (assignmentId: string) => {
     setActionError("");
+    setActionLoading({ assignmentId, action: "accept" });
     try {
       await dispatch(
         acceptCleanerAssignment({
@@ -123,11 +128,14 @@ export default function CleanerAssignments() {
       dispatch(loadCleanerAssignments(assignmentListParams));
     } catch (error) {
       setActionError(String(error));
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const handleReject = async (assignmentId: string) => {
     setActionError("");
+    setActionLoading({ assignmentId, action: "reject" });
     try {
       await dispatch(
         rejectCleanerAssignment({
@@ -138,11 +146,14 @@ export default function CleanerAssignments() {
       dispatch(loadCleanerAssignments(assignmentListParams));
     } catch (error) {
       setActionError(String(error));
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const handleStart = async (assignmentId: string) => {
     setActionError("");
+    setActionLoading({ assignmentId, action: "start" });
     try {
       await dispatch(
         startCleanerAssignment({
@@ -153,6 +164,8 @@ export default function CleanerAssignments() {
       dispatch(loadCleanerAssignments(assignmentListParams));
     } catch (error) {
       setActionError(String(error));
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -171,6 +184,7 @@ export default function CleanerAssignments() {
     }
 
     setActionError("");
+    setActionLoading({ assignmentId, action: "complete" });
     try {
       await dispatch(
         completeCleanerAssignment({
@@ -189,8 +203,17 @@ export default function CleanerAssignments() {
       dispatch(loadCleanerAssignments(assignmentListParams));
     } catch (error) {
       setActionError(String(error));
+    } finally {
+      setActionLoading(null);
     }
   };
+
+  const isActionLoading = (
+    assignmentId: string,
+    action: "accept" | "reject" | "start" | "complete",
+  ) =>
+    actionLoading?.assignmentId === assignmentId &&
+    actionLoading.action === action;
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
@@ -367,7 +390,8 @@ export default function CleanerAssignments() {
                         <LoadingButton
                           className="btn-accept"
                           onClick={() => handleAccept(assignment.id)}
-                          isLoading={loading}
+                          disabled={Boolean(actionLoading)}
+                          isLoading={isActionLoading(assignment.id, "accept")}
                           loadingText={t("cleaner.accepting")}
                         >
                           ✓ {t("cleaner.accept")}
@@ -375,7 +399,8 @@ export default function CleanerAssignments() {
                         <LoadingButton
                           className="btn-reject"
                           onClick={() => handleReject(assignment.id)}
-                          isLoading={loading}
+                          disabled={Boolean(actionLoading)}
+                          isLoading={isActionLoading(assignment.id, "reject")}
                           loadingText={t("cleaner.rejecting")}
                         >
                           × {t("cleaner.reject")}
@@ -387,7 +412,8 @@ export default function CleanerAssignments() {
                         <LoadingButton
                           className="btn-start"
                           onClick={() => handleStart(assignment.id)}
-                          isLoading={loading}
+                          disabled={Boolean(actionLoading)}
+                          isLoading={isActionLoading(assignment.id, "start")}
                           loadingText={t("cleaner.starting")}
                         >
                           ▶ {t("cleaner.startService")}
@@ -435,7 +461,8 @@ export default function CleanerAssignments() {
                         <LoadingButton
                           className="btn-complete"
                           onClick={() => handleComplete(assignment.id)}
-                          isLoading={loading}
+                          disabled={Boolean(actionLoading)}
+                          isLoading={isActionLoading(assignment.id, "complete")}
                           loadingText={t("cleaner.completing")}
                         >
                           ✓ {t("cleaner.completeService")}

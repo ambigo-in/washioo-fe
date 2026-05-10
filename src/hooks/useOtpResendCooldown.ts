@@ -7,7 +7,7 @@ const getRemainingSeconds = (expiresAt: number) =>
 
 export function useOtpResendCooldown(initialSentAt?: number) {
   const [cooldownExpiresAt, setCooldownExpiresAt] = useState(
-    (initialSentAt || Date.now()) + OTP_RESEND_COOLDOWN_SECONDS * 1000,
+    () => (initialSentAt || Date.now()) + OTP_RESEND_COOLDOWN_SECONDS * 1000,
   );
   const [secondsRemaining, setSecondsRemaining] = useState(() =>
     getRemainingSeconds(cooldownExpiresAt),

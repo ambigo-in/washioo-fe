@@ -6,54 +6,12 @@ import {
   fetchNotifications,
   markNotificationRead,
 } from "../api/notificationApi";
-import type { NotificationItem, UserRole } from "../types/apiTypes";
+import type { NotificationItem } from "../types/apiTypes";
+import {
+  getFilteredNotifications,
+  getNotificationTargetPath,
+} from "../utils/notificationUtils";
 import "./NotificationsPage.css";
-
-const getNotificationLandingPath = (role?: UserRole) => {
-  switch (role) {
-    case "cleaner":
-      return "/cleaner/assignments";
-    case "admin":
-      return "/admin/bookings";
-    case "customer":
-      return "/my-bookings";
-    default:
-      return "/";
-  }
-};
-
-const getFilteredNotifications = (
-  notifications: NotificationItem[],
-  role?: UserRole,
-) => {
-  if (!role) return notifications;
-
-  const cleanerTypes = new Set(["booking_assigned", "service_scheduled_today"]);
-  const customerTypes = new Set([
-    "cleaner_assigned",
-    "booking_accepted",
-    "cleaner_started_route",
-    "service_started",
-    "service_completed",
-    "customer_rating",
-    "payment_collected",
-  ]);
-  const adminTypes = new Set([
-    "booking_assignment_accepted",
-    "booking_assignment_rejected",
-  ]);
-
-  const allowedTypes =
-    role === "cleaner"
-      ? cleanerTypes
-      : role === "admin"
-        ? adminTypes
-        : customerTypes;
-
-  return notifications.filter((notification) =>
-    allowedTypes.has(notification.notification_type),
-  );
-};
 
 export default function NotificationsPage() {
   const { activeRole } = useAuth();
@@ -114,7 +72,7 @@ export default function NotificationsPage() {
       }
     }
 
-    navigate(notification.url || getNotificationLandingPath(activeRole));
+    navigate(getNotificationTargetPath(notification, activeRole));
   };
 
   const handleMarkAllRead = async () => {

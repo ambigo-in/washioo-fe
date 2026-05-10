@@ -185,7 +185,7 @@
 /* Assignment Actions - Color Coded Buttons */
 .assignment-actions {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
   align-items: center;
 }
@@ -204,6 +204,16 @@
   align-items: center;
   gap: 6px;
   min-height: 40px;
+}
+
+.assignment-card.assigned .assignment-actions {
+  gap: 14px;
+}
+
+.assignment-card.assigned .btn-accept,
+.assignment-card.assigned .btn-reject {
+  min-width: 112px;
+  justify-content: center;
 }
 
 .btn-rate-customer {
@@ -419,7 +429,7 @@
   }
 
   .assignment-actions {
-    gap: 6px;
+    gap: 8px;
   }
 
   .assignment-actions button,
@@ -470,7 +480,7 @@
 
   .assignment-actions {
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
   }
 
   .assignment-actions button,

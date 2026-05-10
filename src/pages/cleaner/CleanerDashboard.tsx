@@ -213,6 +213,39 @@ export default function CleanerDashboard() {
           </div>
         </section>
 
+        {pendingJobs.length > 0 && (
+          <section className="today-live-services">
+            <div className="section-header">
+              <h2>{t("cleaner.liveServices")}</h2>
+              <span className="live-badge">{t("common.active")}</span>
+            </div>
+            <div className="live-services-list">
+              {pendingJobs.map((assignment) => (
+                <Link
+                  key={assignment.id}
+                  to={getAssignmentRoute(assignment.assignment_status)}
+                  className={`live-service-card ${assignment.assignment_status}`}
+                >
+                  <div className="live-indicator"></div>
+                  <div className="live-service-info">
+                    <h3>{assignment.booking.service_name}</h3>
+                    <p className="customer-name">
+                      {assignment.booking.customer_name}
+                    </p>
+                    <p className="booking-time">
+                      {assignment.booking.scheduled_date} at{" "}
+                      {assignment.booking.scheduled_time.slice(0, 5)}
+                    </p>
+                    <p className="booking-location">
+                      {formatAddress(assignment.booking.address)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         <section className="pending-assignments">
           <div className="section-header">
             <h2>{t("cleaner.assignedBookings")}</h2>
@@ -286,7 +319,7 @@ export default function CleanerDashboard() {
 
         <CleanerEarnings />
 
-        {pendingJobs.length > 0 && (
+        {false && pendingJobs.length > 0 && (
           <section className="today-live-services">
             <div className="section-header">
               <h2>{t("cleaner.liveServices")}</h2>

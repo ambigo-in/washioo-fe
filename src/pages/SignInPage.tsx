@@ -105,6 +105,12 @@ export default function SignInPage() {
           {t("auth.login")}
         </LoadingButton>
 
+        {isCoolingDown && (
+          <p className="auth-resend-timer">
+            {t("auth.resendIn", { seconds: secondsRemaining })}
+          </p>
+        )}
+
         <p className="signin-footer-text">
           {t("auth.didNotReceive")}{" "}
           <LoadingButton

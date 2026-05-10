@@ -6,11 +6,11 @@
     var(--brand-white) 100%
   );
   min-height: 100vh;
-  padding: 42px 18px 72px;
+  padding: 26px 18px 72px;
 }
 
 .my-bookings-heading {
-  margin: 0 auto 28px;
+  margin: 0 auto 18px;
   max-width: 760px;
   text-align: center;
 }
@@ -24,15 +24,16 @@
 
 .my-bookings-heading h1 {
   color: var(--brand-text);
-  font-size: 40px;
+  font-size: 34px;
   font-weight: 800;
-  margin: 8px 0;
+  margin: 6px 0;
 }
 
 .my-bookings-heading p {
   color: var(--brand-text-muted);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.5;
+  margin: 0;
 }
 
 .my-bookings-page > .form-alert {
@@ -235,16 +236,17 @@
 /* Advanced Filter Styles */
 .my-bookings-page .dashboard-toolbar {
   flex-wrap: wrap;
-  gap: 1rem;
-  margin: 0 auto 1.5rem;
+  gap: 0.75rem;
+  margin: 0 auto 0.9rem;
   max-width: 1100px;
   align-items: flex-end;
+  padding: 10px;
 }
 
 .toolbar-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.55rem;
   flex: 1 1 auto;
   min-width: 240px;
 }
@@ -258,9 +260,9 @@
   font: inherit;
   font-size: 13px;
   font-weight: 600;
-  min-height: 42px;
+  min-height: 38px;
   outline: none;
-  padding: 0.65rem 0.8rem;
+  padding: 0.5rem 0.75rem;
   transition: all 0.2s ease;
   flex: 1 1 auto;
   min-width: 140px;
@@ -284,6 +286,11 @@
 
 .page-size-select {
   min-width: 130px;
+}
+
+.my-bookings-page .dashboard-status-tabs {
+  margin: 0 auto 0.9rem;
+  max-width: 1100px;
 }
 
 /* Tablet Breakpoint (1024px and below) */
@@ -329,11 +336,11 @@
 /* Tablet/Small Device Breakpoint (768px and below) */
 @media (max-width: 768px) {
   .my-bookings-page {
-    padding: 32px 12px 60px;
+    padding: 18px 12px 56px;
   }
 
   .my-bookings-heading {
-    margin-bottom: 24px;
+    margin-bottom: 12px;
   }
 
   .my-bookings-heading span {
@@ -341,20 +348,19 @@
   }
 
   .my-bookings-heading h1 {
-    font-size: 32px;
+    font-size: 26px;
     margin: 6px 0;
   }
 
   .my-bookings-heading p {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   /* Dashboard toolbar - full width with better spacing */
   .my-bookings-page .dashboard-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-    margin: 0 auto 1.2rem;
+    gap: 0.55rem;
+    margin: 0 auto 0.75rem;
+    padding: 8px;
   }
 
   .dashboard-search {
@@ -363,43 +369,48 @@
   }
 
   .dashboard-search input {
-    min-height: 44px;
+    min-height: 40px;
     font-size: 16px;
-    padding: 0.75rem 0.9rem;
+    padding: 0.6rem 0.8rem;
   }
 
-  /* Filters in 2-column grid on tablet */
   .toolbar-filters {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.65rem;
-    flex-direction: row;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    min-width: 0;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .filter-select {
-    width: 100%;
-    min-width: auto;
-    min-height: 44px;
-    font-size: 13px;
-    padding: 0.7rem 0.75rem;
+    flex: 0 0 auto;
+    min-width: 128px;
+    min-height: 38px;
+    font-size: 12px;
+    padding: 0.5rem 0.65rem;
     padding-right: 2.2rem;
   }
 
   .page-size-select {
-    grid-column: span 2;
+    min-width: 112px;
   }
 
   /* Status tabs responsive */
   .dashboard-status-tabs {
-    gap: 0.5rem;
-    margin: 0 0 1rem;
+    gap: 0.45rem;
+    margin: 0 0 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
   }
 
   .dashboard-status-tab {
-    min-height: 36px;
-    padding: 0.5rem 0.75rem;
-    font-size: 12px;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
+    min-height: 34px;
+    padding: 0.42rem 0.65rem;
+    font-size: 11px;
   }
 
   .dashboard-status-tab span {
@@ -503,11 +514,11 @@
 /* Mobile Breakpoint (640px and below) */
 @media (max-width: 640px) {
   .my-bookings-page {
-    padding: 28px 10px 56px;
+    padding: 16px 10px 52px;
   }
 
   .my-bookings-heading {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 
   .my-bookings-heading span {
@@ -516,8 +527,8 @@
   }
 
   .my-bookings-heading h1 {
-    font-size: 28px;
-    margin: 6px 0;
+    font-size: 24px;
+    margin: 4px 0;
   }
 
   .my-bookings-heading p {
@@ -525,37 +536,20 @@
     line-height: 1.4;
   }
 
-  /* Search and filters stack vertically */
   .my-bookings-page .dashboard-toolbar {
-    gap: 0.65rem;
-  }
-
-  .dashboard-search input {
-    min-height: 42px;
-    font-size: 16px;
-  }
-
-  /* Filters in single column for small phones */
-  .toolbar-filters {
-    grid-template-columns: 1fr;
-    gap: 0.6rem;
-  }
-
-  .page-size-select {
-    grid-column: span 1;
+    gap: 0.5rem;
   }
 
   .filter-select {
-    min-height: 42px;
-    font-size: 13px;
+    min-height: 38px;
+    font-size: 12px;
   }
 
-  /* Status tabs horizontal scroll on mobile */
   .dashboard-status-tabs {
-    gap: 0.5rem;
-    margin: 0 0 1rem;
+    gap: 0.45rem;
+    margin: 0 0 0.75rem;
     overflow-x: auto;
-    padding-bottom: 0.5rem;
+    padding-bottom: 2px;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -707,15 +701,15 @@
 /* Small Mobile Breakpoint (480px and below) */
 @media (max-width: 480px) {
   .my-bookings-page {
-    padding: 24px 8px 52px;
+    padding: 14px 8px 50px;
   }
 
   .my-bookings-heading {
-    margin-bottom: 18px;
+    margin-bottom: 10px;
   }
 
   .my-bookings-heading h1 {
-    font-size: 26px;
+    font-size: 23px;
   }
 
   .my-bookings-heading p {
@@ -723,18 +717,13 @@
   }
 
   /* Search input larger for touch */
-  .dashboard-search input {
-    min-height: 44px;
-    font-size: 16px;
-  }
-
   .toolbar-filters {
-    gap: 0.55rem;
+    gap: 0.45rem;
   }
 
   .filter-select {
-    min-height: 44px;
-    font-size: 13px;
+    min-height: 38px;
+    font-size: 12px;
   }
 
   /* Status tabs */
