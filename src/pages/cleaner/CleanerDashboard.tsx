@@ -185,26 +185,6 @@ export default function CleanerDashboard() {
           </div>
         </section>
 
-        <section className="quick-stats">
-          <h2>{t("cleaner.todayAtGlance")}</h2>
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-value">{pendingJobs.length}</div>
-              <div className="stat-label">{t("cleaner.newAssignments")}</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">{activeJobs.length}</div>
-              <div className="stat-label">{t("cleaner.activeJobs")}</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">{completedJobs.length}</div>
-              <div className="stat-label">{t("cleaner.completed")}</div>
-            </div>
-          </div>
-        </section>
-
-        <CleanerEarnings />
-
         {pendingJobs.length > 0 && (
           <section className="today-live-services">
             <div className="section-header">
@@ -234,6 +214,26 @@ export default function CleanerDashboard() {
             </div>
           </section>
         )}
+
+        <section className="quick-stats">
+          <h2>{t("cleaner.todayAtGlance")}</h2>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-value">{pendingJobs.length}</div>
+              <div className="stat-label">{t("cleaner.newAssignments")}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{activeJobs.length}</div>
+              <div className="stat-label">{t("cleaner.activeJobs")}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{completedJobs.length}</div>
+              <div className="stat-label">{t("cleaner.completed")}</div>
+            </div>
+          </div>
+        </section>
+
+        <CleanerEarnings />
       </div>
     </DashboardLayout>
   );
