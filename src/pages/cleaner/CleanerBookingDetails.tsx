@@ -97,6 +97,10 @@ export default function CleanerBookingDetails() {
     booking?.booking_status === "completed" &&
     inferredPaymentStatus === "pending_collection";
   const assignment = booking?.assignment;
+  const canViewCustomerDetails =
+    assignment?.assignment_status === "accepted" ||
+    assignment?.assignment_status === "in_progress" ||
+    assignment?.assignment_status === "completed";
 
   const refreshAfterAssignmentAction = async (
     action: typeof acceptCleanerAssignment,
@@ -178,11 +182,13 @@ export default function CleanerBookingDetails() {
               <span className={`status-pill ${booking.booking_status}`}>
                 {t(`booking.${booking.booking_status === "in_progress" ? "inProgress" : booking.booking_status}`)}
               </span>
-              <OpenInMapsButton
-                latitude={address?.latitude}
-                longitude={address?.longitude}
-                mode="directions"
-              />
+              {canViewCustomerDetails && (
+                <OpenInMapsButton
+                  latitude={address?.latitude}
+                  longitude={address?.longitude}
+                  mode="directions"
+                />
+              )}
             </div>
           </div>
 
@@ -246,21 +252,34 @@ export default function CleanerBookingDetails() {
           <div className="detail-grid">
             <section className="detail-card">
               <h3>{t("cleaner.customer")}</h3>
-              <dl>
-                <div>
-                  <dt>{t("common.name")}</dt>
-                  <dd>{booking.customer_name || t("common.notAvailable")}</dd>
-                </div>
-                <div>
-                  <dt>{t("common.phone")}</dt>
-                  <dd>{booking.customer_phone || t("common.notAvailable")}</dd>
-                </div>
-              </dl>
+              {canViewCustomerDetails ? (
+                <dl>
+                  <div>
+                    <dt>{t("common.name")}</dt>
+                    <dd>{booking.customer_name || t("common.notAvailable")}</dd>
+                  </div>
+                  <div>
+                    <dt>{t("common.phone")}</dt>
+                    <dd>{booking.customer_phone || t("common.notAvailable")}</dd>
+                  </div>
+                </dl>
+              ) : (
+                <p className="privacy-note">
+                  Accept this booking to view the customer's name and mobile
+                  number.
+                </p>
+              )}
             </section>
 
             <section className="detail-card">
               <h3>{t("common.address")}</h3>
-              <p className="full-address">{formatAddress(address)}</p>
+              {canViewCustomerDetails ? (
+                <p className="full-address">{formatAddress(address)}</p>
+              ) : (
+                <p className="privacy-note">
+                  The service address is shown after accepting the booking.
+                </p>
+              )}
             </section>
 
             <section className="detail-card">

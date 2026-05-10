@@ -41,18 +41,18 @@
 }
 
 .status-badge.offline {
-  background: var(--brand-surface);
-  color: var(--brand-text-muted);
+  background: #fee2e2;
+  color: #b91c1c;
 }
 
 .status-badge.available {
-  background: var(--brand-teal-soft);
-  color: var(--brand-teal-dark);
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .status-badge.busy {
-  background: var(--brand-teal-soft);
-  color: var(--brand-teal-dark);
+  background: #ffedd5;
+  color: #c2410c;
 }
 
 .status-details {
@@ -140,11 +140,15 @@
 }
 
 .availability-switch.available.active {
-  color: var(--brand-teal-dark);
+  color: #15803d;
+}
+
+.availability-switch.offline.active {
+  color: #b91c1c;
 }
 
 .availability-switch.busy.active {
-  color: #b45309;
+  color: #c2410c;
 }
 
 .availability-switch:disabled {
