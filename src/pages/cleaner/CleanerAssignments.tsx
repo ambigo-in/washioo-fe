@@ -294,6 +294,11 @@ export default function CleanerAssignments() {
                   key={assignment.id}
                   className={`assignment-card ${assignment.workflowStatus}`}
                 >
+                  {assignment.workflowStatus === "assigned" && (
+                    <div className="assigned-callout-label">
+                      {t("cleaner.newAssignments")}
+                    </div>
+                  )}
                   <div className="assignment-header">
                     <div className="service-info">
                       <h3>{assignment.booking.service_name}</h3>

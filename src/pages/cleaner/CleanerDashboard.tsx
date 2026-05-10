@@ -231,6 +231,11 @@ export default function CleanerDashboard() {
                   )}
                 >
                   <div className="assignment-info">
+                    {assignment.assignment_status === "assigned" && (
+                      <span className="assigned-callout-label">
+                        {t("cleaner.newAssignments")}
+                      </span>
+                    )}
                     <div className="assignment-title-row">
                       <h4>{assignment.booking.service_name}</h4>
                       <span className="assignment-status-chip">
