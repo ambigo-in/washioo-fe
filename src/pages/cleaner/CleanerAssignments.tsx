@@ -46,7 +46,7 @@ const assignmentStatuses: WorkflowStatus[] = [
 ];
 
 const assignmentListParams = {
-  limit: 500,
+  limit: 50,
   offset: 0,
 };
 

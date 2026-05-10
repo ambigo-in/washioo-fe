@@ -26,7 +26,7 @@ const approvalStatuses: ApprovalStatus[] = [
 ];
 
 const cleanerListParams = {
-  limit: 500,
+  limit: 50,
   offset: 0,
 };
 
