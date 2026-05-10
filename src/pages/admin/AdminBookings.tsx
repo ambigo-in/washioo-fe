@@ -25,6 +25,16 @@ import "./AdminBookings.css";
 
 type FilterStatus = "all" | BookingStatus;
 
+const bookingStatusLabels: Record<FilterStatus, string> = {
+  all: "All",
+  pending: "Pending",
+  assigned: "Assigned",
+  accepted: "Accepted",
+  in_progress: "In Progress",
+  completed: "Completed",
+  cancelled: "Cancelled",
+};
+
 export default function AdminBookings() {
   const dispatch = useAppDispatch();
   const { bookings, bookingsTotal, cleaners, loading } = useAppSelector(
@@ -165,7 +175,7 @@ export default function AdminBookings() {
   const totalVisible = query.debouncedSearch ? filteredBookings.length : bookingsTotal;
   const tabOptions: Array<StatusTabOption<FilterStatus>> = statusFilters.map((status) => ({
     value: status,
-    label: status === "all" ? "All" : status.replace("_", " "),
+    label: bookingStatusLabels[status],
     count:
       status === "all"
         ? Object.values(statusCounts).reduce((sum, count) => sum + count, 0)
@@ -213,7 +223,7 @@ export default function AdminBookings() {
                         backgroundColor: getStatusColor(booking.booking_status),
                       }}
                     >
-                      {booking.booking_status.replace("_", " ")}
+                      {bookingStatusLabels[booking.booking_status]}
                     </span>
                   </div>
                   <div className="booking-price">

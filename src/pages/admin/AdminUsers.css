@@ -123,6 +123,7 @@
 
 .users-table table {
   border-collapse: collapse;
+  table-layout: fixed;
   width: 100%;
 }
 
@@ -150,13 +151,56 @@
   color: var(--brand-text);
   border-bottom: 1px solid var(--brand-border);
   vertical-align: middle;
+  line-height: 1.35;
+}
+
+.users-table th:nth-child(1),
+.users-table td:nth-child(1) {
+  width: 22%;
+}
+
+.users-table th:nth-child(2),
+.users-table td:nth-child(2) {
+  width: 15%;
+}
+
+.users-table th:nth-child(3),
+.users-table td:nth-child(3) {
+  width: 12%;
+}
+
+.users-table th:nth-child(4),
+.users-table td:nth-child(4) {
+  width: 18%;
+}
+
+.users-table th:nth-child(5),
+.users-table td:nth-child(5) {
+  width: 18%;
+}
+
+.users-table th:nth-child(6),
+.users-table td:nth-child(6) {
+  width: 7%;
+}
+
+.users-table th:nth-child(7),
+.users-table td:nth-child(7) {
+  width: 8%;
+}
+
+.user-id-cell,
+.user-email-cell {
   overflow-wrap: anywhere;
 }
 
-.users-table td:nth-child(4) {
-  max-width: 260px;
+.user-email-cell {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.user-phone-cell {
+  white-space: nowrap;
 }
 
 .users-table tbody tr:hover {
@@ -175,14 +219,20 @@
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .role-badge {
-  padding: 4px 10px;
-  border-radius: 20px;
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  justify-content: center;
+  line-height: 1;
+  min-height: 28px;
+  padding: 0 10px;
   font-size: 0.75rem;
   font-weight: 600;
-  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .role-badge.customer {
@@ -201,10 +251,17 @@
 }
 
 .status {
-  padding: 4px 12px;
-  border-radius: 20px;
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  justify-content: center;
+  line-height: 1;
+  min-height: 30px;
+  min-width: 76px;
+  padding: 0 12px;
   font-size: 0.8rem;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .status.active {
@@ -231,5 +288,19 @@
 
   .search-box {
     max-width: none;
+  }
+
+  .users-table table {
+    table-layout: auto;
+  }
+
+  .users-table th,
+  .users-table td {
+    padding: 12px 10px;
+  }
+
+  .users-table th:nth-child(n),
+  .users-table td:nth-child(n) {
+    width: auto;
   }
 }

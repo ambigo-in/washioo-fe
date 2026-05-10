@@ -10,6 +10,7 @@ import {
   paginateItems,
   useDashboardQueryState,
 } from "../../components/dashboard/DashboardControls";
+import { formatIndianPhoneForDisplay } from "../../utils/phoneUtils";
 import "./AdminUsers.css";
 
 export default function AdminUsers() {
@@ -66,7 +67,7 @@ export default function AdminUsers() {
 
       return (
         <span key={role} className={badgeClass}>
-          {role}
+          {role.toUpperCase()}
         </span>
       );
     });
@@ -137,10 +138,16 @@ export default function AdminUsers() {
               <tbody>
                 {visibleUsers.map((user) => (
                   <tr key={user.id}>
-                    <td>#{user.id}</td>
+                    <td className="user-id-cell" title={user.id}>
+                      #{user.id}
+                    </td>
                     <td className="user-name">{user.full_name || "N/A"}</td>
-                    <td>{user.phone}</td>
-                    <td>{user.email || "N/A"}</td>
+                    <td className="user-phone-cell">
+                      {formatIndianPhoneForDisplay(user.phone)}
+                    </td>
+                    <td className="user-email-cell" title={user.email || "N/A"}>
+                      {user.email || "N/A"}
+                    </td>
                     <td>
                       <div className="role-badges">
                         {getRoleBadge(user.roles)}
