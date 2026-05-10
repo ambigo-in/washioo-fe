@@ -46,6 +46,22 @@
   padding: 16px;
 }
 
+.assignment-card.assigned {
+  border: 2px solid #dc3545;
+  box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+  animation: assigned-border-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes assigned-border-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.42);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(220, 53, 69, 0.14);
+  }
+}
+
 .assignment-header {
   display: flex;
   justify-content: space-between;

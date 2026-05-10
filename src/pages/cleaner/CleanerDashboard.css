@@ -245,10 +245,24 @@
   gap: 16px;
 }
 
-.dashboard-assignment-link.assigned,
 .dashboard-assignment-link.accepted,
 .dashboard-assignment-link.in_progress {
   border-left: 4px solid var(--brand-teal);
+}
+
+.dashboard-assignment-link.assigned {
+  border: 2px solid #dc3545;
+  animation: dashboard-assigned-border-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes dashboard-assigned-border-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.42);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(220, 53, 69, 0.14);
+  }
 }
 
 .dashboard-assignment-link:hover {

@@ -103,10 +103,8 @@ export default function CleanerDashboard() {
       );
     });
 
-  const getAssignmentRoute = (status: string, reference: string) =>
-    `/cleaner/assignments?status=${encodeURIComponent(
-      status || "all",
-    )}&q=${encodeURIComponent(reference)}`;
+  const getAssignmentRoute = (status: string) =>
+    `/cleaner/assignments?status=${encodeURIComponent(status || "all")}`;
 
   const getAssignmentStatusLabel = (status: string) =>
     t(status === "in_progress" ? "booking.inProgress" : `booking.${status}`);
@@ -230,7 +228,6 @@ export default function CleanerDashboard() {
                   className={`assignment-card dashboard-assignment-link ${assignment.assignment_status}`}
                   to={getAssignmentRoute(
                     assignment.assignment_status,
-                    assignment.booking.booking_reference,
                   )}
                 >
                   <div className="assignment-info">
@@ -296,7 +293,6 @@ export default function CleanerDashboard() {
                   key={assignment.id}
                   to={getAssignmentRoute(
                     assignment.assignment_status,
-                    assignment.booking.booking_reference,
                   )}
                   className={`live-service-card ${assignment.assignment_status}`}
                 >

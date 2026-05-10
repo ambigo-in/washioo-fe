@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { fetchCleaners, updateCleanerProfile } from "../../api/adminApi";
 import type { CleanerProfile } from "../../types/cleanerTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
@@ -14,7 +14,21 @@ import {
 import { formatIndianPhoneForDisplay } from "../../utils/phoneUtils";
 import "./AdminCleaners.css";
 
-type FilterStatus = "all" | "pending" | "approved" | "rejected" | "suspended";
+type ApprovalStatus = CleanerProfile["approval_status"];
+type AvailabilityStatus = CleanerProfile["availability_status"];
+type FilterStatus = "all" | ApprovalStatus;
+
+const approvalStatuses: ApprovalStatus[] = [
+  "pending",
+  "approved",
+  "rejected",
+  "suspended",
+];
+
+const cleanerListParams = {
+  limit: 500,
+  offset: 0,
+};
 
 const identityStatusLabel: Record<string, string> = {
   full_available: "Full data available",
@@ -32,13 +46,6 @@ const hasFullIdentityData = (cleaner: CleanerProfile) =>
 
 export default function AdminCleaners() {
   const [cleaners, setCleaners] = useState<CleanerProfile[]>([]);
-  const [total, setTotal] = useState(0);
-  const [counts, setCounts] = useState<Record<Exclude<FilterStatus, "all">, number>>({
-    pending: 0,
-    approved: 0,
-    rejected: 0,
-    suspended: 0,
-  });
   const [loading, setLoading] = useState(true);
   const query = useDashboardQueryState<FilterStatus>("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -46,60 +53,32 @@ export default function AdminCleaners() {
     null,
   );
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const status = query.status === "all" ? undefined : query.status;
-        const response = await fetchCleaners({
-          approval_status: status,
-          limit: query.pageSize,
-          offset: query.offset,
-        });
-        setCleaners(response.cleaners);
-        setTotal(response.total);
-      } catch (error) {
-        console.error("Failed to fetch cleaners:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [query.offset, query.pageSize, query.status]);
+  const loadCleaners = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchCleaners(cleanerListParams);
+      setCleaners(response.cleaners);
+    } catch (error) {
+      console.error("Failed to fetch cleaners:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    let active = true;
-    Promise.all(
-      (["pending", "approved", "rejected", "suspended"] as const).map(async (status) => {
-        const response = await fetchCleaners({
-          approval_status: status,
-          limit: 1,
-          offset: 0,
-        });
-        return [status, response.total] as const;
-      }),
-    )
-      .then((entries) => {
-        if (active) setCounts(Object.fromEntries(entries) as Record<Exclude<FilterStatus, "all">, number>);
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [total]);
+    void loadCleaners();
+  }, [loadCleaners]);
 
-  const handleUpdateStatus = async (cleanerId: string, status: string) => {
+  const handleUpdateStatus = async (
+    cleanerId: string,
+    status: ApprovalStatus,
+  ) => {
     setUpdatingId(cleanerId);
     try {
-      await updateCleanerProfile(cleanerId, { approval_status: status as any });
-      // Refresh the list
-      const response = await fetchCleaners(
-        query.status === "all"
-          ? { limit: query.pageSize, offset: query.offset }
-          : { approval_status: query.status as any, limit: query.pageSize, offset: query.offset },
-      );
-      setCleaners(response.cleaners);
-      setTotal(response.total);
+      await updateCleanerProfile(cleanerId, {
+        approval_status: status,
+      });
+      await loadCleaners();
     } catch (error) {
       console.error("Failed to update cleaner:", error);
     } finally {
@@ -109,20 +88,14 @@ export default function AdminCleaners() {
 
   const handleUpdateAvailability = async (
     cleanerId: string,
-    status: string,
+    status: AvailabilityStatus,
   ) => {
     setUpdatingId(cleanerId);
     try {
       await updateCleanerProfile(cleanerId, {
-        availability_status: status as any,
+        availability_status: status,
       });
-      const response = await fetchCleaners(
-        query.status === "all"
-          ? { limit: query.pageSize, offset: query.offset }
-          : { approval_status: query.status as any, limit: query.pageSize, offset: query.offset },
-      );
-      setCleaners(response.cleaners);
-      setTotal(response.total);
+      await loadCleaners();
     } catch (error) {
       console.error("Failed to update availability:", error);
     } finally {
@@ -143,14 +116,23 @@ export default function AdminCleaners() {
     return colors[status] || "var(--brand-text-muted)";
   };
 
-  const filters: FilterStatus[] = [
-    "all",
-    "pending",
-    "approved",
-    "rejected",
-    "suspended",
-  ];
-  const filteredCleaners = cleaners.filter((cleaner) =>
+  const counts = useMemo(() => {
+    const next: Record<ApprovalStatus, number> = {
+      pending: 0,
+      approved: 0,
+      rejected: 0,
+      suspended: 0,
+    };
+    cleaners.forEach((cleaner) => {
+      next[cleaner.approval_status] += 1;
+    });
+    return next;
+  }, [cleaners]);
+  const statusFilteredCleaners =
+    query.status === "all"
+      ? cleaners
+      : cleaners.filter((cleaner) => cleaner.approval_status === query.status);
+  const filteredCleaners = statusFilteredCleaners.filter((cleaner) =>
     matchesSearch(cleaner, query.debouncedSearch, [
       (item) => item.full_name,
       (item) => item.phone,
@@ -160,17 +142,19 @@ export default function AdminCleaners() {
       (item) => item.availability_status,
     ]),
   );
-  const visibleCleaners = query.debouncedSearch
-    ? paginateItems(filteredCleaners, query.page, query.pageSize)
-    : filteredCleaners;
-  const visibleTotal = query.debouncedSearch ? filteredCleaners.length : total;
-  const tabOptions: Array<StatusTabOption<FilterStatus>> = filters.map((status) => ({
+  const visibleCleaners = paginateItems(
+    filteredCleaners,
+    query.page,
+    query.pageSize,
+  );
+  const visibleTotal = filteredCleaners.length;
+  const tabOptions: Array<StatusTabOption<FilterStatus>> = ([
+    "all",
+    ...approvalStatuses,
+  ] as FilterStatus[]).map((status) => ({
     value: status,
     label: status === "all" ? "All" : status,
-    count:
-      status === "all"
-        ? Object.values(counts).reduce((sum, count) => sum + count, 0)
-        : counts[status],
+    count: status === "all" ? cleaners.length : counts[status],
   }));
 
   return (

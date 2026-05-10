@@ -42,6 +42,19 @@ export function useDashboardQueryState<TStatus extends string>(
   const debouncedSearch = useDebouncedValue(search);
 
   useEffect(() => {
+    const nextSearch = searchParams.get("q") ?? "";
+    const nextStatus =
+      (searchParams.get("status") as TStatus | null) ?? defaultStatus;
+    const nextPage = Math.max(Number(searchParams.get("page") ?? "1"), 1);
+
+    setSearch((current) => (current === nextSearch ? current : nextSearch));
+    setStatusState((current) =>
+      current === nextStatus ? current : nextStatus,
+    );
+    setPageState((current) => (current === nextPage ? current : nextPage));
+  }, [defaultStatus, searchParams]);
+
+  useEffect(() => {
     const next = new URLSearchParams();
 
     if (debouncedSearch) next.set("q", debouncedSearch);

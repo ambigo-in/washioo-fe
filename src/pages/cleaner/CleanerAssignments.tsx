@@ -32,7 +32,8 @@ type FilterStatus =
   | "assigned"
   | "accepted"
   | "in_progress"
-  | "completed";
+  | "completed"
+  | "rejected";
 
 type WorkflowStatus = Exclude<FilterStatus, "all">;
 
@@ -41,14 +42,20 @@ const assignmentStatuses: WorkflowStatus[] = [
   "accepted",
   "in_progress",
   "completed",
+  "rejected",
 ];
-
-const isWorkflowStatus = (status: string): status is WorkflowStatus =>
-  assignmentStatuses.includes(status as WorkflowStatus);
 
 const assignmentListParams = {
   limit: 500,
   offset: 0,
+};
+
+const workflowStatusPriority: Record<WorkflowStatus, number> = {
+  assigned: 0,
+  accepted: 1,
+  in_progress: 2,
+  completed: 3,
+  rejected: 4,
 };
 
 const formatMoney = (value: number) =>
@@ -59,6 +66,30 @@ const formatMoney = (value: number) =>
 
 const statusKey = (status: Exclude<FilterStatus, "all">) =>
   status === "in_progress" ? "booking.inProgress" : `booking.${status}`;
+
+const getWorkflowStatus = (assignment: {
+  assignment_status: string;
+  accepted_at: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+}): WorkflowStatus => {
+  if (
+    assignment.assignment_status === "rejected" ||
+    assignment.assignment_status === "cancelled"
+  ) {
+    return "rejected";
+  }
+  if (assignment.completed_at || assignment.assignment_status === "completed") {
+    return "completed";
+  }
+  if (assignment.started_at || assignment.assignment_status === "in_progress") {
+    return "in_progress";
+  }
+  if (assignment.accepted_at || assignment.assignment_status === "accepted") {
+    return "accepted";
+  }
+  return "assigned";
+};
 
 export default function CleanerAssignments() {
   const dispatch = useAppDispatch();
@@ -174,9 +205,21 @@ export default function CleanerAssignments() {
 
   const workflowAssignments = useMemo(
     () =>
-      assignments.filter((assignment) =>
-        isWorkflowStatus(assignment.assignment_status),
-      ),
+      assignments
+        .map((assignment) => ({
+          ...assignment,
+          workflowStatus: getWorkflowStatus(assignment),
+        }))
+        .sort((left, right) => {
+          const priority =
+            workflowStatusPriority[left.workflowStatus] -
+            workflowStatusPriority[right.workflowStatus];
+          if (priority !== 0) return priority;
+          return (
+            new Date(right.assigned_at).getTime() -
+            new Date(left.assigned_at).getTime()
+          );
+        }),
     [assignments],
   );
   const counts = useMemo(() => {
@@ -185,9 +228,10 @@ export default function CleanerAssignments() {
       accepted: 0,
       in_progress: 0,
       completed: 0,
+      rejected: 0,
     };
     workflowAssignments.forEach((assignment) => {
-      next[assignment.assignment_status as WorkflowStatus] += 1;
+      next[assignment.workflowStatus] += 1;
     });
     return next;
   }, [workflowAssignments]);
@@ -202,14 +246,14 @@ export default function CleanerAssignments() {
     query.status === "all"
       ? workflowAssignments
       : workflowAssignments.filter(
-          (assignment) => assignment.assignment_status === query.status,
+          (assignment) => assignment.workflowStatus === query.status,
         );
   const filteredAssignments = statusFilteredAssignments.filter((assignment) =>
     matchesSearch(assignment, query.debouncedSearch, [
       (item) => item.booking.booking_reference,
       (item) => item.booking.service_name,
       (item) => item.booking.customer_name,
-      (item) => item.assignment_status,
+      (item) => item.workflowStatus,
       (item) => formatAddress(item.booking.address),
     ]),
   );
@@ -246,7 +290,10 @@ export default function CleanerAssignments() {
             {actionError && <p className="form-alert error">{actionError}</p>}
             <div className="assignments-list">
               {visibleAssignments.map((assignment) => (
-                <div key={assignment.id} className="assignment-card">
+                <div
+                  key={assignment.id}
+                  className={`assignment-card ${assignment.workflowStatus}`}
+                >
                   <div className="assignment-header">
                     <div className="service-info">
                       <h3>{assignment.booking.service_name}</h3>
@@ -258,14 +305,14 @@ export default function CleanerAssignments() {
                       className="status-badge"
                       style={{
                         backgroundColor: getStatusColor(
-                          assignment.assignment_status,
+                          assignment.workflowStatus,
                         ),
                       }}
                     >
                       {t(
-                        assignment.assignment_status === "in_progress"
+                        assignment.workflowStatus === "in_progress"
                           ? "booking.inProgress"
-                          : `booking.${assignment.assignment_status}`,
+                          : `booking.${assignment.workflowStatus}`,
                       )}
                     </span>
                   </div>
@@ -301,8 +348,8 @@ export default function CleanerAssignments() {
                       {t("actions.viewDetails")}
                     </Link>
 
-                    {(assignment.assignment_status === "accepted" ||
-                      assignment.assignment_status === "in_progress") && (
+                    {(assignment.workflowStatus === "accepted" ||
+                      assignment.workflowStatus === "in_progress") && (
                       <OpenInMapsButton
                         address={assignment.booking.address}
                         label={t("cleaner.route")}
@@ -310,7 +357,7 @@ export default function CleanerAssignments() {
                       />
                     )}
 
-                    {assignment.assignment_status === "assigned" && (
+                    {assignment.workflowStatus === "assigned" && (
                       <>
                         <LoadingButton
                           className="btn-accept"
@@ -330,7 +377,7 @@ export default function CleanerAssignments() {
                         </LoadingButton>
                       </>
                     )}
-                    {assignment.assignment_status === "accepted" &&
+                    {assignment.workflowStatus === "accepted" &&
                       !assignment.started_at && (
                         <LoadingButton
                           className="btn-start"
@@ -341,7 +388,7 @@ export default function CleanerAssignments() {
                           ▶ {t("cleaner.startService")}
                         </LoadingButton>
                       )}
-                    {assignment.assignment_status === "in_progress" && (
+                    {assignment.workflowStatus === "in_progress" && (
                       <div className="complete-section">
                         <div className="payment-collect-fields">
                           <div className="field-row">
@@ -390,7 +437,7 @@ export default function CleanerAssignments() {
                         </LoadingButton>
                       </div>
                     )}
-                    {assignment.assignment_status === "completed" && (
+                    {assignment.workflowStatus === "completed" && (
                       <>
                         <span className="completed-badge">✓ {t("common.completed")}</span>
                         <button
@@ -409,12 +456,12 @@ export default function CleanerAssignments() {
                         </button>
                       </>
                     )}
-                    {assignment.assignment_status === "rejected" && (
+                    {assignment.workflowStatus === "rejected" && (
                       <span className="rejected-badge">× {t("cleaner.rejected")}</span>
                     )}
                   </div>
 
-                  {assignment.assignment_status === "completed" &&
+                  {assignment.workflowStatus === "completed" &&
                     showRating[assignment.id] && (
                       <div className="assignment-rating-panel">
                         <BookingRatingPanel
