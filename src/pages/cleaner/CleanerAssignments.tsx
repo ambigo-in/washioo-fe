@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import {
   PaginationControls,
@@ -13,7 +13,6 @@ import {
 import BookingRatingPanel from "../../components/BookingRatingPanel";
 import { LoadingButton } from "../../components/ui";
 import OpenInMapsButton from "../../components/OpenInMapsButton";
-import { fetchCleanerAssignments } from "../../api/cleanerApi";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   acceptCleanerAssignment,
@@ -35,6 +34,23 @@ type FilterStatus =
   | "in_progress"
   | "completed";
 
+type WorkflowStatus = Exclude<FilterStatus, "all">;
+
+const assignmentStatuses: WorkflowStatus[] = [
+  "assigned",
+  "accepted",
+  "in_progress",
+  "completed",
+];
+
+const isWorkflowStatus = (status: string): status is WorkflowStatus =>
+  assignmentStatuses.includes(status as WorkflowStatus);
+
+const assignmentListParams = {
+  limit: 500,
+  offset: 0,
+};
+
 const formatMoney = (value: number) =>
   value.toLocaleString(undefined, {
     minimumFractionDigits: 2,
@@ -47,18 +63,10 @@ const statusKey = (status: Exclude<FilterStatus, "all">) =>
 export default function CleanerAssignments() {
   const dispatch = useAppDispatch();
   const { t } = useLanguage();
-  const { assignments, total, loading } = useAppSelector(
+  const { assignments, loading } = useAppSelector(
     (state) => state.cleaner,
   );
   const query = useDashboardQueryState<FilterStatus>("all");
-  const [counts, setCounts] = useState<
-    Record<Exclude<FilterStatus, "all">, number>
-  >({
-    assigned: 0,
-    accepted: 0,
-    in_progress: 0,
-    completed: 0,
-  });
   const [completeAmount, setCompleteAmount] = useState<Record<string, number>>(
     {},
   );
@@ -69,43 +77,8 @@ export default function CleanerAssignments() {
   const [actionError, setActionError] = useState("");
 
   useEffect(() => {
-    dispatch(
-      loadCleanerAssignments({
-        status: query.status === "all" ? undefined : query.status,
-        limit: query.pageSize,
-        offset: query.offset,
-      }),
-    );
-  }, [dispatch, query.offset, query.pageSize, query.status]);
-
-  useEffect(() => {
-    let active = true;
-    Promise.all(
-      (["assigned", "accepted", "in_progress", "completed"] as const).map(
-        async (status) => {
-          const response = await fetchCleanerAssignments(status, {
-            limit: 1,
-            offset: 0,
-          });
-          return [status, response.total] as const;
-        },
-      ),
-    )
-      .then((entries) => {
-        if (active) {
-          setCounts(
-            Object.fromEntries(entries) as Record<
-              Exclude<FilterStatus, "all">,
-              number
-            >,
-          );
-        }
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [total]);
+    dispatch(loadCleanerAssignments(assignmentListParams));
+  }, [dispatch]);
 
   const handleAccept = async (assignmentId: string) => {
     setActionError("");
@@ -116,13 +89,7 @@ export default function CleanerAssignments() {
           actionPayload: { cleaner_notes: "Accepted" },
         }),
       ).unwrap();
-      dispatch(
-        loadCleanerAssignments({
-          status: query.status === "all" ? undefined : query.status,
-          limit: query.pageSize,
-          offset: query.offset,
-        }),
-      );
+      dispatch(loadCleanerAssignments(assignmentListParams));
     } catch (error) {
       setActionError(String(error));
     }
@@ -137,13 +104,7 @@ export default function CleanerAssignments() {
           actionPayload: { cleaner_notes: "Rejected" },
         }),
       ).unwrap();
-      dispatch(
-        loadCleanerAssignments({
-          status: query.status === "all" ? undefined : query.status,
-          limit: query.pageSize,
-          offset: query.offset,
-        }),
-      );
+      dispatch(loadCleanerAssignments(assignmentListParams));
     } catch (error) {
       setActionError(String(error));
     }
@@ -158,13 +119,7 @@ export default function CleanerAssignments() {
           actionPayload: { cleaner_notes: "Started" },
         }),
       ).unwrap();
-      dispatch(
-        loadCleanerAssignments({
-          status: query.status === "all" ? undefined : query.status,
-          limit: query.pageSize,
-          offset: query.offset,
-        }),
-      );
+      dispatch(loadCleanerAssignments(assignmentListParams));
     } catch (error) {
       setActionError(String(error));
     }
@@ -200,13 +155,7 @@ export default function CleanerAssignments() {
         }),
       ).unwrap();
       dispatch(loadCleanerEarnings());
-      dispatch(
-        loadCleanerAssignments({
-          status: query.status === "all" ? undefined : query.status,
-          limit: query.pageSize,
-          offset: query.offset,
-        }),
-      );
+      dispatch(loadCleanerAssignments(assignmentListParams));
     } catch (error) {
       setActionError(String(error));
     }
@@ -223,23 +172,39 @@ export default function CleanerAssignments() {
     return colors[status] || "var(--brand-text-muted)";
   };
 
+  const workflowAssignments = useMemo(
+    () =>
+      assignments.filter((assignment) =>
+        isWorkflowStatus(assignment.assignment_status),
+      ),
+    [assignments],
+  );
+  const counts = useMemo(() => {
+    const next: Record<WorkflowStatus, number> = {
+      assigned: 0,
+      accepted: 0,
+      in_progress: 0,
+      completed: 0,
+    };
+    workflowAssignments.forEach((assignment) => {
+      next[assignment.assignment_status as WorkflowStatus] += 1;
+    });
+    return next;
+  }, [workflowAssignments]);
   const statusOptions: Array<StatusTabOption<FilterStatus>> = (
-    [
-      "all",
-      "assigned",
-      "accepted",
-      "in_progress",
-      "completed",
-    ] as FilterStatus[]
+    ["all", ...assignmentStatuses] as FilterStatus[]
   ).map((status) => ({
     value: status,
     label: status === "all" ? t("common.all") : t(statusKey(status)),
-    count:
-      status === "all"
-        ? Object.values(counts).reduce((sum, count) => sum + count, 0)
-        : counts[status],
+    count: status === "all" ? workflowAssignments.length : counts[status],
   }));
-  const filteredAssignments = assignments.filter((assignment) =>
+  const statusFilteredAssignments =
+    query.status === "all"
+      ? workflowAssignments
+      : workflowAssignments.filter(
+          (assignment) => assignment.assignment_status === query.status,
+        );
+  const filteredAssignments = statusFilteredAssignments.filter((assignment) =>
     matchesSearch(assignment, query.debouncedSearch, [
       (item) => item.booking.booking_reference,
       (item) => item.booking.service_name,
@@ -248,12 +213,12 @@ export default function CleanerAssignments() {
       (item) => formatAddress(item.booking.address),
     ]),
   );
-  const visibleAssignments = query.debouncedSearch
-    ? paginateItems(filteredAssignments, query.page, query.pageSize)
-    : filteredAssignments;
-  const visibleTotal = query.debouncedSearch
-    ? filteredAssignments.length
-    : total;
+  const visibleAssignments = paginateItems(
+    filteredAssignments,
+    query.page,
+    query.pageSize,
+  );
+  const visibleTotal = filteredAssignments.length;
 
   return (
     <DashboardLayout title={t("cleaner.myAssignments")}>

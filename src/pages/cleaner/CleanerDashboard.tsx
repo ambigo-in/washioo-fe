@@ -1,17 +1,37 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
+import { LoadingButton } from "../../components/ui";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   loadCleanerAssignments,
   loadCleanerProfile,
+  setCleanerAvailability,
   setCleanerLocation,
 } from "../../store/slices/cleanerSlice";
 import CleanerEarnings from "./CleanerEarnings";
+import type { CleanerProfile } from "../../types/cleanerTypes";
 import { formatAddress } from "../../utils/addressUtils";
 import { getCurrentCoordinates } from "../../utils/locationUtils";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerDashboard.css";
+
+type AvailabilityStatus = CleanerProfile["availability_status"];
+
+const availabilityOptions: AvailabilityStatus[] = [
+  "offline",
+  "available",
+  "busy",
+];
+
+const dashboardStatusPriority: Record<string, number> = {
+  assigned: 0,
+  accepted: 1,
+  in_progress: 2,
+  completed: 3,
+  rejected: 4,
+  cancelled: 5,
+};
 
 export default function CleanerDashboard() {
   const dispatch = useAppDispatch();
@@ -19,6 +39,9 @@ export default function CleanerDashboard() {
   const { profile, assignments, loading } = useAppSelector(
     (state) => state.cleaner,
   );
+  const [availabilityMessage, setAvailabilityMessage] = useState("");
+  const [updatingAvailability, setUpdatingAvailability] =
+    useState<AvailabilityStatus | null>(null);
 
   useEffect(() => {
     dispatch(loadCleanerProfile());
@@ -62,6 +85,53 @@ export default function CleanerDashboard() {
   const completedJobs = assignments.filter(
     (assignment) => assignment.assignment_status === "completed",
   );
+  const isApproved = profile?.approval_status === "approved";
+  const dashboardAssignments = [...assignments]
+    .filter((assignment) =>
+      ["assigned", "accepted", "in_progress", "completed"].includes(
+        assignment.assignment_status,
+      ),
+    )
+    .sort((left, right) => {
+      const priority =
+        (dashboardStatusPriority[left.assignment_status] ?? 99) -
+        (dashboardStatusPriority[right.assignment_status] ?? 99);
+      if (priority !== 0) return priority;
+      return (
+        new Date(right.assigned_at).getTime() -
+        new Date(left.assigned_at).getTime()
+      );
+    });
+
+  const getAssignmentRoute = (status: string, reference: string) =>
+    `/cleaner/assignments?status=${encodeURIComponent(
+      status || "all",
+    )}&q=${encodeURIComponent(reference)}`;
+
+  const getAssignmentStatusLabel = (status: string) =>
+    t(status === "in_progress" ? "booking.inProgress" : `booking.${status}`);
+
+  const handleAvailabilityChange = async (status: AvailabilityStatus) => {
+    if (!isApproved) {
+      setAvailabilityMessage(t("availability.mustBeApproved"));
+      return;
+    }
+
+    setAvailabilityMessage("");
+    setUpdatingAvailability(status);
+    try {
+      if (status === "available") {
+        const coordinates = await getCurrentCoordinates();
+        await dispatch(setCleanerLocation(coordinates)).unwrap();
+      }
+      await dispatch(setCleanerAvailability(status)).unwrap();
+      setAvailabilityMessage(t("availability.updateSuccess"));
+    } catch {
+      setAvailabilityMessage(t("availability.updateFailed"));
+    } finally {
+      setUpdatingAvailability(null);
+    }
+  };
 
   if (loading && !assignments.length) {
     return (
@@ -103,10 +173,95 @@ export default function CleanerDashboard() {
                 <span className="value">{profile?.rating ?? 0}</span>
               </div>
             </div>
-            <Link to="/cleaner/availability" className="manage-btn">
-              {t("actions.manageAvailability")}
+            <div className="availability-inline">
+              <div
+                className="availability-switcher"
+                aria-label={t("availability.setAvailability")}
+              >
+                {availabilityOptions.map((status) => (
+                  <LoadingButton
+                    key={status}
+                    type="button"
+                    className={`availability-switch ${
+                      profile?.availability_status === status ? "active" : ""
+                    } ${status}`}
+                    onClick={() => handleAvailabilityChange(status)}
+                    disabled={
+                      Boolean(updatingAvailability) ||
+                      profile?.availability_status === status
+                    }
+                    isLoading={updatingAvailability === status}
+                    loadingText={t("profile.saving")}
+                  >
+                    {t(`availability.${status}`)}
+                  </LoadingButton>
+                ))}
+              </div>
+              <Link to="/cleaner/availability" className="manage-btn">
+                {t("actions.manageAvailability")}
+              </Link>
+            </div>
+            {availabilityMessage && (
+              <p
+                className={`availability-message ${
+                  availabilityMessage === t("availability.updateSuccess")
+                    ? "success"
+                    : "error"
+                }`}
+              >
+                {availabilityMessage}
+              </p>
+            )}
+          </div>
+        </section>
+
+        <section className="pending-assignments">
+          <div className="section-header">
+            <h2>{t("cleaner.assignedBookings")}</h2>
+            <Link to="/cleaner/assignments" className="view-all">
+              {t("actions.viewAll")}
             </Link>
           </div>
+          {dashboardAssignments.length ? (
+            <div className="assignments-list">
+              {dashboardAssignments.slice(0, 4).map((assignment) => (
+                <Link
+                  key={assignment.id}
+                  className={`assignment-card dashboard-assignment-link ${assignment.assignment_status}`}
+                  to={getAssignmentRoute(
+                    assignment.assignment_status,
+                    assignment.booking.booking_reference,
+                  )}
+                >
+                  <div className="assignment-info">
+                    <div className="assignment-title-row">
+                      <h4>{assignment.booking.service_name}</h4>
+                      <span className="assignment-status-chip">
+                        {getAssignmentStatusLabel(
+                          assignment.assignment_status,
+                        )}
+                      </span>
+                    </div>
+                    <p className="booking-ref">
+                      {assignment.booking.booking_reference}
+                    </p>
+                    <p className="booking-date">
+                      {assignment.booking.scheduled_date} at{" "}
+                      {assignment.booking.scheduled_time.slice(0, 5)}
+                    </p>
+                    <p className="customer-address">
+                      {formatAddress(assignment.booking.address)}
+                    </p>
+                  </div>
+                  <span className="btn-primary">{t("actions.viewDetails")}</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <p>{t("cleaner.noAssignments")}</p>
+            </div>
+          )}
         </section>
 
         <section className="quick-stats">
@@ -129,48 +284,6 @@ export default function CleanerDashboard() {
 
         <CleanerEarnings />
 
-        <section className="pending-assignments">
-          <div className="section-header">
-            <h2>{t("cleaner.assignedBookings")}</h2>
-            <Link to="/cleaner/assignments" className="view-all">
-              {t("actions.viewAll")}
-            </Link>
-          </div>
-          {assignments.length ? (
-            <div className="assignments-list">
-              {assignments.slice(0, 4).map((assignment) => (
-                <div key={assignment.id} className="assignment-card">
-                  <div className="assignment-info">
-                    <h4>{assignment.booking.service_name}</h4>
-                    <p className="booking-ref">
-                      {assignment.booking.booking_reference}
-                    </p>
-                    <p className="booking-date">
-                      {assignment.booking.scheduled_date} at{" "}
-                      {assignment.booking.scheduled_time.slice(0, 5)}
-                    </p>
-                    <p className="customer-address">
-                      {formatAddress(assignment.booking.address)}
-                    </p>
-                  </div>
-                  <div className="assignment-actions">
-                    <Link
-                      className="btn-primary"
-                      to={`/cleaner/bookings/${assignment.booking_id}`}
-                    >
-                      {t("actions.viewDetails")}
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">
-              <p>{t("cleaner.noAssignments")}</p>
-            </div>
-          )}
-        </section>
-
         {pendingJobs.length > 0 && (
           <section className="today-live-services">
             <div className="section-header">
@@ -181,7 +294,10 @@ export default function CleanerDashboard() {
               {pendingJobs.map((assignment) => (
                 <Link
                   key={assignment.id}
-                  to={`/cleaner/bookings/${assignment.booking_id}`}
+                  to={getAssignmentRoute(
+                    assignment.assignment_status,
+                    assignment.booking.booking_reference,
+                  )}
                   className={`live-service-card ${assignment.assignment_status}`}
                 >
                   <div className="live-indicator"></div>

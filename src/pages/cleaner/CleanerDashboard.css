@@ -106,6 +106,66 @@
   background: var(--brand-teal-dark);
 }
 
+.availability-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.availability-switcher {
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px;
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+}
+
+.availability-switch {
+  border: 0;
+  background: transparent;
+  color: var(--brand-text-muted);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.availability-switch.active {
+  background: var(--brand-white);
+  color: var(--brand-text);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
+}
+
+.availability-switch.available.active {
+  color: var(--brand-teal-dark);
+}
+
+.availability-switch.busy.active {
+  color: #b45309;
+}
+
+.availability-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.availability-message {
+  margin: 10px 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.availability-message.success {
+  color: var(--brand-teal-dark);
+}
+
+.availability-message.error {
+  color: #dc3545;
+}
+
 /* Quick Stats */
 .quick-stats {
   margin-bottom: 24px;
@@ -177,6 +237,44 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.dashboard-assignment-link {
+  color: inherit;
+  text-decoration: none;
+  gap: 16px;
+}
+
+.dashboard-assignment-link.assigned,
+.dashboard-assignment-link.accepted,
+.dashboard-assignment-link.in_progress {
+  border-left: 4px solid var(--brand-teal);
+}
+
+.dashboard-assignment-link:hover {
+  border-color: var(--brand-teal);
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.12);
+  transform: translateY(-1px);
+}
+
+.assignment-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.assignment-status-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--brand-teal-soft);
+  color: var(--brand-teal-dark);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
 .assignment-info h4 {
@@ -474,6 +572,15 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .availability-inline,
+  .availability-switcher {
+    width: 100%;
+  }
+
+  .availability-switch {
+    flex: 1;
+  }
+
   .live-service-card {
     gap: 12px;
     padding: 12px;
