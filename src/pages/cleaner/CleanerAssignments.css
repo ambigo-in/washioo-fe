@@ -39,76 +39,66 @@
   gap: 12px;
 }
 
-.assignment-card {
+.cleaner-assignments .assignment-card {
   background: var(--brand-white);
   border-radius: 12px;
   border: 1px solid var(--brand-border);
+  display: block;
   padding: 16px;
 }
 
-.assignment-card.assigned {
+.cleaner-assignments .assignment-card.assigned {
   position: relative;
   overflow: hidden;
   margin: 6px 0;
-  padding: 18px 78px 18px 20px;
+  padding: 18px;
   border: 3px solid #d1434a;
-  border-radius: 10px;
-  background:
-    linear-gradient(90deg, #ffffff 0%, #ffffff 77%, #fff5f5 100%),
-    var(--brand-white);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #fffafa 100%);
   box-shadow:
     0 0 0 0 rgba(209, 67, 74, 0.44),
     0 10px 24px rgba(127, 29, 29, 0.08);
   animation: assigned-border-pulse 1.8s ease-in-out infinite;
 }
 
-.assignment-card.assigned::before {
+.cleaner-assignments .assignment-card.assigned::before {
   content: "";
   position: absolute;
-  left: 12px;
-  top: 50%;
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: #fecaca;
-  transform: translateY(-50%);
+  inset: 0 auto 0 0;
+  width: 6px;
+  background: #d1434a;
 }
 
-.assignment-card.assigned::after {
-  content: "->";
-  position: absolute;
-  inset: 0 0 0 auto;
-  width: 64px;
-  display: grid;
-  place-items: center;
-  color: #d1434a;
-  font-size: 1.35rem;
-  font-weight: 900;
-  background: linear-gradient(90deg, rgba(255, 245, 245, 0), #fff5f5 45%);
-  border-left: 1px solid #fee2e2;
-}
-
-.assignment-card.assigned .assignment-header,
-.assignment-card.assigned .assignment-details,
-.assignment-card.assigned .assignment-actions,
-.assignment-card.assigned .assigned-callout-label {
+.cleaner-assignments .assignment-card.assigned .assignment-header,
+.cleaner-assignments .assignment-card.assigned .assignment-details,
+.cleaner-assignments .assignment-card.assigned .assignment-actions,
+.cleaner-assignments .assignment-card.assigned .assigned-callout-label {
   position: relative;
   z-index: 1;
 }
 
-.assignment-card.assigned .assignment-header,
-.assignment-card.assigned .assignment-details,
-.assignment-card.assigned .assignment-actions {
-  margin-left: 16px;
+.cleaner-assignments .assignment-card.assigned .assignment-header {
+  align-items: center;
 }
 
-.assigned-callout-label {
+.cleaner-assignments .assignment-card.assigned .assignment-details {
+  background: #fff7f7;
+  border: 1px solid #fee2e2;
+}
+
+.cleaner-assignments .assignment-card.assigned .assignment-actions {
+  border-top: 1px solid #fee2e2;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.cleaner-assignments .assigned-callout-label {
   display: inline-flex;
   align-items: center;
   width: fit-content;
   min-height: 24px;
   padding: 4px 12px;
-  margin: 0 0 8px 16px;
+  margin: 0 0 8px;
   border-radius: 999px;
   background: #d1434a;
   color: var(--brand-white);
@@ -395,28 +385,16 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .assignment-card {
+  .cleaner-assignments .assignment-card {
     padding: 12px;
   }
 
-  .assignment-card.assigned {
-    padding: 14px 54px 14px 14px;
+  .cleaner-assignments .assignment-card.assigned {
+    padding: 14px;
   }
 
-  .assignment-card.assigned::before {
-    display: none;
-  }
-
-  .assignment-card.assigned::after {
-    width: 44px;
-    font-size: 1rem;
-  }
-
-  .assignment-card.assigned .assignment-header,
-  .assignment-card.assigned .assignment-details,
-  .assignment-card.assigned .assignment-actions,
-  .assigned-callout-label {
-    margin-left: 0;
+  .cleaner-assignments .assignment-card.assigned::before {
+    width: 4px;
   }
 
   .assignment-header {
@@ -464,7 +442,7 @@
 }
 
 @media (max-width: 640px) {
-  .assignment-card {
+  .cleaner-assignments .assignment-card {
     padding: 10px;
   }
 

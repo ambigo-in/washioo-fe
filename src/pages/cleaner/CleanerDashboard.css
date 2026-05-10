@@ -253,39 +253,19 @@
 .dashboard-assignment-link.assigned {
   position: relative;
   overflow: hidden;
-  padding-right: 74px;
+  padding: 14px 16px 14px 18px;
   border: 3px solid #d1434a;
-  border-radius: 10px;
-  background:
-    linear-gradient(90deg, #ffffff 0%, #ffffff 76%, #fff5f5 100%),
-    var(--brand-white);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #fffafa 100%);
   animation: dashboard-assigned-border-pulse 1.8s ease-in-out infinite;
 }
 
 .dashboard-assignment-link.assigned::before {
   content: "";
   position: absolute;
-  left: 12px;
-  top: 50%;
-  width: 11px;
-  height: 11px;
-  border-radius: 999px;
-  background: #fecaca;
-  transform: translateY(-50%);
-}
-
-.dashboard-assignment-link.assigned::after {
-  content: "->";
-  position: absolute;
-  inset: 0 0 0 auto;
-  width: 60px;
-  display: grid;
-  place-items: center;
-  color: #d1434a;
-  font-size: 1.25rem;
-  font-weight: 900;
-  background: linear-gradient(90deg, rgba(255, 245, 245, 0), #fff5f5 45%);
-  border-left: 1px solid #fee2e2;
+  inset: 0 auto 0 0;
+  width: 6px;
+  background: #d1434a;
 }
 
 .dashboard-assignment-link.assigned .assignment-info,
@@ -295,7 +275,7 @@
 }
 
 .dashboard-assignment-link.assigned .assignment-info {
-  margin-left: 18px;
+  margin-left: 0;
 }
 
 @keyframes dashboard-assigned-border-pulse {
@@ -313,8 +293,8 @@
 }
 
 .dashboard-assignment-link:hover {
-  border-color: var(--brand-teal);
-  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.12);
+  border-color: #c83c43;
+  box-shadow: 0 6px 18px rgba(127, 29, 29, 0.12);
   transform: translateY(-1px);
 }
 
@@ -659,20 +639,11 @@
   }
 
   .dashboard-assignment-link.assigned {
-    padding-right: 50px;
+    padding: 14px;
   }
 
   .dashboard-assignment-link.assigned::before {
-    display: none;
-  }
-
-  .dashboard-assignment-link.assigned::after {
-    width: 42px;
-    font-size: 1rem;
-  }
-
-  .dashboard-assignment-link.assigned .assignment-info {
-    margin-left: 0;
+    width: 4px;
   }
 
   .live-service-card {
