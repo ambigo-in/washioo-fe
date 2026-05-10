@@ -97,7 +97,7 @@ export default function CleanerBookingDetails() {
     booking?.booking_status === "completed" &&
     inferredPaymentStatus === "pending_collection";
   const assignment = booking?.assignment;
-  const canViewCustomerDetails =
+  const canViewCustomerContact =
     assignment?.assignment_status === "accepted" ||
     assignment?.assignment_status === "in_progress" ||
     assignment?.assignment_status === "completed";
@@ -182,13 +182,11 @@ export default function CleanerBookingDetails() {
               <span className={`status-pill ${booking.booking_status}`}>
                 {t(`booking.${booking.booking_status === "in_progress" ? "inProgress" : booking.booking_status}`)}
               </span>
-              {canViewCustomerDetails && (
-                <OpenInMapsButton
-                  latitude={address?.latitude}
-                  longitude={address?.longitude}
-                  mode="directions"
-                />
-              )}
+              <OpenInMapsButton
+                latitude={address?.latitude}
+                longitude={address?.longitude}
+                mode="directions"
+              />
             </div>
           </div>
 
@@ -252,7 +250,7 @@ export default function CleanerBookingDetails() {
           <div className="detail-grid">
             <section className="detail-card">
               <h3>{t("cleaner.customer")}</h3>
-              {canViewCustomerDetails ? (
+              {canViewCustomerContact ? (
                 <dl>
                   <div>
                     <dt>{t("common.name")}</dt>
@@ -273,13 +271,7 @@ export default function CleanerBookingDetails() {
 
             <section className="detail-card">
               <h3>{t("common.address")}</h3>
-              {canViewCustomerDetails ? (
-                <p className="full-address">{formatAddress(address)}</p>
-              ) : (
-                <p className="privacy-note">
-                  The service address is shown after accepting the booking.
-                </p>
-              )}
+              <p className="full-address">{formatAddress(address)}</p>
             </section>
 
             <section className="detail-card">
