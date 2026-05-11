@@ -8,6 +8,7 @@ import {
   PaginationControls,
   paginateItems,
 } from "../../components/dashboard/DashboardControls";
+import { formatDisplayDate } from "../../utils/dateTimeUtils";
 import "./AdminDashboard.css";
 
 const RECENT_BOOKINGS_PAGE_SIZE = 5;
@@ -195,7 +196,7 @@ export default function AdminDashboard() {
                       <td>{booking.customer_name}</td>
                       <td>{booking.service_name}</td>
                       <td>
-                        {new Date(booking.scheduled_date).toLocaleDateString()}
+                        {formatDisplayDate(booking.scheduled_date)}
                       </td>
                       <td>
                         <span

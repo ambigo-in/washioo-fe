@@ -231,6 +231,7 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "booking.paymentStatus": "Payment Status",
     "booking.pending": "Pending",
     "booking.scheduleRequired": "Choose both service date and time.",
+    "booking.scheduleFutureRequired": "Choose today or a future date and time.",
     "booking.searchPlaceholder": "Search by reference, service, address...",
     "booking.selectAddress": "Select Address",
     "booking.selectedService": "Selected service",

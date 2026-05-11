@@ -12,6 +12,7 @@ import {
 import CleanerEarnings from "./CleanerEarnings";
 import type { CleanerProfile } from "../../types/cleanerTypes";
 import { formatAddress } from "../../utils/addressUtils";
+import { formatScheduleDateTime } from "../../utils/dateTimeUtils";
 import { getCurrentCoordinates } from "../../utils/locationUtils";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerDashboard.css";
@@ -202,8 +203,10 @@ export default function CleanerDashboard() {
                   <div className="live-service-info">
                     <h3>{assignment.booking.service_name}</h3>
                     <p className="booking-time">
-                      {assignment.booking.scheduled_date} at{" "}
-                      {assignment.booking.scheduled_time.slice(0, 5)}
+                      {formatScheduleDateTime(
+                        assignment.booking.scheduled_date,
+                        assignment.booking.scheduled_time,
+                      )}
                     </p>
                     <p className="booking-location">
                       {formatAddress(assignment.booking.address)}

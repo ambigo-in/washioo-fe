@@ -11,6 +11,7 @@ import {
   useDashboardQueryState,
 } from "../../components/dashboard/DashboardControls";
 import { formatIndianPhoneForDisplay } from "../../utils/phoneUtils";
+import { formatDisplayDate } from "../../utils/dateTimeUtils";
 import "./AdminUsers.css";
 
 export default function AdminUsers() {
@@ -70,15 +71,6 @@ export default function AdminUsers() {
           {role.toUpperCase()}
         </span>
       );
-    });
-  };
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
     });
   };
 
@@ -160,7 +152,7 @@ export default function AdminUsers() {
                         {user.is_active ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td>{formatDate(user.created_at)}</td>
+                    <td>{formatDisplayDate(user.created_at)}</td>
                   </tr>
                 ))}
               </tbody>

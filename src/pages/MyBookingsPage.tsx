@@ -19,6 +19,15 @@ import {
   patchBooking,
 } from "../store/slices/customerSlice";
 import { formatAddress } from "../utils/addressUtils";
+import {
+  formatDisplayDate,
+  formatDisplayTime,
+  getDateValue,
+  getLocalDateInputValue,
+  getLocalTimeInputValue,
+  getMinTimeForDate,
+  isPastSchedule,
+} from "../utils/dateTimeUtils";
 import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/myBookings.css";
 
@@ -90,8 +99,11 @@ const MyBookingsPage: React.FC = () => {
 
   // Helper functions for filtering
   const isDateInRange = (dateStr: string, range: string) => {
-    const bookingDate = new Date(dateStr);
-    const today = new Date();
+    const bookingDate = getDateValue(dateStr);
+    if (!bookingDate) return false;
+
+    const today = getDateValue(getLocalDateInputValue());
+    if (!today) return false;
     today.setHours(0, 0, 0, 0);
 
     switch (range) {
@@ -131,14 +143,14 @@ const MyBookingsPage: React.FC = () => {
       case "date-desc":
         return sorted.sort(
           (a, b) =>
-            new Date(b.scheduled_date).getTime() -
-            new Date(a.scheduled_date).getTime(),
+            (getDateValue(b.scheduled_date)?.getTime() ?? 0) -
+            (getDateValue(a.scheduled_date)?.getTime() ?? 0),
         );
       case "date-asc":
         return sorted.sort(
           (a, b) =>
-            new Date(a.scheduled_date).getTime() -
-            new Date(b.scheduled_date).getTime(),
+            (getDateValue(a.scheduled_date)?.getTime() ?? 0) -
+            (getDateValue(b.scheduled_date)?.getTime() ?? 0),
         );
       case "price-desc":
         return sorted.sort(
@@ -167,6 +179,16 @@ const MyBookingsPage: React.FC = () => {
 
   const handleUpdate = async (booking: CustomerBooking) => {
     setError("");
+
+    if (!editDate || !editTime) {
+      setError(t("booking.scheduleRequired"));
+      return;
+    }
+
+    if (isPastSchedule(editDate, editTime)) {
+      setError(t("booking.scheduleFutureRequired"));
+      return;
+    }
 
     try {
       await dispatch(
@@ -360,11 +382,11 @@ const MyBookingsPage: React.FC = () => {
                 <div className="booking-details-grid">
                   <div>
                     <span>{t("common.date")}</span>
-                    <strong>{booking.scheduled_date}</strong>
+                    <strong>{formatDisplayDate(booking.scheduled_date)}</strong>
                   </div>
                   <div>
                     <span>{t("common.time")}</span>
-                    <strong>{booking.scheduled_time.slice(0, 5)}</strong>
+                    <strong>{formatDisplayTime(booking.scheduled_time)}</strong>
                   </div>
                   <div>
                     <span>{t("common.price")}</span>
@@ -407,11 +429,19 @@ const MyBookingsPage: React.FC = () => {
                   <div className="booking-edit-form">
                     <input
                       type="date"
+                      min={getLocalDateInputValue()}
                       value={editDate}
-                      onChange={(event) => setEditDate(event.target.value)}
+                      onChange={(event) => {
+                        const nextDate = event.target.value;
+                        setEditDate(nextDate);
+                        if (editTime && isPastSchedule(nextDate, editTime)) {
+                          setEditTime(getLocalTimeInputValue());
+                        }
+                      }}
                     />
                     <input
                       type="time"
+                      min={getMinTimeForDate(editDate)}
                       value={editTime}
                       onChange={(event) => setEditTime(event.target.value)}
                     />

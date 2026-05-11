@@ -21,6 +21,7 @@ import {
   submitAdminSplit,
 } from "../../store/slices/paymentSlice";
 import type { CleanerHandoverStatus, Payment, PaymentStatus } from "../../types/apiTypes";
+import { formatDisplayDateTime } from "../../utils/dateTimeUtils";
 import "./AdminPayments.css";
 
 type FilterStatus = "all" | "collected" | "split_done" | "admin_due" | "admin_collected";
@@ -377,7 +378,7 @@ export default function AdminPayments() {
                         <span>Split At</span>
                         <strong>
                           {payment.split_updated_at
-                            ? new Date(payment.split_updated_at).toLocaleString()
+                            ? formatDisplayDateTime(payment.split_updated_at)
                             : "N/A"}
                         </strong>
                       </div>

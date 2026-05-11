@@ -13,6 +13,7 @@ import {
   getFilteredNotifications,
   getNotificationTargetPath,
 } from "../../utils/notificationUtils";
+import { formatDisplayDateTime } from "../../utils/dateTimeUtils";
 import {
   useLanguage,
   type LanguageCode,
@@ -285,9 +286,7 @@ export default function DashboardLayout({
                               {notification.message}
                             </span>
                             <span className="notification-time">
-                              {new Date(
-                                notification.created_at,
-                              ).toLocaleString()}
+                              {formatDisplayDateTime(notification.created_at)}
                             </span>
                           </button>
                         ))}

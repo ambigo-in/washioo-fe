@@ -16,6 +16,14 @@ import {
   type LocationError,
 } from "../utils/locationUtils";
 import { formatAddress } from "../utils/addressUtils";
+import {
+  addLocalDays,
+  formatDisplayTime,
+  getLocalDateInputValue,
+  getLocalTimeInputValue,
+  getMinTimeForDate,
+  isPastSchedule,
+} from "../utils/dateTimeUtils";
 import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/checkout.css";
 
@@ -44,13 +52,7 @@ const emptyAddress: AddressPayload = {
   is_default: false,
 };
 
-const today = new Date().toISOString().split("T")[0];
-const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
-  .toISOString()
-  .split("T")[0];
 const quickTimeOptions = ["now", "09:00", "14:00", "18:00"];
-
-const formatCurrentTime = () => new Date().toTimeString().slice(0, 5);
 
 const compactAddressPayload = (payload: AddressPayload): AddressPayload => ({
   address_label: payload.address_label?.trim() || "Home",
@@ -92,6 +94,9 @@ const CheckoutPage: React.FC = () => {
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [instructions, setInstructions] = useState("");
+  const today = getLocalDateInputValue();
+  const tomorrow = getLocalDateInputValue(addLocalDays(1));
+  const minScheduledTime = scheduledDate ? getMinTimeForDate(scheduledDate) : undefined;
 
   const hasUnsavedAddress = !!(
     formData.address_line1.trim() ||
@@ -275,6 +280,8 @@ const CheckoutPage: React.FC = () => {
 
     if (!scheduledDate || !scheduledTime) {
       nextFieldErrors.schedule = t("booking.scheduleRequired");
+    } else if (isPastSchedule(scheduledDate, scheduledTime)) {
+      nextFieldErrors.schedule = t("booking.scheduleFutureRequired");
     }
 
     if (Object.keys(nextFieldErrors).length) {
@@ -535,6 +542,9 @@ const CheckoutPage: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setScheduledDate(today);
+                  if (scheduledTime && isPastSchedule(today, scheduledTime)) {
+                    setScheduledTime(getLocalTimeInputValue());
+                  }
                   setFieldErrors((prev) => ({ ...prev, schedule: undefined }));
                 }}
               >
@@ -557,7 +567,14 @@ const CheckoutPage: React.FC = () => {
                 type="date"
                 value={scheduledDate}
                 onChange={(event) => {
-                  setScheduledDate(event.target.value);
+                  const nextDate = event.target.value;
+                  setScheduledDate(nextDate);
+                  if (
+                    scheduledTime &&
+                    isPastSchedule(nextDate, scheduledTime)
+                  ) {
+                    setScheduledTime(getLocalTimeInputValue());
+                  }
                   setFieldErrors((prev) => ({ ...prev, schedule: undefined }));
                 }}
                 aria-invalid={!!fieldErrors.schedule}
@@ -570,17 +587,26 @@ const CheckoutPage: React.FC = () => {
                 <button
                   key={timeOption}
                   type="button"
+                  disabled={
+                    timeOption !== "now" &&
+                    isPastSchedule(scheduledDate || today, timeOption)
+                  }
                   onClick={() => {
                     setScheduledTime(
-                      timeOption === "now" ? formatCurrentTime() : timeOption,
+                      timeOption === "now" ? getLocalTimeInputValue() : timeOption,
                     );
+                    if (!scheduledDate) {
+                      setScheduledDate(today);
+                    }
                     setFieldErrors((prev) => ({
                       ...prev,
                       schedule: undefined,
                     }));
                   }}
                 >
-                  {timeOption === "now" ? t("booking.now") : timeOption}
+                  {timeOption === "now"
+                    ? t("booking.now")
+                    : formatDisplayTime(timeOption)}
                 </button>
               ))}
             </div>
@@ -588,6 +614,7 @@ const CheckoutPage: React.FC = () => {
               {t("common.time")}
               <input
                 type="time"
+                min={minScheduledTime}
                 value={scheduledTime}
                 onChange={(event) => {
                   setScheduledTime(event.target.value);

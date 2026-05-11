@@ -21,6 +21,7 @@ import {
   loadAdminCleaners,
 } from "../../store/slices/adminSlice";
 import { formatAddress } from "../../utils/addressUtils";
+import { formatScheduleDateTime } from "../../utils/dateTimeUtils";
 import "./AdminBookings.css";
 
 type FilterStatus = "all" | BookingStatus;
@@ -250,8 +251,10 @@ export default function AdminBookings() {
                   <div className="detail-item">
                     <span className="label">Date</span>
                     <span className="value">
-                      {new Date(booking.scheduled_date).toLocaleDateString()} at{" "}
-                      {booking.scheduled_time.slice(0, 5)}
+                      {formatScheduleDateTime(
+                        booking.scheduled_date,
+                        booking.scheduled_time,
+                      )}
                     </span>
                   </div>
                   <div className="detail-item">

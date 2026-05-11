@@ -8,6 +8,7 @@ import { LoadingButton } from "./ui";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { submitRating } from "../store/slices/ratingSlice";
 import { useLanguage } from "../i18n/LanguageContext";
+import { formatDisplayDateTime } from "../utils/dateTimeUtils";
 import type { BookingStatus } from "../types/apiTypes";
 import type { RatingResponse } from "../types/ratingTypes";
 import "./BookingRatingPanel.css";
@@ -216,7 +217,7 @@ export default function BookingRatingPanel({
               <StarMeter value={entry.rating} label={`${entry.rating.toFixed(1)} / 5`} />
               {entry.comment && <p>{entry.comment}</p>}
               <time dateTime={entry.created_at}>
-                {new Date(entry.created_at).toLocaleString()}
+                {formatDisplayDateTime(entry.created_at)}
               </time>
             </article>
           ))}

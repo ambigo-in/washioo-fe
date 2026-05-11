@@ -11,6 +11,7 @@ import {
   useDashboardQueryState,
 } from "../../components/dashboard/DashboardControls";
 import { formatAddress } from "../../utils/addressUtils";
+import { formatDisplayDate, formatDisplayTime } from "../../utils/dateTimeUtils";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerHistory.css";
 
@@ -65,15 +66,6 @@ export default function CleanerHistory() {
       default:
         return <span className="status-badge">{status}</span>;
     }
-  };
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
   };
 
   const formatMoney = (value: number) =>
@@ -196,7 +188,7 @@ export default function CleanerHistory() {
                     {getStatusBadge(assignment.assignment_status)}
                   </div>
                   <span className="booking-date">
-                    {formatDate(assignment.booking?.scheduled_date)}
+                    {formatDisplayDate(assignment.booking?.scheduled_date)}
                   </span>
                 </div>
 
@@ -222,7 +214,7 @@ export default function CleanerHistory() {
                   <div className="detail-row">
                     <span className="detail-label">{t("history.time")}</span>
                     <span className="detail-value">
-                      {assignment.booking?.scheduled_time || "N/A"}
+                      {formatDisplayTime(assignment.booking?.scheduled_time)}
                     </span>
                   </div>
                   <div className="detail-row">

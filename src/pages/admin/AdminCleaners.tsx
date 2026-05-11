@@ -12,6 +12,7 @@ import {
   type StatusTabOption,
 } from "../../components/dashboard/DashboardControls";
 import { formatIndianPhoneForDisplay } from "../../utils/phoneUtils";
+import { formatDisplayDate } from "../../utils/dateTimeUtils";
 import "./AdminCleaners.css";
 
 type ApprovalStatus = CleanerProfile["approval_status"];
@@ -384,9 +385,7 @@ export default function AdminCleaners() {
                     <div className="detail-item">
                       <span className="label">Joined Date</span>
                       <span className="value">
-                        {new Date(
-                          selectedCleaner.created_at,
-                        ).toLocaleDateString()}
+                        {formatDisplayDate(selectedCleaner.created_at)}
                       </span>
                     </div>
                   </div>

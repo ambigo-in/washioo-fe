@@ -11,6 +11,7 @@ import {
   getFilteredNotifications,
   getNotificationTargetPath,
 } from "../utils/notificationUtils";
+import { formatDisplayDateTime } from "../utils/dateTimeUtils";
 import "./NotificationsPage.css";
 
 export default function NotificationsPage() {
@@ -137,9 +138,7 @@ export default function NotificationsPage() {
                   {!notification.is_read && <span>New</span>}
                 </div>
                 <p>{notification.message}</p>
-                <small>
-                  {new Date(notification.created_at).toLocaleString()}
-                </small>
+                <small>{formatDisplayDateTime(notification.created_at)}</small>
               </button>
             ))}
           </div>

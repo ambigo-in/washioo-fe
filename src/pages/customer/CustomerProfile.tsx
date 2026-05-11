@@ -5,6 +5,7 @@ import { useAuth } from "../../context/useAuth";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { updateProfileRequest } from "../../store/slices/authSlice";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { formatDisplayDate } from "../../utils/dateTimeUtils";
 import "./CustomerProfile.css";
 
 interface ProfileFormData {
@@ -130,7 +131,7 @@ export default function CustomerProfile() {
               <span className="info-label">{t("profile.memberSince")}</span>
               <span className="info-value">
                 {user?.created_at
-                  ? new Date(user.created_at).toLocaleDateString()
+                  ? formatDisplayDate(user.created_at)
                   : "N/A"}
               </span>
             </div>

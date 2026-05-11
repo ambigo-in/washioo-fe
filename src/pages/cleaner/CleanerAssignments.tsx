@@ -24,6 +24,7 @@ import {
 import { loadCleanerEarnings } from "../../store/slices/paymentSlice";
 import type { PaymentType } from "../../types/apiTypes";
 import { formatAddress } from "../../utils/addressUtils";
+import { formatScheduleDateTime } from "../../utils/dateTimeUtils";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerAssignments.css";
 
@@ -349,11 +350,10 @@ export default function CleanerAssignments() {
                     <div className="detail-row">
                       <span className="label">📅</span>
                       <span>
-                        {new Date(
+                        {formatScheduleDateTime(
                           assignment.booking.scheduled_date,
-                        ).toLocaleDateString()}
-                        {" at "}
-                        {assignment.booking.scheduled_time.slice(0, 5)}
+                          assignment.booking.scheduled_time,
+                        )}
                       </span>
                     </div>
                     <div className="detail-row">

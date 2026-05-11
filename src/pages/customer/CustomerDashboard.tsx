@@ -8,6 +8,7 @@ import {
 } from "../../store/slices/customerSlice";
 import { loadServices } from "../../store/slices/servicesSlice";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { formatScheduleDateTime } from "../../utils/dateTimeUtils";
 import "./CustomerDashboard.css";
 
 export default function CustomerDashboard() {
@@ -170,8 +171,10 @@ export default function CustomerDashboard() {
                     <h4>{booking.service_name}</h4>
                     <p className="booking-ref">{booking.booking_reference}</p>
                     <p className="booking-date">
-                      {new Date(booking.scheduled_date).toLocaleDateString()} at{" "}
-                      {booking.scheduled_time.slice(0, 5)}
+                      {formatScheduleDateTime(
+                        booking.scheduled_date,
+                        booking.scheduled_time,
+                      )}
                     </p>
                   </div>
                   <div className="booking-status">

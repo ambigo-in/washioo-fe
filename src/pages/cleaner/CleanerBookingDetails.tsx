@@ -20,6 +20,11 @@ import {
 import type { Payment, PaymentStatus, PaymentType } from "../../types/apiTypes";
 import type { CleanerBookingDetail } from "../../types/cleanerTypes";
 import { formatAddress } from "../../utils/addressUtils";
+import {
+  formatDisplayDate,
+  formatDisplayTime,
+  formatScheduleDateTime,
+} from "../../utils/dateTimeUtils";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerBookingDetails.css";
 
@@ -174,9 +179,7 @@ export default function CleanerBookingDetails() {
                 {booking.booking_reference}
               </span>
               <h2>{booking.service_name || t("booking.serviceBooking")}</h2>
-              <p>
-                {booking.scheduled_date} {t("common.time")} {booking.scheduled_time.slice(0, 5)}
-              </p>
+              <p>{formatScheduleDateTime(booking.scheduled_date, booking.scheduled_time)}</p>
             </div>
             <div className="hero-actions">
               <span className={`status-pill ${booking.booking_status}`}>
@@ -283,11 +286,11 @@ export default function CleanerBookingDetails() {
                 </div>
                 <div>
                   <dt>{t("common.date")}</dt>
-                  <dd>{booking.scheduled_date}</dd>
+                  <dd>{formatDisplayDate(booking.scheduled_date)}</dd>
                 </div>
                 <div>
                   <dt>{t("common.time")}</dt>
-                  <dd>{booking.scheduled_time.slice(0, 5)}</dd>
+                  <dd>{formatDisplayTime(booking.scheduled_time)}</dd>
                 </div>
               </dl>
             </section>

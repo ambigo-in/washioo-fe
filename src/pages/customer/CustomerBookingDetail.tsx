@@ -11,6 +11,11 @@ import {
 } from "../../store/slices/paymentSlice";
 import type { CustomerBooking } from "../../types/apiTypes";
 import { formatAddress } from "../../utils/addressUtils";
+import {
+  formatDisplayDate,
+  formatDisplayTime,
+  formatScheduleDateTime,
+} from "../../utils/dateTimeUtils";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CustomerBookingDetail.css";
 
@@ -77,9 +82,7 @@ export default function CustomerBookingDetail() {
                 {booking.booking_reference}
               </span>
               <h2>{booking.service_name}</h2>
-              <p>
-                {booking.scheduled_date} {t("common.time")} {booking.scheduled_time.slice(0, 5)}
-              </p>
+              <p>{formatScheduleDateTime(booking.scheduled_date, booking.scheduled_time)}</p>
             </div>
             <span className={`booking-status ${booking.booking_status}`}>
               {t(`booking.${booking.booking_status === "in_progress" ? "inProgress" : booking.booking_status}`)}
@@ -98,11 +101,11 @@ export default function CustomerBookingDetail() {
                 </div>
                 <div>
                   <dt>{t("common.date")}</dt>
-                  <dd>{booking.scheduled_date}</dd>
+                  <dd>{formatDisplayDate(booking.scheduled_date)}</dd>
                 </div>
                 <div>
                   <dt>{t("common.time")}</dt>
-                  <dd>{booking.scheduled_time.slice(0, 5)}</dd>
+                  <dd>{formatDisplayTime(booking.scheduled_time)}</dd>
                 </div>
               </dl>
             </section>

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loadCleanerEarnings } from "../../store/slices/paymentSlice";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { formatDisplayDateTime } from "../../utils/dateTimeUtils";
 import "./CleanerEarnings.css";
 
 const formatMoney = (value?: number | null) =>
@@ -9,9 +10,6 @@ const formatMoney = (value?: number | null) =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
-
-const formatDate = (value?: string | null) =>
-  value ? new Date(value).toLocaleString() : "Not updated yet";
 
 export default function CleanerEarnings() {
   const dispatch = useAppDispatch();
@@ -50,7 +48,8 @@ export default function CleanerEarnings() {
       </div>
 
       <p className="earnings-updated">
-        {t("earnings.updated")}: {formatDate(earnings?.last_updated)}
+        {t("earnings.updated")}:{" "}
+        {formatDisplayDateTime(earnings?.last_updated, "Not updated yet")}
       </p>
     </section>
   );

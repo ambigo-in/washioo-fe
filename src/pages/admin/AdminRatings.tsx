@@ -15,6 +15,7 @@ import {
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import type { AdminBooking } from "../../types/adminTypes";
 import type { RatingResponse, RatingReviewerRole } from "../../types/ratingTypes";
+import { formatDisplayDateTime } from "../../utils/dateTimeUtils";
 import "./AdminRatings.css";
 
 type RatingFilter = "all" | RatingReviewerRole;
@@ -213,7 +214,7 @@ export default function AdminRatings() {
                         </td>
                         <td>{rating.reviewee_name || booking?.assignment?.cleaner_name || "N/A"}</td>
                         <td>{rating.comment || "No comment"}</td>
-                        <td>{new Date(rating.created_at).toLocaleString()}</td>
+                        <td>{formatDisplayDateTime(rating.created_at)}</td>
                       </tr>
                     );
                   })}
