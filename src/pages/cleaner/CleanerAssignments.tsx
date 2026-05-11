@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import {
@@ -94,6 +94,7 @@ const getWorkflowStatus = (assignment: {
 
 export default function CleanerAssignments() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const { assignments, loading } = useAppSelector(
     (state) => state.cleaner,
@@ -112,6 +113,11 @@ export default function CleanerAssignments() {
   } | null>(null);
   const [actionError, setActionError] = useState("");
 
+  const switchStatusTab = (status: FilterStatus) => {
+    query.setStatus(status);
+    navigate(`/cleaner/assignments?status=${status}`, { replace: true });
+  };
+
   useEffect(() => {
     dispatch(loadCleanerAssignments(assignmentListParams));
   }, [dispatch]);
@@ -126,8 +132,8 @@ export default function CleanerAssignments() {
           actionPayload: { cleaner_notes: "Accepted" },
         }),
       ).unwrap();
-      query.setStatus("accepted");
-      dispatch(loadCleanerAssignments(assignmentListParams));
+      await dispatch(loadCleanerAssignments(assignmentListParams)).unwrap();
+      switchStatusTab("accepted");
     } catch (error) {
       setActionError(String(error));
     } finally {
@@ -163,8 +169,8 @@ export default function CleanerAssignments() {
           actionPayload: { cleaner_notes: "Started" },
         }),
       ).unwrap();
-      query.setStatus("in_progress");
-      dispatch(loadCleanerAssignments(assignmentListParams));
+      await dispatch(loadCleanerAssignments(assignmentListParams)).unwrap();
+      switchStatusTab("in_progress");
     } catch (error) {
       setActionError(String(error));
     } finally {
@@ -203,8 +209,8 @@ export default function CleanerAssignments() {
         }),
       ).unwrap();
       dispatch(loadCleanerEarnings());
-      query.setStatus("completed");
-      dispatch(loadCleanerAssignments(assignmentListParams));
+      await dispatch(loadCleanerAssignments(assignmentListParams)).unwrap();
+      switchStatusTab("completed");
     } catch (error) {
       setActionError(String(error));
     } finally {

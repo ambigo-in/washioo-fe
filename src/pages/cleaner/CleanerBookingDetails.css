@@ -145,6 +145,39 @@
   overflow-wrap: anywhere;
 }
 
+.customer-call-button {
+  align-items: center;
+  background: var(--brand-teal);
+  border-radius: 10px;
+  color: var(--brand-white);
+  display: inline-flex;
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 14px;
+  text-decoration: none;
+  width: fit-content;
+}
+
+.customer-call-button:hover {
+  background: var(--brand-teal-dark);
+}
+
+.customer-call-button:focus-visible {
+  outline: 3px solid var(--brand-teal-soft);
+  outline-offset: 2px;
+}
+
+.customer-call-icon {
+  fill: none;
+  flex: 0 0 auto;
+  height: 18px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 18px;
+}
+
 .full-address + .full-address {
   margin-top: 8px;
 }

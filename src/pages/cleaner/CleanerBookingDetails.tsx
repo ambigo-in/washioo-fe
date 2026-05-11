@@ -25,6 +25,7 @@ import {
   formatDisplayTime,
   formatScheduleDateTime,
 } from "../../utils/dateTimeUtils";
+import { normalizeIndianPhone } from "../../utils/phoneUtils";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CleanerBookingDetails.css";
 
@@ -33,6 +34,18 @@ const formatMoney = (value: number) =>
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+
+const getPhoneDialHref = (value?: string | null) => {
+  if (!value) return null;
+
+  const normalizedPhone = normalizeIndianPhone(value);
+  if (/^[6-9]\d{9}$/.test(normalizedPhone)) {
+    return `tel:+91${normalizedPhone}`;
+  }
+
+  const dialablePhone = value.replace(/[^\d+]/g, "");
+  return dialablePhone ? `tel:${dialablePhone}` : null;
+};
 
 export default function CleanerBookingDetails() {
   const { bookingId } = useParams();
@@ -104,8 +117,8 @@ export default function CleanerBookingDetails() {
   const assignment = booking?.assignment;
   const canViewCustomerContact =
     assignment?.assignment_status === "accepted" ||
-    assignment?.assignment_status === "in_progress" ||
-    assignment?.assignment_status === "completed";
+    assignment?.assignment_status === "in_progress";
+  const customerCallHref = getPhoneDialHref(booking?.customer_phone);
 
   const refreshAfterAssignmentAction = async (
     action: typeof acceptCleanerAssignment,
@@ -261,13 +274,34 @@ export default function CleanerBookingDetails() {
                   </div>
                   <div>
                     <dt>{t("common.phone")}</dt>
-                    <dd>{booking.customer_phone || t("common.notAvailable")}</dd>
+                    <dd>
+                      {customerCallHref ? (
+                        <a
+                          className="customer-call-button"
+                          href={customerCallHref}
+                          aria-label={t("cleaner.callCustomer")}
+                          title={t("cleaner.callCustomer")}
+                        >
+                          <svg
+                            className="customer-call-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                          >
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.35 1.9.66 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.31 1.85.53 2.81.66A2 2 0 0 1 22 16.92z" />
+                          </svg>
+                          <span>{t("cleaner.callCustomer")}</span>
+                        </a>
+                      ) : (
+                        t("common.notAvailable")
+                      )}
+                    </dd>
                   </div>
                 </dl>
               ) : (
                 <p className="privacy-note">
-                  Accept this booking to view the customer's name and mobile
-                  number.
+                  Customer contact is available only after accepting and until
+                  the service is completed.
                 </p>
               )}
             </section>

@@ -1063,6 +1063,7 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
     "common.cleaner": "Cleaner",
     "common.customer": "Customer",
     "common.delete": "Delete",
+    "cleaner.callCustomer": "Call customer",
     "profile.aadhaar": "Aadhaar",
     "profile.drivingLicense": "Driving License",
     "profile.fullDetailsUnavailable": "Full document number is not available from the API. Showing the masked value.",

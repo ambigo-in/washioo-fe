@@ -101,8 +101,7 @@ export default function CleanerDashboard() {
     }
   };
 
-  const getAssignmentRoute = (status: string) =>
-    `/cleaner/assignments?status=${encodeURIComponent(status || "all")}`;
+  const assignedAssignmentsRoute = "/cleaner/assignments?status=assigned";
 
   if (loading && !assignments.length) {
     return (
@@ -196,7 +195,7 @@ export default function CleanerDashboard() {
               {pendingJobs.map((assignment) => (
                 <Link
                   key={assignment.id}
-                  to={getAssignmentRoute(assignment.assignment_status)}
+                  to={assignedAssignmentsRoute}
                   className={`live-service-card ${assignment.assignment_status}`}
                 >
                   <div className="live-indicator"></div>

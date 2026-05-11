@@ -56,8 +56,8 @@ export interface Assignment {
     id: string;
     booking_reference: string;
     customer_id: string;
-    customer_name: string;
-    customer_phone: string;
+    customer_name: string | null;
+    customer_phone: string | null;
     service_name: string;
     service_category_id: string;
     scheduled_date: string;
