@@ -126,6 +126,7 @@ export default function CleanerAssignments() {
           actionPayload: { cleaner_notes: "Accepted" },
         }),
       ).unwrap();
+      query.setStatus("accepted");
       dispatch(loadCleanerAssignments(assignmentListParams));
     } catch (error) {
       setActionError(String(error));
@@ -162,6 +163,7 @@ export default function CleanerAssignments() {
           actionPayload: { cleaner_notes: "Started" },
         }),
       ).unwrap();
+      query.setStatus("in_progress");
       dispatch(loadCleanerAssignments(assignmentListParams));
     } catch (error) {
       setActionError(String(error));
@@ -201,6 +203,7 @@ export default function CleanerAssignments() {
         }),
       ).unwrap();
       dispatch(loadCleanerEarnings());
+      query.setStatus("completed");
       dispatch(loadCleanerAssignments(assignmentListParams));
     } catch (error) {
       setActionError(String(error));
