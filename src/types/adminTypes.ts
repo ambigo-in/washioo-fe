@@ -92,3 +92,29 @@ export interface DashboardStats {
   todayBookings: number;
   weekBookings: number;
 }
+
+export type CleanupTarget =
+  | "otp_codes"
+  | "refresh_tokens"
+  | "notifications"
+  | "assignment_attempts"
+  | "push_subscriptions"
+  | "audit_logs";
+
+export interface CleanupPreviewItem {
+  key: CleanupTarget;
+  label: string;
+  eligible_records: number;
+}
+
+export interface CleanupPreviewResponse {
+  message: string;
+  items: CleanupPreviewItem[];
+}
+
+export interface CleanupResultResponse {
+  message: string;
+  target?: CleanupTarget;
+  deleted_count: number;
+  results?: Record<CleanupTarget, number>;
+}

@@ -12,6 +12,9 @@ import type {
   CleanerFilters,
   AdminUser,
   AdminPayment,
+  CleanupPreviewResponse,
+  CleanupResultResponse,
+  CleanupTarget,
 } from "../types/adminTypes";
 import type { CleanerProfile } from "../types/cleanerTypes";
 import type { Assignment } from "../types/cleanerTypes";
@@ -24,6 +27,33 @@ export const fetchAdminDashboard = () =>
     "/auth/admin/dashboard",
     { auth: true },
   );
+
+// Storage Cleanup APIs
+export const fetchCleanupPreview = () =>
+  apiRequest<CleanupPreviewResponse>("/admin/cleanup/preview", {
+    auth: true,
+  });
+
+const cleanupEndpoints: Record<CleanupTarget, string> = {
+  otp_codes: "/admin/cleanup/otp-codes",
+  refresh_tokens: "/admin/cleanup/refresh-tokens",
+  notifications: "/admin/cleanup/notifications",
+  assignment_attempts: "/admin/cleanup/assignment-attempts",
+  push_subscriptions: "/admin/cleanup/push-subscriptions",
+  audit_logs: "/admin/cleanup/audit-logs",
+};
+
+export const runCleanupTarget = (target: CleanupTarget) =>
+  apiRequest<CleanupResultResponse>(cleanupEndpoints[target], {
+    method: "DELETE",
+    auth: true,
+  });
+
+export const runAllCleanupTasks = () =>
+  apiRequest<CleanupResultResponse>("/admin/cleanup/run-all", {
+    method: "POST",
+    auth: true,
+  });
 
 // Service Category APIs
 export const fetchAdminServiceCategories = (params: PaginationParams = {}) =>
