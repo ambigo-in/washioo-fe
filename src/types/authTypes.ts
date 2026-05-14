@@ -30,5 +30,6 @@ export interface AuthResponse {
   user?: import("./apiTypes").UserProfile;
   cleaner?: import("./cleanerTypes").CleanerProfile;
   is_new_user?: boolean;
+  terms_accepted?: boolean;
 }
 

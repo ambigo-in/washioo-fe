@@ -60,6 +60,13 @@ const readErrorMessage = (payload: unknown, fallback: string) => {
 
   const detail = (payload as { detail?: unknown }).detail;
   if (typeof detail === "string") return detail;
+  if (detail && typeof detail === "object") {
+    const detailMessage = (detail as { message?: unknown }).message;
+    if (typeof detailMessage === "string") return detailMessage;
+
+    const errorCode = (detail as { error_code?: unknown }).error_code;
+    if (typeof errorCode === "string") return errorCode;
+  }
 
   if (Array.isArray(detail)) {
     return detail

@@ -17,6 +17,8 @@ export interface UserProfile {
   email: string | null;
   is_verified: boolean;
   is_active: boolean;
+  terms_accepted: boolean;
+  terms_accepted_at: string | null;
   roles: UserRole[];
   created_at: string;
 }

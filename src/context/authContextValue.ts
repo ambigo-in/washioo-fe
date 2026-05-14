@@ -7,10 +7,12 @@ export interface AuthContextType {
   user: UserProfile | null;
   roles: UserRole[];
   activeRole: UserRole | null;
+  termsAccepted: boolean;
   hasRole: (role: UserRole) => boolean;
   setActiveRole: (role: UserRole) => void;
   refreshUser: () => Promise<UserProfile | null>;
   login: () => Promise<UserProfile | null>;
+  acceptTerms: () => Promise<UserProfile>;
   logout: () => Promise<void>;
   setUser: (user: UserProfile | null) => void;
 }

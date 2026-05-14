@@ -6,6 +6,7 @@ import {
   hydrateSession,
   logoutSession,
   refreshCurrentUser,
+  acceptTermsRequest,
   setUser as setAuthUser,
 } from "../store/slices/authSlice";
 import { removeCleanerPushSubscription } from "../utils/pushNotifications";
@@ -15,7 +16,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const dispatch = useAppDispatch();
-  const { user, isAuthenticated, isLoading, activeRole } = useAppSelector(
+  const { user, isAuthenticated, isLoading, activeRole, termsAccepted } = useAppSelector(
     (state) => state.auth,
   );
   const roles = useMemo(() => user?.roles ?? [], [user?.roles]);
@@ -30,6 +31,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const login = refreshUser;
+  const acceptTerms = async () => {
+    const response = await dispatch(acceptTermsRequest()).unwrap();
+    return response.user;
+  };
 
   const logout = async () => {
     if (activeRole === "cleaner") {
@@ -51,15 +56,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         user,
         roles,
         activeRole,
+        termsAccepted,
         hasRole,
         setActiveRole,
         refreshUser,
         login,
+        acceptTerms,
         logout,
         setUser: (nextUser: UserProfile | null) => dispatch(setAuthUser(nextUser)),
       }}
     >
-      <RealtimeBridge isAuthenticated={isAuthenticated} activeRole={activeRole} />
+      <RealtimeBridge
+        isAuthenticated={isAuthenticated && termsAccepted}
+        activeRole={activeRole}
+      />
       {children}
     </AuthContext.Provider>
   );

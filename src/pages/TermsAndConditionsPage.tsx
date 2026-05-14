@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import "./TermsAndConditionsPage.css";
 
-const termsSections = [
+export const termsSections = [
   {
     title: "1. Introduction & Acceptance",
     clauses: [

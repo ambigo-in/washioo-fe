@@ -85,7 +85,7 @@ export default function SignUpPage() {
     setError("");
 
     try {
-      await dispatch(
+      const authResponse = await dispatch(
         signUpRequest({
           body: {
             full_name: fullName.trim(),
@@ -105,8 +105,16 @@ export default function SignUpPage() {
           accountType,
         }),
       ).unwrap();
-      await login();
-      navigate(dashboardPath, { replace: true });
+      const user = await login();
+      const termsAccepted =
+        user?.terms_accepted ??
+        authResponse.terms_accepted ??
+        authResponse.user?.terms_accepted ??
+        false;
+
+      navigate(termsAccepted ? dashboardPath : "/accept-terms", {
+        replace: true,
+      });
     } catch (err) {
       setError(String(err));
     }

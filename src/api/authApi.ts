@@ -40,6 +40,15 @@ export const getCurrentUser = () =>
     auth: true,
   });
 
+export const acceptTerms = () =>
+  apiRequest<{ message: string; terms_accepted: boolean; user: UserProfile }>(
+    "/auth/accept-terms",
+    {
+      method: "POST",
+      auth: true,
+    },
+  );
+
 export const logoutUser = (refresh_token: string) =>
   apiRequest<{ message: string }>("/auth/logout", {
     method: "POST",

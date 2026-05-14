@@ -52,7 +52,7 @@ export default function SignInPage() {
     setError("");
 
     try {
-      await dispatch(
+      const authResponse = await dispatch(
         signInRequest({
           body: {
             phone_number: phone,
@@ -61,8 +61,16 @@ export default function SignInPage() {
           accountType,
         }),
       ).unwrap();
-      await login();
-      navigate(dashboardPath, { replace: true });
+      const user = await login();
+      const termsAccepted =
+        user?.terms_accepted ??
+        authResponse.terms_accepted ??
+        authResponse.user?.terms_accepted ??
+        false;
+
+      navigate(termsAccepted ? dashboardPath : "/accept-terms", {
+        replace: true,
+      });
     } catch (err) {
       setError(String(err));
     }

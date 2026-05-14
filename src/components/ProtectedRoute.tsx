@@ -10,7 +10,8 @@ const ProtectedRoute: React.FC<{
   children,
   roles,
 }) => {
-  const { isAuthenticated, isLoading, hasRole, activeRole } = useAuth();
+  const { isAuthenticated, isLoading, hasRole, activeRole, termsAccepted } =
+    useAuth();
   const location = useLocation();
 
   if (isLoading) {
@@ -19,6 +20,10 @@ const ProtectedRoute: React.FC<{
 
   if (!isAuthenticated) {
     return <Navigate to="/verify-phone" state={{ from: location }} replace />;
+  }
+
+  if (!termsAccepted) {
+    return <Navigate to="/accept-terms" state={{ from: location }} replace />;
   }
 
   if (roles?.length && !roles.some(hasRole)) {

@@ -4,10 +4,14 @@ import { useAuth } from "../context/useAuth";
 import type { UserRole } from "../types/apiTypes";
 
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isLoading, activeRole } = useAuth();
+  const { isAuthenticated, isLoading, activeRole, termsAccepted } = useAuth();
 
   if (isLoading) {
     return <div className="route-state">Checking your session...</div>;
+  }
+
+  if (isAuthenticated && !termsAccepted) {
+    return <Navigate to="/accept-terms" replace />;
   }
 
   return isAuthenticated ? (

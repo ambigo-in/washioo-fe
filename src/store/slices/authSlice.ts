@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
+  acceptTerms,
   getCurrentUser,
   logoutUser,
   sendOtp,
@@ -29,6 +30,7 @@ type AuthState = {
   isLoading: boolean;
   loading: boolean;
   resendLoading: boolean;
+  termsAccepted: boolean;
   activeRole: UserRole | null;
   error: string | null;
 };
@@ -39,6 +41,7 @@ const initialState: AuthState = {
   isLoading: true,
   loading: false,
   resendLoading: false,
+  termsAccepted: false,
   activeRole: getTokenActiveRole(),
   error: null,
 };
@@ -149,6 +152,17 @@ export const refreshCurrentUser = createAsyncThunk(
   },
 );
 
+export const acceptTermsRequest = createAsyncThunk(
+  "auth/acceptTerms",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await acceptTerms();
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error));
+    }
+  },
+);
+
 export const logoutSession = createAsyncThunk("auth/logoutSession", async () => {
   const refreshToken = getRefreshToken();
   if (refreshToken && getAccessToken()) {
@@ -168,6 +182,8 @@ const authSlice = createSlice({
     applyAuthResponse(state, action: PayloadAction<AuthResponse>) {
       saveTokens(action.payload.access_token, action.payload.refresh_token);
       state.user = action.payload.user ?? null;
+      state.termsAccepted =
+        action.payload.terms_accepted ?? action.payload.user?.terms_accepted ?? false;
       state.isAuthenticated = true;
       state.isLoading = false;
       state.loading = false;
@@ -176,6 +192,7 @@ const authSlice = createSlice({
     },
     setUser(state, action: PayloadAction<UserProfile | null>) {
       state.user = action.payload;
+      state.termsAccepted = action.payload?.terms_accepted ?? false;
       state.isAuthenticated = !!action.payload || !!getAccessToken();
     },
     clearAuthState(state) {
@@ -186,6 +203,7 @@ const authSlice = createSlice({
       state.loading = false;
       state.resendLoading = false;
       state.activeRole = null;
+      state.termsAccepted = false;
       state.error = null;
     },
   },
@@ -197,6 +215,7 @@ const authSlice = createSlice({
       .addCase(hydrateSession.fulfilled, (state, action) => {
         state.user = action.payload;
         state.isAuthenticated = !!action.payload;
+        state.termsAccepted = action.payload?.terms_accepted ?? false;
         state.activeRole = action.payload ? getTokenActiveRole() : null;
         state.isLoading = false;
         state.error = null;
@@ -205,12 +224,14 @@ const authSlice = createSlice({
         state.user = null;
         state.isAuthenticated = false;
         state.activeRole = null;
+        state.termsAccepted = false;
         state.isLoading = false;
         state.error = String(action.payload ?? "Session expired.");
       })
       .addCase(refreshCurrentUser.fulfilled, (state, action) => {
         state.user = action.payload;
         state.isAuthenticated = true;
+        state.termsAccepted = action.payload?.terms_accepted ?? false;
         state.activeRole = getTokenActiveRole();
         state.error = null;
       })
@@ -220,6 +241,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.loading = false;
         state.activeRole = null;
+        state.termsAccepted = false;
         state.error = null;
       })
       .addCase(resendOtp.pending, (state) => {
@@ -236,17 +258,27 @@ const authSlice = createSlice({
       .addCase(signUpRequest.fulfilled, (state, action) => {
         saveTokens(action.payload.access_token, action.payload.refresh_token);
         state.user = action.payload.user ?? null;
+        state.termsAccepted =
+          action.payload.terms_accepted ?? action.payload.user?.terms_accepted ?? false;
         state.isAuthenticated = true;
         state.activeRole = action.payload.account_type ?? getTokenActiveRole();
       })
       .addCase(signInRequest.fulfilled, (state, action) => {
         saveTokens(action.payload.access_token, action.payload.refresh_token);
         state.user = action.payload.user ?? null;
+        state.termsAccepted =
+          action.payload.terms_accepted ?? action.payload.user?.terms_accepted ?? false;
         state.isAuthenticated = true;
         state.activeRole = action.payload.account_type ?? getTokenActiveRole();
       })
+      .addCase(acceptTermsRequest.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.termsAccepted = action.payload.terms_accepted;
+        state.isAuthenticated = true;
+      })
       .addCase(updateProfileRequest.fulfilled, (state, action) => {
         state.user = action.payload.user;
+        state.termsAccepted = action.payload.user.terms_accepted;
         state.isAuthenticated = true;
       })
       .addMatcher(

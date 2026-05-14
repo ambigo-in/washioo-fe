@@ -10,6 +10,8 @@ const HomePage = lazy(() => import("./pages/HomePage"));
 const TermsAndConditionsPage = lazy(
   () => import("./pages/TermsAndConditionsPage"),
 );
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const TermsAcceptancePage = lazy(() => import("./pages/TermsAcceptancePage"));
 const PhoneVerificationPage = lazy(
   () => import("./pages/PhoneVerificationPage"),
 );
@@ -69,6 +71,8 @@ function App() {
               path="/terms-and-conditions"
               element={<TermsAndConditionsPage />}
             />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+            <Route path="/accept-terms" element={<TermsAcceptancePage />} />
 
             {/* Auth Routes */}
             <Route
