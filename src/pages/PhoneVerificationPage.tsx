@@ -90,6 +90,7 @@ export default function PhoneVerificationPage() {
         <input
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
+          aria-label={t("auth.phonePlaceholder")}
           placeholder={t("auth.phonePlaceholder")}
           autoComplete="tel"
           inputMode="tel"
@@ -97,6 +98,7 @@ export default function PhoneVerificationPage() {
         />
         <select
           value={accountType}
+          aria-label="Account type"
           onChange={(event) => {
             const nextType = event.target.value as AccountType;
             setAccountType(nextType);

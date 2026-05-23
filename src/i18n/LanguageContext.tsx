@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 export type LanguageCode = "en" | "te" | "hi";

@@ -115,7 +115,7 @@ export default function CleanerProfile() {
       setVerificationModal({ isOpen: false, type: null });
       setSuccess(t("profile.detailsDisplayed"));
       setError("");
-    } catch (err) {
+    } catch {
       setError(t("profile.verifyFailed"));
     } finally {
       setVerifyingDocument(false);

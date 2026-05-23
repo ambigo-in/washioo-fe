@@ -24,6 +24,8 @@ type RequestOptions = {
   retryOnUnauthorized?: boolean;
   dedupe?: boolean;
   priority?: "normal" | "background";
+  signal?: AbortSignal;
+  timeoutMs?: number;
 };
 
 type QueuedRequest<T> = {
@@ -116,9 +118,47 @@ const MAX_CONCURRENT_API_READS =
     ? configuredMaxConcurrentReads
     : 4;
 const OVERLOAD_RETRY_STATUSES = new Set([429, 503]);
+const configuredRequestTimeoutMs = Number(
+  import.meta.env.VITE_API_REQUEST_TIMEOUT_MS,
+);
+const DEFAULT_REQUEST_TIMEOUT_MS =
+  Number.isFinite(configuredRequestTimeoutMs) &&
+  configuredRequestTimeoutMs > 0
+    ? configuredRequestTimeoutMs
+    : 15000;
 
 const sleep = (ms: number) =>
   new Promise((resolve) => window.setTimeout(resolve, ms));
+
+const createRequestSignal = (
+  externalSignal?: AbortSignal,
+  timeoutMs = DEFAULT_REQUEST_TIMEOUT_MS,
+) => {
+  const controller = new AbortController();
+  let timeoutId: number | null = null;
+  const abort = () => controller.abort();
+
+  if (externalSignal?.aborted) {
+    controller.abort();
+  } else {
+    externalSignal?.addEventListener("abort", abort, { once: true });
+  }
+
+  if (timeoutMs > 0) {
+    timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  }
+
+  return {
+    signal: controller.signal,
+    cleanup: () => {
+      if (timeoutId != null) window.clearTimeout(timeoutId);
+      externalSignal?.removeEventListener("abort", abort);
+    },
+  };
+};
+
+const isAbortError = (error: unknown) =>
+  error instanceof DOMException && error.name === "AbortError";
 
 const parseRetryAfterMs = (value: string | null) => {
   if (!value) return null;
@@ -179,18 +219,29 @@ const refreshTokens = async () => {
 
   refreshRequest = (async () => {
     let response: Response;
+    const requestSignal = createRequestSignal(undefined, DEFAULT_REQUEST_TIMEOUT_MS);
     try {
       response = await fetch(apiUrl("/auth/refresh-token"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refresh_token: refreshToken }),
+        signal: requestSignal.signal,
       });
-    } catch {
+    } catch (error) {
+      if (isAbortError(error)) {
+        throw new ApiError(
+          "Session refresh timed out. Please try again.",
+          408,
+          null,
+        );
+      }
       throw new ApiError(
         "Session refresh is temporarily unavailable. Please try again.",
         503,
         null,
       );
+    } finally {
+      requestSignal.cleanup();
     }
 
     const payload = await parseResponse(response);
@@ -230,6 +281,8 @@ export const apiRequest = async <T>(
     retryOnUnauthorized = true,
     dedupe = method === "GET",
     priority = "normal",
+    signal,
+    timeoutMs,
   }: RequestOptions = {},
 ): Promise<T> => {
   if (auth && shouldRefreshAccessToken()) {
@@ -262,11 +315,24 @@ export const apiRequest = async <T>(
     const maxAttempts = method === "GET" ? 3 : 1;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-      const response = await fetch(apiUrl(path), {
-        method,
-        headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
-      });
+      const requestSignal = createRequestSignal(signal, timeoutMs);
+      let response: Response;
+
+      try {
+        response = await fetch(apiUrl(path), {
+          method,
+          headers,
+          body: body === undefined ? undefined : JSON.stringify(body),
+          signal: requestSignal.signal,
+        });
+      } catch (error) {
+        if (isAbortError(error)) {
+          throw new ApiError("Request timed out or was cancelled.", 408, null);
+        }
+        throw error;
+      } finally {
+        requestSignal.cleanup();
+      }
 
       if (
         attempt < maxAttempts &&
@@ -306,6 +372,10 @@ export const apiRequest = async <T>(
         body,
         auth,
         retryOnUnauthorized: false,
+        dedupe,
+        priority,
+        signal,
+        timeoutMs,
       });
     }
   }

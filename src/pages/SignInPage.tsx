@@ -105,6 +105,7 @@ export default function SignInPage() {
         <input
           value={otpCode}
           onChange={(event) => setOtpCode(event.target.value)}
+          aria-label={t("auth.enterOtp")}
           placeholder={t("auth.enterOtp")}
           autoComplete="one-time-code"
           inputMode="numeric"

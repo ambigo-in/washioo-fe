@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { fetchUsers } from "../../api/adminApi";
 import type { AdminUser } from "../../types/adminTypes";
@@ -21,11 +21,7 @@ export default function AdminUsers() {
   const [error, setError] = useState("");
   const query = useDashboardQueryState<"all" | "customer" | "cleaner" | "admin">("all");
 
-  useEffect(() => {
-    loadUsers();
-  }, [query.offset, query.pageSize, query.status]);
-
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     try {
       setLoading(true);
       const data = await fetchUsers({
@@ -42,7 +38,11 @@ export default function AdminUsers() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [query.offset, query.pageSize, query.status]);
+
+  useEffect(() => {
+    void loadUsers();
+  }, [loadUsers]);
 
   const filteredUsers = users.filter((user) =>
     matchesSearch(user, query.debouncedSearch, [

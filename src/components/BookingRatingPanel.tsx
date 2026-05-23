@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
 import {
   fetchBookingRatings,
@@ -72,7 +72,7 @@ export default function BookingRatingPanel({
     [perspective, subjectName, t],
   );
 
-  const loadRatings = async () => {
+  const loadRatings = useCallback(async () => {
     if (!isCompleted) return;
 
     setLoading(true);
@@ -87,11 +87,11 @@ export default function BookingRatingPanel({
     } finally {
       setLoading(false);
     }
-  };
+  }, [bookingId, isCompleted, perspective]);
 
   useEffect(() => {
     void loadRatings();
-  }, [bookingId, isCompleted, perspective]);
+  }, [loadRatings]);
 
   if (!isCompleted) return null;
 

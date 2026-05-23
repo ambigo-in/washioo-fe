@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
 
+import ErrorBoundary from "./components/ErrorBoundary";
 import PublicRoute from "./components/PublicRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { RouteLoader } from "./components/ui";
@@ -64,8 +65,9 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Suspense fallback={<RouteLoader message="Loading page..." />}>
-          <Routes>
+        <ErrorBoundary>
+          <Suspense fallback={<RouteLoader message="Loading page..." />}>
+            <Routes>
             {/* Public Routes */}
             <Route path="/" element={<HomePage />} />
             <Route
@@ -294,8 +296,9 @@ function App() {
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
       </BrowserRouter>
     </AuthProvider>
   );

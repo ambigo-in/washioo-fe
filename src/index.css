@@ -90,6 +90,38 @@ textarea:disabled {
   }
 }
 
+.route-error-boundary {
+  align-items: center;
+  color: var(--brand-text);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  text-align: center;
+}
+
+.route-error-boundary h1 {
+  color: var(--brand-teal-dark);
+  font-size: 1.5rem;
+}
+
+.route-error-boundary p {
+  color: var(--brand-text-muted);
+  max-width: 360px;
+}
+
+.route-error-boundary button {
+  background: var(--brand-teal);
+  border: 0;
+  border-radius: 8px;
+  color: var(--brand-white);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 11px 16px;
+}
+
 .form-alert {
   border-radius: 14px;
   font-size: 0.94rem;
