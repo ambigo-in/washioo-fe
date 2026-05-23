@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type UIEvent } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { LoadingButton } from "../components/ui";
+import { LoadingButton, RouteLoader } from "../components/ui";
 import { useAuth } from "../context/useAuth";
 import type { UserRole } from "../types/apiTypes";
 import { termsSections } from "./TermsAndConditionsPage";
@@ -51,7 +51,7 @@ export default function TermsAcceptancePage() {
   }, []);
 
   if (isLoading) {
-    return <div className="route-state">Checking your session...</div>;
+    return <RouteLoader />;
   }
 
   if (!isAuthenticated) {

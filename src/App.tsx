@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/AuthContext";
 
 import PublicRoute from "./components/PublicRoute";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { RouteLoader } from "./components/ui";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const TermsAndConditionsPage = lazy(
@@ -63,7 +64,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Suspense fallback={<div className="route-state">Loading...</div>}>
+        <Suspense fallback={<RouteLoader message="Loading page..." />}>
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<HomePage />} />

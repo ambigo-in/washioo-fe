@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { RouteLoader } from "./ui";
 import type { UserRole } from "../types/apiTypes";
 
 const ProtectedRoute: React.FC<{
@@ -15,7 +16,7 @@ const ProtectedRoute: React.FC<{
   const location = useLocation();
 
   if (isLoading) {
-    return <div className="route-state">Checking your session...</div>;
+    return <RouteLoader />;
   }
 
   if (!isAuthenticated) {
