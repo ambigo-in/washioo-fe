@@ -16,7 +16,7 @@ export const fetchNotifications = (
       offset: 0,
       ...params,
     }),
-    { auth: true },
+    { auth: true, priority: "background" },
   );
 };
 

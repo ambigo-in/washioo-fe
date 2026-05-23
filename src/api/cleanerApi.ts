@@ -181,7 +181,7 @@ export const fetchCleanerNotifications = (
       offset: 0,
       ...params,
     }),
-    { auth: true },
+    { auth: true, priority: "background" },
   );
 
 export const markCleanerNotificationRead = (notificationId: string) =>

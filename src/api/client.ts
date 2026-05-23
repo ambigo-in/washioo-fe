@@ -22,6 +22,14 @@ type RequestOptions = {
   body?: unknown;
   auth?: boolean;
   retryOnUnauthorized?: boolean;
+  dedupe?: boolean;
+  priority?: "normal" | "background";
+};
+
+type QueuedRequest<T> = {
+  run: () => Promise<T>;
+  resolve: (value: T) => void;
+  reject: (reason?: unknown) => void;
 };
 
 export type PaginationParams = {
@@ -96,6 +104,72 @@ const parseResponse = async (response: Response) => {
 };
 
 let refreshRequest: Promise<boolean> | null = null;
+const readRequestCache = new Map<string, Promise<unknown>>();
+const requestQueue: QueuedRequest<unknown>[] = [];
+let activeQueuedRequests = 0;
+
+const configuredMaxConcurrentReads = Number(
+  import.meta.env.VITE_MAX_CONCURRENT_API_READS,
+);
+const MAX_CONCURRENT_API_READS =
+  Number.isFinite(configuredMaxConcurrentReads) && configuredMaxConcurrentReads > 0
+    ? configuredMaxConcurrentReads
+    : 4;
+const OVERLOAD_RETRY_STATUSES = new Set([429, 503]);
+
+const sleep = (ms: number) =>
+  new Promise((resolve) => window.setTimeout(resolve, ms));
+
+const parseRetryAfterMs = (value: string | null) => {
+  if (!value) return null;
+  const seconds = Number(value);
+  if (Number.isFinite(seconds)) return Math.max(0, seconds * 1000);
+
+  const retryDate = Date.parse(value);
+  if (Number.isNaN(retryDate)) return null;
+  return Math.max(0, retryDate - Date.now());
+};
+
+const runNextQueuedRequest = () => {
+  if (
+    activeQueuedRequests >= MAX_CONCURRENT_API_READS ||
+    requestQueue.length === 0
+  ) {
+    return;
+  }
+
+  const queued = requestQueue.shift();
+  if (!queued) return;
+
+  activeQueuedRequests += 1;
+  queued
+    .run()
+    .then(queued.resolve)
+    .catch(queued.reject)
+    .finally(() => {
+      activeQueuedRequests -= 1;
+      runNextQueuedRequest();
+    });
+};
+
+const enqueueReadRequest = <T>(run: () => Promise<T>) => {
+  if (activeQueuedRequests < MAX_CONCURRENT_API_READS) {
+    activeQueuedRequests += 1;
+    return run().finally(() => {
+      activeQueuedRequests -= 1;
+      runNextQueuedRequest();
+    });
+  }
+
+  return new Promise<T>((resolve, reject) => {
+    requestQueue.push({
+      run: run as () => Promise<unknown>,
+      resolve: resolve as (value: unknown) => void,
+      reject,
+    });
+    runNextQueuedRequest();
+  });
+};
 
 const refreshTokens = async () => {
   if (refreshRequest) return refreshRequest;
@@ -154,6 +228,8 @@ export const apiRequest = async <T>(
     body,
     auth = false,
     retryOnUnauthorized = true,
+    dedupe = method === "GET",
+    priority = "normal",
   }: RequestOptions = {},
 ): Promise<T> => {
   if (auth && shouldRefreshAccessToken()) {
@@ -174,11 +250,53 @@ export const apiRequest = async <T>(
     if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  const response = await fetch(apiUrl(path), {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  const requestKey = `${method}:${auth ? "auth" : "public"}:${path}`;
+  const shouldQueue = method === "GET" && auth;
+  const shouldDedupe = method === "GET" && dedupe;
+
+  if (shouldDedupe && readRequestCache.has(requestKey)) {
+    return readRequestCache.get(requestKey) as Promise<T>;
+  }
+
+  const runFetch = async () => {
+    const maxAttempts = method === "GET" ? 3 : 1;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      const response = await fetch(apiUrl(path), {
+        method,
+        headers,
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+
+      if (
+        attempt < maxAttempts &&
+        OVERLOAD_RETRY_STATUSES.has(response.status)
+      ) {
+        const retryAfterMs = parseRetryAfterMs(response.headers.get("Retry-After"));
+        const fallbackMs = priority === "background" ? 1500 : 600;
+        await sleep(retryAfterMs ?? fallbackMs * attempt);
+        continue;
+      }
+
+      return response;
+    }
+
+    throw new ApiError("Request could not be completed.", 503, null);
+  };
+
+  const responsePromise = shouldQueue
+    ? enqueueReadRequest(runFetch)
+    : runFetch();
+
+  if (shouldDedupe) {
+    readRequestCache.set(requestKey, responsePromise);
+    responsePromise.then(
+      () => readRequestCache.delete(requestKey),
+      () => readRequestCache.delete(requestKey),
+    );
+  }
+
+  const response = await responsePromise;
 
   if (response.status === 401 && auth && retryOnUnauthorized) {
     const refreshed = await refreshTokens();

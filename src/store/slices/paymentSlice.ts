@@ -155,7 +155,7 @@ export const loadCleanerEarnings = createAsyncThunk(
       return await apiRequest<{
         message: string;
         earnings: CleanerEarningsSummary;
-      }>("/cleaner/earnings", { auth: true });
+      }>("/cleaner/earnings", { auth: true, priority: "background" });
     } catch (error) {
       return rejectWithValue(getApiErrorMessage(error));
     }
