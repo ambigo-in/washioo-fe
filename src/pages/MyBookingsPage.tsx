@@ -74,6 +74,7 @@ const MyBookingsPage: React.FC = () => {
   const [priceFilter, setPriceFilter] = useState<PriceFilter>("all");
   const [dateRangeFilter, setDateRangeFilter] =
     useState<DateRangeFilter>("all");
+  const requestedBookingLimit = Math.max(bookingsTotal, 50);
 
   const formatPaymentMethod = (booking: CustomerBooking) => {
     const payment = booking.payment;
@@ -93,9 +94,9 @@ const MyBookingsPage: React.FC = () => {
 
   useEffect(() => {
     dispatch(
-      loadCustomerBookings({ limit: query.pageSize, offset: query.offset }),
+      loadCustomerBookings({ limit: requestedBookingLimit, offset: 0 }),
     );
-  }, [dispatch, query.offset, query.pageSize]);
+  }, [dispatch, requestedBookingLimit]);
 
   // Helper functions for filtering
   const isDateInRange = (dateStr: string, range: string) => {
@@ -213,7 +214,7 @@ const MyBookingsPage: React.FC = () => {
     try {
       await dispatch(cancelCustomerBooking(booking.id)).unwrap();
       await dispatch(
-        loadCustomerBookings({ limit: query.pageSize, offset: query.offset }),
+        loadCustomerBookings({ limit: requestedBookingLimit, offset: 0 }),
       ).unwrap();
     } catch (err) {
       setError(String(err));
@@ -245,21 +246,16 @@ const MyBookingsPage: React.FC = () => {
 
   const sortedBookings = sortBookings(filteredBookings);
 
-  const visibleBookings =
-    query.debouncedSearch ||
-    query.status !== "all" ||
-    priceFilter !== "all" ||
-    dateRangeFilter !== "all"
-      ? paginateItems(sortedBookings, query.page, pageSize)
-      : paginateItems(sortedBookings, query.page, pageSize);
+  const visibleBookings = paginateItems(sortedBookings, query.page, pageSize);
+  const totalVisible = sortedBookings.length;
 
-  const totalVisible =
-    query.debouncedSearch ||
-    query.status !== "all" ||
-    priceFilter !== "all" ||
-    dateRangeFilter !== "all"
-      ? sortedBookings.length
-      : Math.min(pageSize, sortedBookings.length);
+  useEffect(() => {
+    const totalPages = Math.max(Math.ceil(totalVisible / pageSize), 1);
+    if (query.page > totalPages) {
+      query.setPage(totalPages);
+    }
+  }, [pageSize, query, totalVisible]);
+
   const counts = bookings.reduce(
     (acc, booking) => {
       acc[booking.booking_status] += 1;
@@ -341,7 +337,10 @@ const MyBookingsPage: React.FC = () => {
             <select
               className="filter-select page-size-select"
               value={pageSize}
-              onChange={(e) => setPageSize(Number(e.target.value))}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                query.setPage(1);
+              }}
             >
               <option value="5">{t("booking.pageSize", { count: 5 })}</option>
               <option value="10">{t("booking.pageSize", { count: 10 })}</option>
