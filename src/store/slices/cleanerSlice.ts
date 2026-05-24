@@ -17,6 +17,8 @@ import type {
   CompleteAssignmentPayload,
 } from "../../types/cleanerTypes";
 
+type AssignmentUpdate = Partial<Assignment> & Pick<Assignment, "id">;
+
 type CleanerState = {
   profile: CleanerProfile | null;
   assignments: Assignment[];
@@ -119,10 +121,34 @@ export const rejectCleanerAssignment = assignmentAction(rejectAssignment);
 export const startCleanerAssignment = assignmentAction(startAssignment);
 export const completeCleanerAssignment = assignmentAction(completeAssignment);
 
-const upsertAssignment = (items: Assignment[], assignment: Assignment) => {
+const hasRenderableAssignmentShape = (
+  assignment: AssignmentUpdate,
+): assignment is Assignment => Boolean(assignment.booking);
+
+const mergeAssignmentUpdate = (
+  current: Assignment,
+  update: AssignmentUpdate,
+): Assignment => ({
+  ...current,
+  ...update,
+  booking: update.booking ?? current.booking,
+  cleaner: update.cleaner ?? current.cleaner,
+});
+
+const upsertAssignmentUpdate = (
+  items: Assignment[],
+  assignment: AssignmentUpdate,
+) => {
   const index = items.findIndex((item) => item.id === assignment.id);
-  if (index === -1) items.unshift(assignment);
-  else items[index] = assignment;
+  if (index === -1) {
+    if (hasRenderableAssignmentShape(assignment)) items.unshift(assignment);
+    return;
+  }
+
+  const existing = items[index];
+  if (existing) {
+    items[index] = mergeAssignmentUpdate(existing, assignment);
+  }
 };
 
 const cleanerSlice = createSlice({
@@ -154,8 +180,8 @@ const cleanerSlice = createSlice({
           action.type.startsWith("cleaner/") &&
           action.type.endsWith("/fulfilled") &&
           action.payload?.assignment,
-        (state, action: { payload: { assignment: Assignment } }) => {
-          upsertAssignment(state.assignments, action.payload.assignment);
+        (state, action: { payload: { assignment: AssignmentUpdate } }) => {
+          upsertAssignmentUpdate(state.assignments, action.payload.assignment);
         },
       )
       .addMatcher(
