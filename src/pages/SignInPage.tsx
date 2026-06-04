@@ -18,12 +18,13 @@ export default function SignInPage() {
   const [error, setError] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { acceptTerms, login } = useAuth();
 
   const state = location.state as {
     phone?: string;
     accountType?: AccountType;
     otpSentAt?: number;
+    termsAcceptedAtOtp?: boolean;
   } | null;
   const phone = state?.phone || "";
   const accountType = state?.accountType || "customer";
@@ -41,6 +42,24 @@ export default function SignInPage() {
     if (!phone) navigate("/verify-phone", { replace: true });
   }, [navigate, phone]);
 
+  useEffect(() => {
+    if (!("OTPCredential" in window) || !navigator.credentials) return;
+
+    const controller = new AbortController();
+    navigator.credentials
+      .get({
+        otp: { transport: ["sms"] },
+        signal: controller.signal,
+      } as CredentialRequestOptions)
+      .then((credential) => {
+        const code = (credential as { code?: string } | null)?.code;
+        if (code) setOtpCode(code);
+      })
+      .catch(() => undefined);
+
+    return () => controller.abort();
+  }, []);
+
   const handleSignIn = async (event: FormEvent) => {
     event.preventDefault();
 
@@ -57,6 +76,7 @@ export default function SignInPage() {
           body: {
             phone_number: phone,
             otp_code: otpCode.trim(),
+            terms_accepted: Boolean(state?.termsAcceptedAtOtp),
           },
           accountType,
         }),
@@ -67,8 +87,11 @@ export default function SignInPage() {
         authResponse.terms_accepted ??
         authResponse.user?.terms_accepted ??
         false;
+      if (state?.termsAcceptedAtOtp && !termsAccepted) {
+        await acceptTerms();
+      }
 
-      navigate(termsAccepted ? dashboardPath : "/accept-terms", {
+      navigate(state?.termsAcceptedAtOtp || termsAccepted ? dashboardPath : "/accept-terms", {
         replace: true,
       });
     } catch (err) {
@@ -108,17 +131,13 @@ export default function SignInPage() {
           aria-label={t("auth.enterOtp")}
           placeholder={t("auth.enterOtp")}
           autoComplete="one-time-code"
+          name="otp"
           inputMode="numeric"
+          pattern="[0-9]*"
         />
         <LoadingButton isLoading={loading} loadingText={t("auth.signingIn")} type="submit">
           {t("auth.login")}
         </LoadingButton>
-
-        {isCoolingDown && (
-          <p className="auth-resend-timer">
-            {t("auth.resendIn", { seconds: secondsRemaining })}
-          </p>
-        )}
 
         <p className="signin-footer-text">
           {t("auth.didNotReceive")}{" "}

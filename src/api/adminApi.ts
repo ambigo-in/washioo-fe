@@ -271,6 +271,38 @@ export const updateCleanerProfile = (
     },
   );
 
+export const approveCleanerDocuments = (cleanerId: string) =>
+  apiRequest<{ message: string; cleaner: CleanerProfile }>(
+    `/services/admin/cleaners/${cleanerId}/approve`,
+    {
+      method: "PUT",
+      auth: true,
+    },
+  );
+
+export const rejectCleanerDocuments = (cleanerId: string, reason: string) =>
+  apiRequest<{ message: string; cleaner: CleanerProfile }>(
+    `/services/admin/cleaners/${cleanerId}/reject`,
+    {
+      method: "PUT",
+      auth: true,
+      body: { reason },
+    },
+  );
+
+export const requestCleanerDocumentResubmission = (
+  cleanerId: string,
+  reason: string,
+) =>
+  apiRequest<{ message: string; cleaner: CleanerProfile }>(
+    `/services/admin/cleaners/${cleanerId}/request-resubmission`,
+    {
+      method: "PUT",
+      auth: true,
+      body: { reason },
+    },
+  );
+
 export const deleteCleanerProfile = (cleanerId: string) =>
   apiRequest<{ message: string; cleaner_id: string }>(
     `/services/admin/cleaners/${cleanerId}`,

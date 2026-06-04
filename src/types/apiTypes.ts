@@ -169,6 +169,14 @@ export interface AssignmentSummary {
   id: string;
   cleaner_id: string;
   cleaner_name?: string | null;
+  cleaner_details?: {
+    id: string;
+    name: string | null;
+    profile_photo_url: string | null;
+    rating: number;
+    experience: number;
+    verification_badge: boolean;
+  } | null;
   assignment_status:
     | "assigned"
     | "accepted"

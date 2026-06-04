@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchCleaners, updateCleanerProfile } from "../../api/adminApi";
+import {
+  approveCleanerDocuments,
+  fetchCleaners,
+  rejectCleanerDocuments,
+  requestCleanerDocumentResubmission,
+  updateCleanerProfile,
+} from "../../api/adminApi";
 import type { CleanerProfile } from "../../types/cleanerTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import {
@@ -13,6 +19,7 @@ import {
 } from "../../components/dashboard/DashboardControls";
 import { formatIndianPhoneForDisplay } from "../../utils/phoneUtils";
 import { formatDisplayDate } from "../../utils/dateTimeUtils";
+import { useLanguage } from "../../i18n/LanguageContext";
 import "./AdminCleaners.css";
 
 type ApprovalStatus = CleanerProfile["approval_status"];
@@ -45,12 +52,41 @@ const hasFullIdentityData = (cleaner: CleanerProfile) =>
   cleaner.identity_data_status === "full_available" ||
   Boolean(cleaner.aadhaar_number);
 
+const canReviewCleanerDocuments = (cleaner: CleanerProfile) =>
+  cleaner.pending_document_update ||
+  cleaner.approval_status !== "approved" ||
+  cleaner.document_review_status !== "approved" ||
+  cleaner.verification_status !== "approved";
+
+const sanitizeFilenamePart = (value?: string | null) =>
+  (value || "cleaner")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "cleaner";
+
+const getImageExtension = (url: string) => {
+  try {
+    const pathname = new URL(url).pathname;
+    const match = pathname.match(/\.([a-zA-Z0-9]+)$/);
+    return match?.[1]?.toLowerCase() || "jpg";
+  } catch {
+    return "jpg";
+  }
+};
+
 export default function AdminCleaners() {
+  const { t } = useLanguage();
   const [cleaners, setCleaners] = useState<CleanerProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const query = useDashboardQueryState<FilterStatus>("all");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [selectedCleaner, setSelectedCleaner] = useState<CleanerProfile | null>(
+    null,
+  );
+  const [reviewReason, setReviewReason] = useState("");
+  const [reviewError, setReviewError] = useState("");
+  const [downloadingDocument, setDownloadingDocument] = useState<string | null>(
     null,
   );
 
@@ -104,6 +140,45 @@ export default function AdminCleaners() {
     }
   };
 
+  const handleApproveCleaner = async (cleanerId: string) => {
+    setUpdatingId(cleanerId);
+    setReviewError("");
+    try {
+      await approveCleanerDocuments(cleanerId);
+      setSelectedCleaner(null);
+      setReviewReason("");
+      await loadCleaners();
+    } catch (error) {
+      setReviewError(error instanceof Error ? error.message : t("admin.approveCleanerFailed"));
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleRejectCleaner = async (
+    cleanerId: string,
+    requestResubmission = false,
+  ) => {
+    if (!reviewReason.trim()) {
+      setReviewError(t("admin.reasonRequired"));
+      return;
+    }
+    setUpdatingId(cleanerId);
+    setReviewError("");
+    try {
+      requestResubmission
+        ? await requestCleanerDocumentResubmission(cleanerId, reviewReason.trim())
+        : await rejectCleanerDocuments(cleanerId, reviewReason.trim());
+      setSelectedCleaner(null);
+      setReviewReason("");
+      await loadCleaners();
+    } catch (error) {
+      setReviewError(error instanceof Error ? error.message : t("admin.updateVerificationFailed"));
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
       pending: "var(--brand-teal)",
@@ -115,6 +190,70 @@ export default function AdminCleaners() {
       busy: "var(--brand-teal)",
     };
     return colors[status] || "var(--brand-text-muted)";
+  };
+
+  const handleDownloadDocument = async (
+    url: string,
+    cleaner: CleanerProfile,
+    documentType: string,
+  ) => {
+    const downloadKey = `${cleaner.id}:${documentType}`;
+    setDownloadingDocument(downloadKey);
+    setReviewError("");
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Document download failed");
+      }
+
+      const blob = await response.blob();
+      const objectUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = `${sanitizeFilenamePart(cleaner.full_name)}-${documentType}.${getImageExtension(url)}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(objectUrl);
+    } catch {
+      setReviewError(t("admin.downloadDocumentFailed"));
+    } finally {
+      setDownloadingDocument(null);
+    }
+  };
+
+  const renderDocumentPreview = (
+    cleaner: CleanerProfile,
+    label: string,
+    documentType: string,
+    url?: string | null,
+    missingText = t("profile.missing"),
+  ) => {
+    const downloadKey = `${cleaner.id}:${documentType}`;
+
+    return (
+      <div className="document-preview">
+        <div className="document-preview-header">
+          <span>{label}</span>
+          {url && (
+            <button
+              type="button"
+              className="document-download-button"
+              onClick={() => handleDownloadDocument(url, cleaner, documentType)}
+              disabled={downloadingDocument === downloadKey}
+              title={t("admin.downloadDocument")}
+              aria-label={t("admin.downloadDocument")}
+            >
+              {downloadingDocument === downloadKey
+                ? t("admin.downloadingDocument")
+                : t("admin.downloadDocument")}
+            </button>
+          )}
+        </div>
+        {url ? <img src={url} alt="" /> : <p>{missingText}</p>}
+      </div>
+    );
   };
 
   const counts = useMemo(() => {
@@ -239,10 +378,10 @@ export default function AdminCleaners() {
                     <span className="label">Identity</span>
                     <span
                       className={`value identity-chip ${
-                        hasFullIdentityData(cleaner) ? "full" : "legacy"
+                        cleaner.document_review_status === "approved" ? "full" : "legacy"
                       }`}
                     >
-                      {hasFullIdentityData(cleaner) ? "Full" : "Masked"}
+                      {cleaner.document_review_status || "not_submitted"}
                     </span>
                   </div>
                 </div>
@@ -250,7 +389,11 @@ export default function AdminCleaners() {
                 <div className="cleaner-actions">
                   <button
                     className="btn-view-details"
-                    onClick={() => setSelectedCleaner(cleaner)}
+                    onClick={() => {
+                      setSelectedCleaner(cleaner);
+                      setReviewReason("");
+                      setReviewError("");
+                    }}
                   >
                     View Details
                   </button>
@@ -258,18 +401,17 @@ export default function AdminCleaners() {
                     <>
                       <button
                         className="btn-approve"
-                        onClick={() =>
-                          handleUpdateStatus(cleaner.id, "approved")
-                        }
+                        onClick={() => handleApproveCleaner(cleaner.id)}
                         disabled={updatingId === cleaner.id}
                       >
                         Approve
                       </button>
                       <button
                         className="btn-reject"
-                        onClick={() =>
-                          handleUpdateStatus(cleaner.id, "rejected")
-                        }
+                        onClick={() => {
+                          setSelectedCleaner(cleaner);
+                          setReviewError(t("admin.openDetailsForRejection"));
+                        }}
                         disabled={updatingId === cleaner.id}
                       >
                         Reject
@@ -346,14 +488,17 @@ export default function AdminCleaners() {
         />
 
         {/* Cleaner Details Modal */}
-        {selectedCleaner && (
+        {selectedCleaner && (() => {
+          const canReviewDocuments = canReviewCleanerDocuments(selectedCleaner);
+
+          return (
           <div
             className="modal-overlay"
             onClick={() => setSelectedCleaner(null)}
           >
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h3>Cleaner Details - {selectedCleaner.full_name}</h3>
+                <h3>{t("admin.cleanerDetailsTitle", { name: selectedCleaner.full_name })}</h3>
                 <button
                   className="modal-close"
                   onClick={() => setSelectedCleaner(null)}
@@ -392,7 +537,12 @@ export default function AdminCleaners() {
                 </div>
 
                 <div className="detail-section">
-                  <h4>Identity Verification</h4>
+                  <h4>{t("profile.identityVerification")}</h4>
+                  {selectedCleaner.document_rejection_reason && (
+                    <p className="identity-status-note legacy">
+                      {selectedCleaner.document_rejection_reason}
+                    </p>
+                  )}
                   {selectedCleaner.identity_data_status && (
                     <p
                       className={`identity-status-note ${
@@ -407,7 +557,19 @@ export default function AdminCleaners() {
                   )}
                   <div className="detail-grid">
                     <div className="detail-item">
-                      <span className="label">Aadhaar Card</span>
+                      <span className="label">{t("admin.documentReview")}</span>
+                      <span className="value">
+                        {selectedCleaner.document_review_status || "not_submitted"}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">{t("admin.verificationStatus")}</span>
+                      <span className="value">
+                        {selectedCleaner.verification_status || "pending"}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">{t("admin.aadhaarCard")}</span>
                       <span className="value">
                         {selectedCleaner.has_aadhaar ? (
                           <span className="verified">✓ Verified</span>
@@ -419,8 +581,8 @@ export default function AdminCleaners() {
                     <div className="detail-item sensitive-detail">
                       <span className="label">
                         {selectedCleaner.aadhaar_number
-                          ? "Full Aadhaar Number"
-                          : "Masked Aadhaar Number"}
+                          ? t("admin.fullAadhaarNumber")
+                          : t("admin.maskedAadhaarNumber")}
                       </span>
                       <span className="value identity-number">
                         {getIdentityValue(
@@ -430,7 +592,7 @@ export default function AdminCleaners() {
                       </span>
                     </div>
                     <div className="detail-item">
-                      <span className="label">Driving License</span>
+                      <span className="label">{t("profile.drivingLicense")}</span>
                       <span className="value">
                         {selectedCleaner.has_driving_license ? (
                           <span className="verified">✓ Verified</span>
@@ -442,8 +604,8 @@ export default function AdminCleaners() {
                     <div className="detail-item sensitive-detail">
                       <span className="label">
                         {selectedCleaner.driving_license_number
-                          ? "Full License Number"
-                          : "Masked License Number"}
+                          ? t("admin.fullLicenseNumber")
+                          : t("admin.maskedLicenseNumber")}
                       </span>
                       <span className="value identity-number">
                         {getIdentityValue(
@@ -453,6 +615,50 @@ export default function AdminCleaners() {
                       </span>
                     </div>
                   </div>
+                  <div className="document-preview-grid">
+                    {renderDocumentPreview(
+                      selectedCleaner,
+                      t("profile.profilePhoto"),
+                      "profile-photo",
+                      selectedCleaner.profile_photo_url,
+                    )}
+                    {renderDocumentPreview(
+                      selectedCleaner,
+                      t("profile.aadhaarImage"),
+                      "aadhaar",
+                      selectedCleaner.aadhaar_image_url,
+                    )}
+                    {renderDocumentPreview(
+                      selectedCleaner,
+                      t("profile.drivingLicenseImage"),
+                      "driving-license",
+                      selectedCleaner.driving_license_image_url,
+                      t("profile.optionalOrMissing"),
+                    )}
+                  </div>
+                  {selectedCleaner.pending_document_update && (
+                    <div className="pending-documents">
+                      <h4>{t("admin.pendingReplacementDocuments")}</h4>
+                      <div className="document-preview-grid">
+                        {selectedCleaner.pending_aadhaar_image_url && (
+                          renderDocumentPreview(
+                            selectedCleaner,
+                            t("admin.pendingAadhaar"),
+                            "pending-aadhaar",
+                            selectedCleaner.pending_aadhaar_image_url,
+                          )
+                        )}
+                        {selectedCleaner.pending_driving_license_image_url && (
+                          renderDocumentPreview(
+                            selectedCleaner,
+                            t("admin.pendingDrivingLicense"),
+                            "pending-driving-license",
+                            selectedCleaner.pending_driving_license_image_url,
+                          )
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="detail-section">
@@ -518,28 +724,56 @@ export default function AdminCleaners() {
                 </div>
               </div>
 
-              {selectedCleaner.approval_status === "pending" && (
-                <div className="modal-actions">
+              {canReviewDocuments ? (
+                <div className="review-box">
+                  <label>
+                    <span>{t("admin.reviewReason")}</span>
+                    <textarea
+                      value={reviewReason}
+                      onChange={(event) => setReviewReason(event.target.value)}
+                      placeholder={t("admin.reviewReasonPlaceholder")}
+                    />
+                  </label>
+                  {reviewError && <p className="review-error">{reviewError}</p>}
+                </div>
+              ) : (
+                <p className="review-status-note">
+                  {t("admin.noReviewActionNeeded")}
+                </p>
+              )}
+
+              <div className="modal-actions">
+                {canReviewDocuments && (
+                  <>
                   <button
                     className="btn-approve"
                     onClick={() => {
-                      handleUpdateStatus(selectedCleaner.id, "approved");
-                      setSelectedCleaner(null);
+                      void handleApproveCleaner(selectedCleaner.id);
                     }}
                     disabled={updatingId === selectedCleaner.id}
                   >
-                    Approve Cleaner
+                    {t("admin.approveCleaner")}
                   </button>
                   <button
                     className="btn-reject"
                     onClick={() => {
-                      handleUpdateStatus(selectedCleaner.id, "rejected");
-                      setSelectedCleaner(null);
+                      void handleRejectCleaner(selectedCleaner.id);
                     }}
                     disabled={updatingId === selectedCleaner.id}
                   >
-                    Reject Cleaner
+                    {t("admin.rejectCleaner")}
                   </button>
+                  <button
+                    className="btn-secondary"
+                    onClick={() => {
+                      void handleRejectCleaner(selectedCleaner.id, true);
+                    }}
+                    disabled={updatingId === selectedCleaner.id}
+                  >
+                    {t("admin.requestResubmission")}
+                  </button>
+                  </>
+                )}
                   <button
                     className="btn-secondary"
                     onClick={() => setSelectedCleaner(null)}
@@ -547,10 +781,10 @@ export default function AdminCleaners() {
                     Close
                   </button>
                 </div>
-              )}
             </div>
           </div>
-        )}
+          );
+        })()}
       </div>
     </DashboardLayout>
   );

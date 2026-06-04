@@ -24,6 +24,7 @@ const dataRefreshEvents = new Set([
   "assignment_rejected",
   "service_started",
   "service_completed",
+  "cleaner_verification_updated",
 ]);
 
 const reconnectDelaysMs = [3000, 10000, 30000, 60000, 120000];

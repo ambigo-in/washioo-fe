@@ -28,6 +28,58 @@ export const verifyCleanerIdentity = (phoneLastFour: string) =>
     },
   );
 
+export const uploadCleanerProfilePhoto = (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return apiRequest<{ message: string; cleaner: CleanerProfile }>(
+    "/services/cleaner/profile/photo",
+    {
+      method: "POST",
+      auth: true,
+      body: formData,
+      timeoutMs: 30000,
+    },
+  );
+};
+
+export const uploadCleanerAadhaar = (
+  file: File,
+  aadhaarNumber?: string,
+) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  if (aadhaarNumber) formData.append("aadhaar_number", aadhaarNumber);
+  return apiRequest<{ message: string; cleaner: CleanerProfile }>(
+    "/services/cleaner/profile/aadhaar",
+    {
+      method: "POST",
+      auth: true,
+      body: formData,
+      timeoutMs: 30000,
+    },
+  );
+};
+
+export const uploadCleanerDrivingLicense = (
+  file: File,
+  drivingLicenseNumber?: string,
+) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  if (drivingLicenseNumber) {
+    formData.append("driving_license_number", drivingLicenseNumber);
+  }
+  return apiRequest<{ message: string; cleaner: CleanerProfile }>(
+    "/services/cleaner/profile/driving-license",
+    {
+      method: "POST",
+      auth: true,
+      body: formData,
+      timeoutMs: 30000,
+    },
+  );
+};
+
 export const updateCleanerAvailability = (payload: AvailabilityPayload) =>
   apiRequest<{ message: string; cleaner: CleanerProfile }>(
     "/services/cleaner/availability",

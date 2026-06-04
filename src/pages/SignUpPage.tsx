@@ -4,6 +4,12 @@ import { LoadingButton } from "../components/ui";
 import { useAuth } from "../context/useAuth";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { resendOtp, signUpRequest } from "../store/slices/authSlice";
+import {
+  uploadCleanerAadhaar,
+  uploadCleanerDrivingLicense,
+  uploadCleanerProfilePhoto,
+} from "../api/cleanerApi";
+import { getAppConfig } from "../api/authApi";
 import type { AccountType } from "../types/authTypes";
 import { formatIndianPhoneForDisplay } from "../utils/phoneUtils";
 import {
@@ -24,17 +30,26 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [aadhaarNumber, setAadhaarNumber] = useState("");
   const [drivingLicenseNumber, setDrivingLicenseNumber] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [aadhaarImage, setAadhaarImage] = useState<File | null>(null);
+  const [drivingLicenseImage, setDrivingLicenseImage] = useState<File | null>(
+    null,
+  );
+  const [drivingLicenseRequired, setDrivingLicenseRequired] = useState(
+    String(import.meta.env.VITE_DRIVING_LICENSE_REQUIRED || "false").toLowerCase() === "true",
+  );
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
 
   const location = useLocation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { acceptTerms, login } = useAuth();
 
   const state = location.state as {
     phone?: string;
     accountType?: AccountType;
     otpSentAt?: number;
+    termsAcceptedAtOtp?: boolean;
   } | null;
   const phone = state?.phone || "";
   const accountType =
@@ -47,6 +62,32 @@ export default function SignUpPage() {
   useEffect(() => {
     if (!phone) navigate("/verify-phone", { replace: true });
   }, [navigate, phone]);
+
+  useEffect(() => {
+    getAppConfig()
+      .then((config) =>
+        setDrivingLicenseRequired(config.cleaner.driving_license_required),
+      )
+      .catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    if (!("OTPCredential" in window) || !navigator.credentials) return;
+
+    const controller = new AbortController();
+    navigator.credentials
+      .get({
+        otp: { transport: ["sms"] },
+        signal: controller.signal,
+      } as CredentialRequestOptions)
+      .then((credential) => {
+        const code = (credential as { code?: string } | null)?.code;
+        if (code) setOtpCode(code);
+      })
+      .catch(() => undefined);
+
+    return () => controller.abort();
+  }, []);
 
   const handleSignUp = async (event: FormEvent) => {
     event.preventDefault();
@@ -66,6 +107,16 @@ export default function SignUpPage() {
       return;
     }
 
+    if (accountType === "cleaner" && !profilePhoto) {
+      setError(t("auth.profilePhotoRequired"));
+      return;
+    }
+
+    if (accountType === "cleaner" && !aadhaarImage) {
+      setError(t("auth.aadhaarImageRequired"));
+      return;
+    }
+
     if (
       accountType === "cleaner" &&
       !isValidAadhaarNumber(aadhaarNumber)
@@ -74,11 +125,29 @@ export default function SignUpPage() {
       return;
     }
 
+    const normalizedDrivingLicense =
+      normalizeDrivingLicenseNumber(drivingLicenseNumber);
+
     if (
       accountType === "cleaner" &&
-      !isValidDrivingLicenseNumber(drivingLicenseNumber)
+      drivingLicenseRequired &&
+      !normalizedDrivingLicense
     ) {
+      setError(t("auth.drivingLicenseRequired"));
+      return;
+    }
+
+    if (accountType === "cleaner" && !isValidDrivingLicenseNumber(drivingLicenseNumber)) {
       setError(t("auth.drivingLicenseInvalid"));
+      return;
+    }
+
+    if (
+      accountType === "cleaner" &&
+      (drivingLicenseRequired || normalizedDrivingLicense) &&
+      !drivingLicenseImage
+    ) {
+      setError(t("auth.drivingLicenseImageRequired"));
       return;
     }
 
@@ -92,27 +161,43 @@ export default function SignUpPage() {
             phone_number: phone,
             email: email.trim() || undefined,
             otp_code: otpCode.trim(),
+            terms_accepted: Boolean(state?.termsAcceptedAtOtp),
             aadhaar_number:
               accountType === "cleaner"
                 ? normalizeAadhaarNumber(aadhaarNumber)
                 : undefined,
             driving_license_number:
               accountType === "cleaner"
-                ? normalizeDrivingLicenseNumber(drivingLicenseNumber) ||
-                  undefined
+                ? normalizedDrivingLicense || undefined
                 : undefined,
           },
           accountType,
         }),
       ).unwrap();
-      const user = await login();
-      const termsAccepted =
-        user?.terms_accepted ??
+      if (accountType === "cleaner" && profilePhoto && aadhaarImage) {
+        await uploadCleanerProfilePhoto(profilePhoto);
+        await uploadCleanerAadhaar(
+          aadhaarImage,
+          normalizeAadhaarNumber(aadhaarNumber),
+        );
+        if (drivingLicenseImage && normalizedDrivingLicense) {
+          await uploadCleanerDrivingLicense(
+            drivingLicenseImage,
+            normalizedDrivingLicense,
+          );
+        }
+      }
+      let termsAccepted =
         authResponse.terms_accepted ??
         authResponse.user?.terms_accepted ??
         false;
+      if (state?.termsAcceptedAtOtp && !termsAccepted) {
+        const acceptedUser = await acceptTerms();
+        termsAccepted = acceptedUser.terms_accepted;
+      }
+      await login().catch(() => undefined);
 
-      navigate(termsAccepted ? dashboardPath : "/accept-terms", {
+      navigate(state?.termsAcceptedAtOtp || termsAccepted ? dashboardPath : "/accept-terms", {
         replace: true,
       });
     } catch (err) {
@@ -168,7 +253,9 @@ export default function SignUpPage() {
           onChange={(event) => setOtpCode(event.target.value)}
           placeholder={t("auth.enterOtp")}
           autoComplete="one-time-code"
+          name="otp"
           inputMode="numeric"
+          pattern="[0-9]*"
         />
         {accountType === "cleaner" && (
           <>
@@ -180,26 +267,58 @@ export default function SignUpPage() {
               autoComplete="off"
               maxLength={12}
             />
+            <label className="file-field">
+              <span>{t("profile.profilePhoto")}</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) =>
+                  setProfilePhoto(event.target.files?.[0] || null)
+                }
+              />
+            </label>
+            <label className="file-field">
+              <span>{t("profile.aadhaarFrontImage")}</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) =>
+                  setAadhaarImage(event.target.files?.[0] || null)
+                }
+              />
+            </label>
             <input
               value={drivingLicenseNumber}
               onChange={(event) =>
                 setDrivingLicenseNumber(event.target.value.toUpperCase())
               }
-              placeholder={t("auth.drivingLicenseOptional")}
+              placeholder={
+                drivingLicenseRequired
+                  ? t("auth.drivingLicenseRequired")
+                  : t("auth.drivingLicenseOptional")
+              }
               autoComplete="off"
               maxLength={16}
             />
+            <label className="file-field">
+              <span>
+                {drivingLicenseRequired
+                  ? t("auth.drivingLicenseImageRequired")
+                  : t("profile.drivingLicenseImage")}
+              </span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) =>
+                  setDrivingLicenseImage(event.target.files?.[0] || null)
+                }
+              />
+            </label>
           </>
         )}
         <LoadingButton isLoading={loading} loadingText={t("auth.signupLoading")} type="submit">
           {t("auth.createAccount")}
         </LoadingButton>
-
-        {isCoolingDown && (
-          <p className="auth-resend-timer">
-            {t("auth.resendIn", { seconds: secondsRemaining })}
-          </p>
-        )}
 
         <p className="signup-footer-text">
           {t("auth.freshCode")}{" "}

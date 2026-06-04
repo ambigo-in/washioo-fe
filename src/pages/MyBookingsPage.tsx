@@ -417,6 +417,34 @@ const MyBookingsPage: React.FC = () => {
                   <p>{formatAddress(booking.address)}</p>
                 </div>
 
+                {booking.assignment?.cleaner_details &&
+                  ["accepted", "in_progress", "completed"].includes(
+                    booking.booking_status,
+                  ) && (
+                    <div className="booking-cleaner-summary">
+                      <div className="booking-cleaner-photo">
+                        {booking.assignment.cleaner_details.profile_photo_url ? (
+                          <img
+                            src={
+                              booking.assignment.cleaner_details
+                                .profile_photo_url
+                            }
+                            alt=""
+                          />
+                        ) : (
+                          booking.assignment.cleaner_details.name?.charAt(0) ||
+                          "C"
+                        )}
+                      </div>
+                      <div>
+                        <span>{t("common.cleaner")}</span>
+                        <strong>
+                          {booking.assignment.cleaner_details.name || t("common.cleaner")}
+                        </strong>
+                      </div>
+                    </div>
+                  )}
+
                 {booking.special_instructions && (
                   <div className="booking-address">
                     <span>{t("booking.instructions")}</span>

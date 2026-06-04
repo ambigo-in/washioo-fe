@@ -5,6 +5,12 @@ export interface SendOtpResponse {
   user_exist?: boolean;
 }
 
+export interface AppConfigResponse {
+  cleaner: {
+    driving_license_required: boolean;
+  };
+}
+
 export type AccountType = "customer" | "cleaner" | "admin";
 
 export interface SignUpPayload {
@@ -12,6 +18,7 @@ export interface SignUpPayload {
   phone_number: string;
   email?: string;
   otp_code: string;
+  terms_accepted?: boolean;
   aadhaar_number?: string;
   driving_license_number?: string;
 }
@@ -19,6 +26,7 @@ export interface SignUpPayload {
 export interface SignInPayload {
   phone_number: string;
   otp_code: string;
+  terms_accepted?: boolean;
 }
 
 export interface AuthResponse {

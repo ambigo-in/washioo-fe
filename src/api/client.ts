@@ -294,9 +294,12 @@ export const apiRequest = async <T>(
     }
   }
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const isFormData = body instanceof FormData;
+  const headers: Record<string, string> = isFormData
+    ? {}
+    : {
+        "Content-Type": "application/json",
+      };
 
   if (auth) {
     const accessToken = getAccessToken();
@@ -322,7 +325,12 @@ export const apiRequest = async <T>(
         response = await fetch(apiUrl(path), {
           method,
           headers,
-          body: body === undefined ? undefined : JSON.stringify(body),
+          body:
+            body === undefined
+              ? undefined
+              : isFormData
+                ? body
+                : JSON.stringify(body),
           signal: requestSignal.signal,
         });
       } catch (error) {
@@ -354,42 +362,46 @@ export const apiRequest = async <T>(
     ? enqueueReadRequest(runFetch)
     : runFetch();
 
-  if (shouldDedupe) {
-    readRequestCache.set(requestKey, responsePromise);
-    responsePromise.then(
-      () => readRequestCache.delete(requestKey),
-      () => readRequestCache.delete(requestKey),
-    );
-  }
+  const requestPromise = (async (): Promise<T> => {
+    const response = await responsePromise;
 
-  const response = await responsePromise;
-
-  if (response.status === 401 && auth && retryOnUnauthorized) {
-    const refreshed = await refreshTokens();
-    if (refreshed) {
-      return apiRequest<T>(path, {
-        method,
-        body,
-        auth,
-        retryOnUnauthorized: false,
-        dedupe,
-        priority,
-        signal,
-        timeoutMs,
-      });
+    if (response.status === 401 && auth && retryOnUnauthorized) {
+      const refreshed = await refreshTokens();
+      if (refreshed) {
+        return apiRequest<T>(path, {
+          method,
+          body,
+          auth,
+          retryOnUnauthorized: false,
+          dedupe,
+          priority,
+          signal,
+          timeoutMs,
+        });
+      }
     }
-  }
 
-  const payload = await parseResponse(response);
-  if (!response.ok) {
-    throw new ApiError(
-      readErrorMessage(payload, "Something went wrong. Please try again."),
-      response.status,
-      payload,
+    const payload = await parseResponse(response);
+    if (!response.ok) {
+      throw new ApiError(
+        readErrorMessage(payload, "Something went wrong. Please try again."),
+        response.status,
+        payload,
+      );
+    }
+
+    return payload as T;
+  })();
+
+  if (shouldDedupe) {
+    readRequestCache.set(requestKey, requestPromise);
+    requestPromise.then(
+      () => readRequestCache.delete(requestKey),
+      () => readRequestCache.delete(requestKey),
     );
   }
 
-  return payload as T;
+  return requestPromise;
 };
 
 export const getApiErrorMessage = (error: unknown) => {

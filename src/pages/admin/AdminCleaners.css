@@ -353,6 +353,115 @@
   font-weight: 600;
 }
 
+.document-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.9rem;
+  margin-top: 1rem;
+}
+
+.document-preview {
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: var(--brand-surface);
+}
+
+.document-preview-header {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  min-height: 30px;
+}
+
+.document-preview-header span {
+  display: block;
+  color: var(--brand-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.document-download-button {
+  background: var(--brand-white);
+  border: 1px solid var(--brand-border-strong);
+  border-radius: 8px;
+  color: var(--brand-teal-dark);
+  cursor: pointer;
+  flex: 0 0 auto;
+  font-size: 0.74rem;
+  font-weight: 800;
+  min-height: 30px;
+  padding: 5px 9px;
+}
+
+.document-download-button:hover:not(:disabled) {
+  background: rgba(var(--brand-teal-rgb), 0.1);
+  border-color: var(--brand-teal);
+}
+
+.document-download-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.document-preview img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--brand-border);
+}
+
+.document-preview p {
+  margin: 0;
+  color: var(--brand-text-muted);
+}
+
+.pending-documents {
+  margin-top: 1rem;
+}
+
+.review-box {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-top: 1px solid var(--brand-border);
+}
+
+.review-box label {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--brand-text);
+  font-weight: 700;
+}
+
+.review-box textarea {
+  width: 100%;
+  min-height: 86px;
+  resize: vertical;
+  border: 1px solid var(--brand-border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font: inherit;
+}
+
+.review-error {
+  margin: 0.6rem 0 0;
+  color: #b42318;
+  font-weight: 700;
+}
+
+.review-status-note {
+  background: rgba(var(--brand-teal-rgb), 0.1);
+  border-top: 1px solid var(--brand-border);
+  color: var(--brand-teal-dark);
+  font-weight: 700;
+  margin: 1rem 0 0;
+  padding: 1rem;
+}
+
 .identity-status-note.full {
   background: rgba(var(--brand-teal-rgb), 0.1);
   color: var(--brand-teal-dark);
@@ -477,6 +586,10 @@
 }
 
 @media (max-width: 720px) {
+  .document-preview-grid {
+    grid-template-columns: 1fr;
+  }
+
   .modal-actions {
     align-items: stretch;
     flex-direction: column;

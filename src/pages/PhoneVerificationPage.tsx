@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LoadingButton } from "../components/ui";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
@@ -25,6 +26,7 @@ export default function PhoneVerificationPage() {
   const [phone, setPhone] = useState("");
   const [accountType, setAccountType] =
     useState<AccountType>(initialAccountType);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -34,6 +36,11 @@ export default function PhoneVerificationPage() {
 
     if (!isValidIndianPhone(phoneNumber)) {
       setError("Enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    if (!termsAccepted) {
+      setError(t("auth.termsRequired"));
       return;
     }
 
@@ -61,6 +68,7 @@ export default function PhoneVerificationPage() {
           phone: phoneNumber,
           accountType: requestedAccountType,
           otpSentAt: Date.now(),
+          termsAcceptedAtOtp: true,
         },
       });
     } catch (err) {
@@ -107,8 +115,23 @@ export default function PhoneVerificationPage() {
           <option value="customer">{t("common.customer")}</option>
           <option value="cleaner">{t("common.cleaner")}</option>
         </select>
+        <label className="terms-consent">
+          <input
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={(event) => setTermsAccepted(event.target.checked)}
+          />
+          <span>
+            {t("auth.agreeTo")}{" "}
+            <Link to="/terms-and-conditions" target="_blank" rel="noreferrer">
+              {t("auth.termsAndConditions")}
+            </Link>
+            .
+          </span>
+        </label>
         <LoadingButton
           isLoading={loading}
+          disabled={!termsAccepted}
           loadingText={t("auth.sendingOtp")}
           type="submit"
         >

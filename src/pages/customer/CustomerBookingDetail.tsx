@@ -64,6 +64,12 @@ export default function CustomerBookingDetail() {
   const address = booking?.address;
   const paymentStatus = customerPaymentStatus?.status ?? "pending_collection";
   const paymentType = customerPaymentStatus?.payment_type;
+  const cleanerDetails = booking?.assignment?.cleaner_details;
+  const showCleanerDetails = Boolean(
+    cleanerDetails &&
+      booking &&
+      ["accepted", "in_progress", "completed"].includes(booking.booking_status),
+  );
 
   return (
     <DashboardLayout title={t("booking.details")}>
@@ -134,6 +140,35 @@ export default function CustomerBookingDetail() {
               <h3>{t("common.address")}</h3>
               <p>{formatAddress(address)}</p>
             </section>
+
+            {showCleanerDetails && cleanerDetails && (
+              <section className="customer-detail-card cleaner-detail-card">
+                <h3>{t("booking.cleanerDetails")}</h3>
+                <div className="assigned-cleaner">
+                  <div className="assigned-cleaner-photo">
+                    {cleanerDetails.profile_photo_url ? (
+                      <img src={cleanerDetails.profile_photo_url} alt="" />
+                    ) : (
+                      cleanerDetails.name?.charAt(0) || "C"
+                    )}
+                  </div>
+                  <div>
+                    <strong>{cleanerDetails.name || t("common.cleaner")}</strong>
+                    <span>
+                      {cleanerDetails.verification_badge
+                        ? t("booking.verifiedCleaner")
+                        : t("booking.verificationPending")}
+                    </span>
+                    <small>
+                      {t("booking.cleanerSummary", {
+                        rating: cleanerDetails.rating.toFixed(1),
+                        jobs: cleanerDetails.experience,
+                      })}
+                    </small>
+                  </div>
+                </div>
+              </section>
+            )}
 
             {booking.booking_status === "completed" && (
               <section className="customer-detail-card payment-card">

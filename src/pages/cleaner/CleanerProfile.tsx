@@ -2,12 +2,22 @@ import React, { useState } from "react";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import { LoadingButton } from "../../components/ui";
 import { useAuth } from "../../context/useAuth";
-import { fetchCleanerProfile, verifyCleanerIdentity } from "../../api/cleanerApi";
+import {
+  fetchCleanerProfile,
+  uploadCleanerAadhaar,
+  uploadCleanerDrivingLicense,
+  uploadCleanerProfilePhoto,
+  verifyCleanerIdentity,
+} from "../../api/cleanerApi";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { updateProfileRequest } from "../../store/slices/authSlice";
 import type { CleanerProfile as CleanerProfileData } from "../../types/cleanerTypes";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { formatDisplayDate } from "../../utils/dateTimeUtils";
+import {
+  normalizeAadhaarNumber,
+  normalizeDrivingLicenseNumber,
+} from "../../utils/identityValidation";
 import "./CleanerProfile.css";
 
 interface ProfileFormData {
@@ -50,6 +60,15 @@ export default function CleanerProfile() {
     aadhaar: false,
     license: false,
   });
+  const [aadhaarUploadNumber, setAadhaarUploadNumber] = useState("");
+  const [licenseUploadNumber, setLicenseUploadNumber] = useState("");
+  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
+  const [aadhaarImageFile, setAadhaarImageFile] = useState<File | null>(null);
+  const [drivingLicenseImageFile, setDrivingLicenseImageFile] =
+    useState<File | null>(null);
+  const [uploadingDocument, setUploadingDocument] = useState<string | null>(
+    null,
+  );
 
   React.useEffect(() => {
     fetchCleanerProfile()
@@ -128,6 +147,71 @@ export default function CleanerProfile() {
     setError("");
   };
 
+  const handleProfilePhotoUpload = async () => {
+    if (!profilePhotoFile) {
+      setError(t("profile.selectProfilePhoto"));
+      return;
+    }
+    setUploadingDocument("profile_photo");
+    setError("");
+    try {
+      const response = await uploadCleanerProfilePhoto(profilePhotoFile);
+      setCleanerProfile(response.cleaner);
+      setProfilePhotoFile(null);
+      setSuccess(t("profile.profilePhotoUploaded"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("profile.uploadFailed"));
+    } finally {
+      setUploadingDocument(null);
+    }
+  };
+
+  const handleAadhaarUpload = async () => {
+    if (!aadhaarImageFile) {
+      setError(t("profile.selectAadhaarImage"));
+      return;
+    }
+    setUploadingDocument("aadhaar");
+    setError("");
+    try {
+      const response = await uploadCleanerAadhaar(
+        aadhaarImageFile,
+        normalizeAadhaarNumber(aadhaarUploadNumber) || undefined,
+      );
+      setCleanerProfile(response.cleaner);
+      setAadhaarUploadNumber("");
+      setAadhaarImageFile(null);
+      setSuccess(t("profile.aadhaarSubmitted"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("profile.uploadFailed"));
+    } finally {
+      setUploadingDocument(null);
+    }
+  };
+
+  const handleDrivingLicenseUpload = async () => {
+    if (!drivingLicenseImageFile) {
+      setError(t("profile.selectDrivingLicenseImage"));
+      return;
+    }
+    setUploadingDocument("driving_license");
+    setError("");
+    try {
+      const response = await uploadCleanerDrivingLicense(
+        drivingLicenseImageFile,
+        normalizeDrivingLicenseNumber(licenseUploadNumber) || undefined,
+      );
+      setCleanerProfile(response.cleaner);
+      setLicenseUploadNumber("");
+      setDrivingLicenseImageFile(null);
+      setSuccess(t("profile.drivingLicenseSubmitted"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("profile.uploadFailed"));
+    } finally {
+      setUploadingDocument(null);
+    }
+  };
+
   const aadhaarDisplay =
     showFullDetails.aadhaar &&
     hasFullIdentityValue(cleanerProfile?.aadhaar_number)
@@ -138,17 +222,28 @@ export default function CleanerProfile() {
     hasFullIdentityValue(cleanerProfile?.driving_license_number)
       ? cleanerProfile?.driving_license_number
       : cleanerProfile?.driving_license_number_masked || t("profile.provided");
+  const progress = cleanerProfile?.verification_progress;
+  const profilePhotoUrl = cleanerProfile?.profile_photo_url;
 
   return (
     <DashboardLayout title={t("profile.myProfile")}>
       <div className="profile-page">
         <div className="profile-card">
           <div className="profile-header">
-            <div className="avatar">{user?.full_name?.charAt(0) || "C"}</div>
+            <div className="avatar">
+              {profilePhotoUrl ? (
+                <img src={profilePhotoUrl} alt="" />
+              ) : (
+                user?.full_name?.charAt(0) || "C"
+              )}
+            </div>
             <div className="profile-info">
               <h2>{user?.full_name || t("common.cleaner")}</h2>
               <p className="user-email">{user?.email || t("profile.noEmail")}</p>
               <p className="user-phone">{user?.phone}</p>
+              <span className="verification-pill">
+                {cleanerProfile?.document_review_status || "not_submitted"}
+              </span>
             </div>
             <button
               className="btn-edit"
@@ -231,6 +326,135 @@ export default function CleanerProfile() {
 
           <div className="profile-section">
             <h3>{t("profile.identityVerification")}</h3>
+            {cleanerProfile?.document_rejection_reason && (
+              <p className="profile-alert">
+                {cleanerProfile.document_rejection_reason}
+              </p>
+            )}
+            <div className="verification-progress">
+              <div>
+                <span>{t("profile.profilePhoto")}</span>
+                <strong>{progress?.profile_photo ? t("profile.uploaded") : t("profile.missing")}</strong>
+              </div>
+              <div>
+                <span>{t("profile.aadhaarNumber")}</span>
+                <strong>{progress?.aadhaar_number ? t("profile.added") : t("profile.missing")}</strong>
+              </div>
+              <div>
+                <span>{t("profile.aadhaarImage")}</span>
+                <strong>{progress?.aadhaar_image ? t("profile.uploaded") : t("profile.missing")}</strong>
+              </div>
+              <div>
+                <span>{t("profile.drivingLicense")}</span>
+                <strong>
+                  {progress?.driving_license_required
+                    ? progress.driving_license_image
+                      ? t("profile.uploaded")
+                      : t("profile.missing")
+                    : progress?.driving_license_image
+                      ? t("profile.uploaded")
+                      : t("profile.optional")}
+                </strong>
+              </div>
+            </div>
+            <div className="document-upload-grid">
+              <div className="document-upload-control">
+                <span>{t("profile.profilePhoto")}</span>
+                <label className="file-picker-button">
+                  {t("profile.chooseImage")}
+                  <input
+                    key={profilePhotoFile?.name || "profile-photo-empty"}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(event) =>
+                      setProfilePhotoFile(event.target.files?.[0] || null)
+                    }
+                    disabled={uploadingDocument !== null}
+                  />
+                </label>
+                <small>{profilePhotoFile?.name || t("profile.noImageSelected")}</small>
+                <LoadingButton
+                  type="button"
+                  className="document-save-button"
+                  isLoading={uploadingDocument === "profile_photo"}
+                  loadingText={t("common.saving")}
+                  disabled={!profilePhotoFile || uploadingDocument !== null}
+                  onClick={handleProfilePhotoUpload}
+                >
+                  {t("profile.saveProfilePhoto")}
+                </LoadingButton>
+              </div>
+              <div className="document-upload-control">
+                <span>{t("profile.aadhaarDocument")}</span>
+                <input
+                  value={aadhaarUploadNumber}
+                  onChange={(event) => setAadhaarUploadNumber(event.target.value)}
+                  placeholder={cleanerProfile?.has_aadhaar ? t("profile.keepCurrentNumber") : t("profile.aadhaar12Digit")}
+                  maxLength={12}
+                  inputMode="numeric"
+                />
+                <label className="file-picker-button">
+                  {t("profile.chooseAadhaarImage")}
+                  <input
+                    key={aadhaarImageFile?.name || "aadhaar-empty"}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(event) =>
+                      setAadhaarImageFile(event.target.files?.[0] || null)
+                    }
+                    disabled={uploadingDocument !== null}
+                  />
+                </label>
+                <small>{aadhaarImageFile?.name || t("profile.noImageSelected")}</small>
+                <LoadingButton
+                  type="button"
+                  className="document-save-button"
+                  isLoading={uploadingDocument === "aadhaar"}
+                  loadingText={t("common.saving")}
+                  disabled={!aadhaarImageFile || uploadingDocument !== null}
+                  onClick={handleAadhaarUpload}
+                >
+                  {t("profile.saveAadhaar")}
+                </LoadingButton>
+              </div>
+              <div className="document-upload-control">
+                <span>{t("profile.drivingLicense")}</span>
+                <input
+                  value={licenseUploadNumber}
+                  onChange={(event) => setLicenseUploadNumber(event.target.value.toUpperCase())}
+                  placeholder={cleanerProfile?.has_driving_license ? t("profile.keepCurrentNumber") : t("profile.optional")}
+                  maxLength={16}
+                />
+                <label className="file-picker-button">
+                  {t("profile.chooseLicenseImage")}
+                  <input
+                    key={drivingLicenseImageFile?.name || "license-empty"}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(event) =>
+                      setDrivingLicenseImageFile(event.target.files?.[0] || null)
+                    }
+                    disabled={uploadingDocument !== null}
+                  />
+                </label>
+                <small>
+                  {drivingLicenseImageFile?.name || t("profile.noImageSelected")}
+                </small>
+                <LoadingButton
+                  type="button"
+                  className="document-save-button"
+                  isLoading={uploadingDocument === "driving_license"}
+                  loadingText={t("common.saving")}
+                  disabled={!drivingLicenseImageFile || uploadingDocument !== null}
+                  onClick={handleDrivingLicenseUpload}
+                >
+                  {t("profile.saveLicense")}
+                </LoadingButton>
+              </div>
+            </div>
+            {uploadingDocument && (
+              <p className="profile-note">{t("profile.uploadingDocument")}</p>
+            )}
             <div className="info-row">
               <span className="info-label">{t("profile.aadhaar")}</span>
               <span className="info-value">

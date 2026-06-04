@@ -3,6 +3,9 @@ import type { NotificationItem, UserRole } from "../types/apiTypes";
 const cleanerTypes = new Set([
   "booking_assigned",
   "service_scheduled_today",
+  "cleaner_verification_approved",
+  "cleaner_verification_rejected",
+  "cleaner_document_resubmission_requested",
 ]);
 
 const customerTypes = new Set([
@@ -57,6 +60,20 @@ export const getNotificationTargetPath = (
 ) => {
   if (role === "cleaner" && notification.notification_type === "booking_assigned") {
     return "/cleaner/assignments?status=assigned";
+  }
+
+  if (
+    role === "cleaner" &&
+    notification.notification_type.startsWith("cleaner_verification")
+  ) {
+    return "/cleaner/profile";
+  }
+
+  if (
+    role === "cleaner" &&
+    notification.notification_type === "cleaner_document_resubmission_requested"
+  ) {
+    return "/cleaner/profile";
   }
 
   if (

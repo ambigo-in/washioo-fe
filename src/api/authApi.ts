@@ -1,6 +1,7 @@
 import { apiRequest } from "./client";
 import type {
   AccountType,
+  AppConfigResponse,
   AuthResponse,
   SendOtpResponse,
   SignInPayload,
@@ -8,6 +9,11 @@ import type {
 } from "../types/authTypes";
 import type { UserProfile } from "../types/apiTypes";
 import { normalizeIndianPhone } from "../utils/phoneUtils";
+
+export const getAppConfig = () =>
+  apiRequest<AppConfigResponse>("/auth/config", {
+    auth: false,
+  });
 
 export const sendOtp = (phone_number: string, accountType: AccountType = "customer") =>
   apiRequest<SendOtpResponse>(`/auth/${accountType}/send-otp`, {

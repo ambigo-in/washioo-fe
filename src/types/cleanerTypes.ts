@@ -14,13 +14,49 @@ export interface CleanerProfile {
   phone: string;
   email: string | null;
   vehicle_type: string | null;
+  profile_photo_url?: string | null;
   aadhaar_number_masked?: string | null;
   driving_license_number_masked?: string | null;
   aadhaar_number?: string | null;
   driving_license_number?: string | null;
+  aadhaar_image_url?: string | null;
+  driving_license_image_url?: string | null;
+  pending_aadhaar_number?: string | null;
+  pending_aadhaar_image_url?: string | null;
+  pending_driving_license_number?: string | null;
+  pending_driving_license_image_url?: string | null;
   identity_data_status?: "full_available" | "masked_legacy_data" | null;
+  has_profile_photo?: boolean;
   has_aadhaar?: boolean;
+  has_aadhaar_image?: boolean;
   has_driving_license?: boolean;
+  has_driving_license_image?: boolean;
+  verification_status?:
+    | "pending"
+    | "pending_reverification"
+    | "approved"
+    | "rejected"
+    | "resubmission_required";
+  document_review_status?:
+    | "not_submitted"
+    | "pending_review"
+    | "approved"
+    | "rejected"
+    | "resubmission_required";
+  document_resubmission_required?: boolean;
+  document_rejection_reason?: string | null;
+  documents_submitted_at?: string | null;
+  documents_verified_at?: string | null;
+  driving_license_required?: boolean;
+  pending_document_update?: boolean;
+  verification_progress?: {
+    profile_photo: boolean;
+    aadhaar_number: boolean;
+    aadhaar_image: boolean;
+    driving_license_number: boolean;
+    driving_license_image: boolean;
+    driving_license_required: boolean;
+  };
   service_radius_km: number | null;
   current_latitude?: number | null;
   current_longitude?: number | null;
