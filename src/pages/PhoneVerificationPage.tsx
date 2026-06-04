@@ -34,8 +34,13 @@ export default function PhoneVerificationPage() {
     event.preventDefault();
     const phoneNumber = normalizeIndianPhone(phone);
 
+    if (!phone.trim()) {
+      setError(t("auth.mobileNumberRequired"));
+      return;
+    }
+
     if (!isValidIndianPhone(phoneNumber)) {
-      setError("Enter a valid 10-digit mobile number.");
+      setError(t("auth.mobileNumberInvalid"));
       return;
     }
 
@@ -83,7 +88,9 @@ export default function PhoneVerificationPage() {
           <span>{t("language.label")}</span>
           <select
             value={language}
-            onChange={(event) => setLanguage(event.target.value as LanguageCode)}
+            onChange={(event) =>
+              setLanguage(event.target.value as LanguageCode)
+            }
           >
             <option value="en">{t("language.english")}</option>
             <option value="te">{t("language.telugu")}</option>
@@ -97,7 +104,10 @@ export default function PhoneVerificationPage() {
 
         <input
           value={phone}
-          onChange={(event) => setPhone(event.target.value)}
+          onChange={(event) => {
+            setPhone(event.target.value);
+            if (error) setError("");
+          }}
           aria-label={t("auth.phonePlaceholder")}
           placeholder={t("auth.phonePlaceholder")}
           autoComplete="tel"
@@ -119,7 +129,10 @@ export default function PhoneVerificationPage() {
           <input
             type="checkbox"
             checked={termsAccepted}
-            onChange={(event) => setTermsAccepted(event.target.checked)}
+            onChange={(event) => {
+              setTermsAccepted(event.target.checked);
+              if (error) setError("");
+            }}
           />
           <span>
             {t("auth.agreeTo")}{" "}
@@ -131,7 +144,6 @@ export default function PhoneVerificationPage() {
         </label>
         <LoadingButton
           isLoading={loading}
-          disabled={!termsAccepted}
           loadingText={t("auth.sendingOtp")}
           type="submit"
         >

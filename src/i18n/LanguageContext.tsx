@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 export type LanguageCode = "en" | "te" | "hi";
 
@@ -125,7 +131,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "services.noneActive": "No active services are available.",
     "services.premium": "Premium Services",
     "services.selectWash": "Select Your Vehicle Wash Service",
-    "services.selectWashHint": "Choose a professional doorstep wash, pick your address and time, and track the booking from pending to completion.",
+    "services.selectWashHint":
+      "Choose a professional doorstep wash, pick your address and time, and track the booking from pending to completion.",
     "vehicles.added": "Vehicle added.",
     "vehicles.addVehicle": "Add Vehicle",
     "vehicles.bike": "Bike",
@@ -136,7 +143,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "vehicles.editVehicle": "Edit Vehicle",
     "vehicles.loading": "Loading vehicles...",
     "vehicles.manage": "Manage Your Vehicles",
-    "vehicles.manageHint": "Save your bike or car details once and reuse them while booking.",
+    "vehicles.manageHint":
+      "Save your bike or car details once and reuse them while booking.",
     "vehicles.myVehicles": "My Vehicles",
     "vehicles.noPlate": "No license plate added",
     "vehicles.none": "No vehicles added yet.",
@@ -165,8 +173,10 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "address.loading": "Loading addresses...",
     "address.locationBeforeBooking": "Tap Use My Live Location before booking.",
     "address.locationBeforeSaving": "Tap Use My Live Location before saving.",
-    "address.locationCaptured": "Location captured. It will be used for directions.",
-    "address.locationCapturedService": "Location captured. It will be used for service directions.",
+    "address.locationCaptured":
+      "Location captured. It will be used for directions.",
+    "address.locationCapturedService":
+      "Location captured. It will be used for service directions.",
     "address.manage": "Manage Your Addresses",
     "address.noAddresses": "No addresses added yet.",
     "address.noSaved": "No saved addresses yet.",
@@ -208,7 +218,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "booking.editPending": "Edit Pending Booking",
     "booking.failed": "Failed",
     "booking.fixBookingDetail": "Fix the highlighted booking detail.",
-    "booking.fixBeforeBooking": "Fix the highlighted address field before booking.",
+    "booking.fixBeforeBooking":
+      "Fix the highlighted address field before booking.",
     "booking.highestPrice": "Highest Price",
     "booking.inProgress": "In Progress",
     "booking.instructions": "Instructions",
@@ -252,7 +263,12 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "auth.drivingLicenseOptional": "Driving license optional",
     "auth.emailOptional": "Email address optional",
     "auth.enterOtp": "Enter OTP",
-    "auth.firstDetails": "We need a few details before your first doorstep wash.",
+    "auth.fullNameRequired": "Please enter your full name.",
+    "auth.mobileNumberRequired": "Please enter your mobile number.",
+    "auth.mobileNumberInvalid": "Please enter a valid 10-digit mobile number.",
+    "auth.otpRequired": "Please enter the OTP sent to your phone.",
+    "auth.firstDetails":
+      "We need a few details before your first doorstep wash.",
     "auth.freshCode": "Need a fresh code?",
     "auth.fullName": "Full name",
     "auth.login": "Login",
@@ -265,21 +281,28 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "auth.signingIn": "Signing in...",
     "auth.signupLoading": "Creating...",
     "auth.verifyPhone": "Verify Your Phone",
-    "auth.verifySubtitle": "Enter your mobile number to login or sign up for a Washioo account.",
+    "auth.verifySubtitle":
+      "Enter your mobile number to login or sign up for a Washioo account.",
     "auth.welcomeBack": "Welcome Back",
     "auth.welcomeSubtitle": "Enter the OTP sent to your phone to continue.",
     "availability.approvalStatus": "Approval Status",
-    "availability.approvalWarning": "You need to be approved by an admin before you can go available.",
+    "availability.approvalWarning":
+      "You need to be approved by an admin before you can go available.",
     "availability.available": "Available",
     "availability.availableHint": "Ready to accept new assignments",
     "availability.busy": "Busy",
     "availability.busyHint": "Currently on a job",
     "availability.currentStatus": "Current Status",
-    "availability.guidelineApproved": "Your profile must be approved by an admin before you can go available.",
-    "availability.guidelineAvailable": "Set your status to Available when you're ready to take new jobs.",
-    "availability.guidelineBusy": "Set status to Busy when you're currently working on a job.",
-    "availability.guidelineOffline": "Set status to Offline when you're not working.",
-    "availability.guidelineUpdated": "Keep your status updated to provide better service to customers.",
+    "availability.guidelineApproved":
+      "Your profile must be approved by an admin before you can go available.",
+    "availability.guidelineAvailable":
+      "Set your status to Available when you're ready to take new jobs.",
+    "availability.guidelineBusy":
+      "Set status to Busy when you're currently working on a job.",
+    "availability.guidelineOffline":
+      "Set status to Offline when you're not working.",
+    "availability.guidelineUpdated":
+      "Keep your status updated to provide better service to customers.",
     "availability.guidelines": "Guidelines",
     "availability.loading": "Loading...",
     "availability.manage": "Manage Availability",
@@ -287,10 +310,13 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "availability.offline": "Offline",
     "availability.offlineHint": "You are not accepting new jobs",
     "availability.setAvailability": "Set Your Availability",
-    "availability.subtitle": "Choose your current working status. Customers will only see you when you're available.",
-    "availability.updateFailed": "Failed to update availability. Please try again.",
+    "availability.subtitle":
+      "Choose your current working status. Customers will only see you when you're available.",
+    "availability.updateFailed":
+      "Failed to update availability. Please try again.",
     "availability.updateSuccess": "Availability updated successfully!",
-    "availability.mustBeApproved": "You must be approved before changing availability.",
+    "availability.mustBeApproved":
+      "You must be approved before changing availability.",
     "cleaner.accept": "Accept",
     "cleaner.accepting": "Accepting...",
     "cleaner.amountCollected": "Amount Collected (Rs.)",
@@ -309,16 +335,19 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "cleaner.searchAssignments": "Search assignment, customer, location...",
     "cleaner.startService": "Start Service",
     "cleaner.starting": "Starting...",
-    "cleaner.validAmount": "Enter a valid collected amount before completing the job.",
+    "cleaner.validAmount":
+      "Enter a valid collected amount before completing the job.",
     "cleaner.customer": "Customer",
-    "cleaner.earningsReconcileNote": "Earnings update after admin reconciliation.",
+    "cleaner.earningsReconcileNote":
+      "Earnings update after admin reconciliation.",
     "cleaner.markCollected": "Mark as Collected",
     "cleaner.paymentCollected": "Payment collection recorded successfully.",
     "cleaner.paymentCollectedSummary": "Rs. {amount} collected via {type}",
     "cleaner.paymentPendingCollection": "Payment pending collection.",
     "cleaner.updatePayment": "Updating payment...",
     "cleaner.validCollectedAmount": "Enter a valid collected amount.",
-    "rating.availableLater": "Your rating has been submitted. The other rating will appear here once available.",
+    "rating.availableLater":
+      "Your rating has been submitted. The other rating will appear here once available.",
     "rating.cleanerRatedCustomer": "Cleaner rated customer",
     "rating.customerRatedCleaner": "Customer rated cleaner",
     "rating.loading": "Loading ratings...",
@@ -354,7 +383,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "profile.email": "Email",
     "profile.failed": "Failed to update profile",
     "profile.fullName": "Full Name",
-    "profile.identityNote": "Identity details are shown in masked format for security. Click View to see full details after verification.",
+    "profile.identityNote":
+      "Identity details are shown in masked format for security. Click View to see full details after verification.",
     "profile.identityVerification": "Identity Verification",
     "profile.memberSince": "Member Since",
     "profile.myProfile": "My Profile",
@@ -367,7 +397,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "profile.saving": "Saving...",
     "profile.updated": "Profile updated successfully!",
     "profile.verify": "Verify",
-    "profile.verifyDigits": "Enter the last 4 digits of your phone number to verify and view full details.",
+    "profile.verifyDigits":
+      "Enter the last 4 digits of your phone number to verify and view full details.",
     "profile.verifyFailed": "Verification failed. Please try again.",
     "profile.verifyIdentity": "Verify Your Identity",
     "profile.verifyPlaceholder": "Enter last 4 digits of phone",
@@ -490,7 +521,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "address.addressLine1": "చిరునామా లైన్ 1",
     "address.addressLine1Required": "చిరునామా లైన్ 1 అవసరం.",
     "address.addressSaved": "చిరునామా సేవ్ చేయబడింది.",
-    "address.addressSavedSelected": "చిరునామా సేవ్ చేసి బుకింగ్ కోసం ఎంచుకున్నారు.",
+    "address.addressSavedSelected":
+      "చిరునామా సేవ్ చేసి బుకింగ్ కోసం ఎంచుకున్నారు.",
     "address.cityRequired": "నగరం అవసరం.",
     "address.closeForm": "చిరునామా ఫారమ్ మూసివేయండి",
     "address.confirmRemove": "ఈ చిరునామాను తీసివేయాలా?",
@@ -503,10 +535,14 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "address.labelRequired": "ఇల్లు లేదా ఆఫీస్ వంటి సరళమైన లేబుల్ జోడించండి.",
     "address.line2": "చిరునామా లైన్ 2",
     "address.loading": "చిరునామాలు లోడ్ అవుతున్నాయి...",
-    "address.locationBeforeBooking": "బుక్ చేసే ముందు నా లైవ్ లొకేషన్ వాడండి నొక్కండి.",
-    "address.locationBeforeSaving": "సేవ్ చేసే ముందు నా లైవ్ లొకేషన్ వాడండి నొక్కండి.",
-    "address.locationCaptured": "లొకేషన్ క్యాప్చర్ అయింది. ఇది దిశల కోసం ఉపయోగించబడుతుంది.",
-    "address.locationCapturedService": "లొకేషన్ క్యాప్చర్ అయింది. ఇది సర్వీస్ దిశల కోసం ఉపయోగించబడుతుంది.",
+    "address.locationBeforeBooking":
+      "బుక్ చేసే ముందు నా లైవ్ లొకేషన్ వాడండి నొక్కండి.",
+    "address.locationBeforeSaving":
+      "సేవ్ చేసే ముందు నా లైవ్ లొకేషన్ వాడండి నొక్కండి.",
+    "address.locationCaptured":
+      "లొకేషన్ క్యాప్చర్ అయింది. ఇది దిశల కోసం ఉపయోగించబడుతుంది.",
+    "address.locationCapturedService":
+      "లొకేషన్ క్యాప్చర్ అయింది. ఇది సర్వీస్ దిశల కోసం ఉపయోగించబడుతుంది.",
     "address.manage": "మీ చిరునామాలను నిర్వహించండి",
     "address.noAddresses": "ఇంకా చిరునామాలు జోడించలేదు.",
     "address.noSaved": "ఇంకా సేవ్ చేసిన చిరునామాలు లేవు.",
@@ -529,7 +565,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "address.failedDefault": "డిఫాల్ట్ చిరునామా సెట్ కాలేదు",
     "booking.accepted": "అంగీకరించబడింది",
     "booking.assigned": "కేటాయించబడింది",
-    "booking.addressRequired": "సేవ్ చేసిన చిరునామాను ఎంచుకోండి లేదా కొత్తది జోడించండి.",
+    "booking.addressRequired":
+      "సేవ్ చేసిన చిరునామాను ఎంచుకోండి లేదా కొత్తది జోడించండి.",
     "booking.allDates": "అన్ని తేదీలు",
     "booking.allPrices": "అన్ని ధరలు",
     "booking.awaitingCollection": "సేకరణ కోసం వేచి ఉంది",
@@ -547,7 +584,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "booking.editPending": "పెండింగ్ బుకింగ్ సవరించండి",
     "booking.failed": "విఫలమైంది",
     "booking.fixBookingDetail": "హైలైట్ చేసిన బుకింగ్ వివరాన్ని సరిచేయండి.",
-    "booking.fixBeforeBooking": "బుక్ చేసే ముందు హైలైట్ చేసిన చిరునామా ఫీల్డ్ సరిచేయండి.",
+    "booking.fixBeforeBooking":
+      "బుక్ చేసే ముందు హైలైట్ చేసిన చిరునామా ఫీల్డ్ సరిచేయండి.",
     "booking.highestPrice": "అధిక ధర ముందు",
     "booking.inProgress": "ప్రగతిలో ఉంది",
     "booking.instructions": "సూచనలు",
@@ -569,7 +607,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "booking.paymentStatus": "చెల్లింపు స్థితి",
     "booking.pending": "పెండింగ్",
     "booking.scheduleRequired": "సర్వీస్ తేదీ మరియు సమయం రెండూ ఎంచుకోండి.",
-    "booking.searchPlaceholder": "రెఫరెన్స్, సర్వీస్, చిరునామా ద్వారా వెతకండి...",
+    "booking.searchPlaceholder":
+      "రెఫరెన్స్, సర్వీస్, చిరునామా ద్వారా వెతకండి...",
     "booking.selectAddress": "చిరునామా ఎంచుకోండి",
     "booking.selectedService": "ఎంచుకున్న సర్వీస్",
     "booking.serviceAddress": "సర్వీస్ చిరునామా",
@@ -580,7 +619,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "booking.thisWeek": "ఈ వారం",
     "booking.today": "ఈరోజు",
     "booking.tomorrow": "రేపు",
-    "booking.trackHint": "యాక్టివ్ బుకింగ్స్ ట్రాక్ చేసి పెండింగ్ అభ్యర్థనలను నిర్వహించండి.",
+    "booking.trackHint":
+      "యాక్టివ్ బుకింగ్స్ ట్రాక్ చేసి పెండింగ్ అభ్యర్థనలను నిర్వహించండి.",
     "booking.washesKicker": "మీ వాష్‌లు",
     "auth.aadhaarRequired": "క్లీనర్ సైన్‌అప్ కోసం ఆధార్ నంబర్ అవసరం.",
     "auth.continue": "కొనసాగించండి",
@@ -590,7 +630,13 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "auth.drivingLicenseOptional": "డ్రైవింగ్ లైసెన్స్ ఐచ్ఛికం",
     "auth.emailOptional": "ఇమెయిల్ చిరునామా ఐచ్ఛికం",
     "auth.enterOtp": "OTP నమోదు చేయండి",
-    "auth.firstDetails": "మీ మొదటి డోర్‌స్టెప్ వాష్‌కు ముందు కొన్ని వివరాలు కావాలి.",
+    "auth.fullNameRequired": "దయచేసి మీ పూర్తి పేరు నమోదు చేయండి.",
+    "auth.mobileNumberRequired": "దయచేసి మీ మొబైల్ నంబర్ నమోదు చేయండి.",
+    "auth.mobileNumberInvalid":
+      "దయచేసి 10 అంకెల సరైన మొబైల్ నంబర్ నమోదు చేయండి.",
+    "auth.otpRequired": "దయచేసి మీ ఫోన్‌కు పంపిన OTP నమోదు చేయండి.",
+    "auth.firstDetails":
+      "మీ మొదటి డోర్‌స్టెప్ వాష్‌కు ముందు కొన్ని వివరాలు కావాలి.",
     "auth.freshCode": "కొత్త కోడ్ కావాలా?",
     "auth.fullName": "పూర్తి పేరు",
     "auth.login": "లాగిన్",
@@ -603,21 +649,27 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "auth.signingIn": "లాగిన్ అవుతోంది...",
     "auth.signupLoading": "సృష్టిస్తోంది...",
     "auth.verifyPhone": "మీ ఫోన్ ధృవీకరించండి",
-    "auth.verifySubtitle": "Washioo ఖాతాలో లాగిన్ లేదా సైన్‌అప్ కోసం మీ మొబైల్ నంబర్ నమోదు చేయండి.",
+    "auth.verifySubtitle":
+      "Washioo ఖాతాలో లాగిన్ లేదా సైన్‌అప్ కోసం మీ మొబైల్ నంబర్ నమోదు చేయండి.",
     "auth.welcomeBack": "మళ్లీ స్వాగతం",
-    "auth.welcomeSubtitle": "కొనసాగించడానికి మీ ఫోన్‌కు పంపిన OTP నమోదు చేయండి.",
+    "auth.welcomeSubtitle":
+      "కొనసాగించడానికి మీ ఫోన్‌కు పంపిన OTP నమోదు చేయండి.",
     "availability.approvalStatus": "ఆమోద స్థితి",
-    "availability.approvalWarning": "లభ్యంగా మారడానికి ముందు అడ్మిన్ ఆమోదం అవసరం.",
+    "availability.approvalWarning":
+      "లభ్యంగా మారడానికి ముందు అడ్మిన్ ఆమోదం అవసరం.",
     "availability.available": "లభ్యం",
     "availability.availableHint": "కొత్త పనులు తీసుకోవడానికి సిద్ధంగా ఉన్నారు",
     "availability.busy": "బిజీ",
     "availability.busyHint": "ప్రస్తుతం పనిలో ఉన్నారు",
     "availability.currentStatus": "ప్రస్తుత స్థితి",
-    "availability.guidelineApproved": "లభ్యంగా మారడానికి ముందు మీ ప్రొఫైల్ అడ్మిన్ ద్వారా ఆమోదించబడాలి.",
-    "availability.guidelineAvailable": "కొత్త పనులు తీసుకోవడానికి సిద్ధంగా ఉన్నప్పుడు Available ఎంచుకోండి.",
+    "availability.guidelineApproved":
+      "లభ్యంగా మారడానికి ముందు మీ ప్రొఫైల్ అడ్మిన్ ద్వారా ఆమోదించబడాలి.",
+    "availability.guidelineAvailable":
+      "కొత్త పనులు తీసుకోవడానికి సిద్ధంగా ఉన్నప్పుడు Available ఎంచుకోండి.",
     "availability.guidelineBusy": "పనిలో ఉన్నప్పుడు Busy ఎంచుకోండి.",
     "availability.guidelineOffline": "పని చేయనప్పుడు Offline ఎంచుకోండి.",
-    "availability.guidelineUpdated": "కస్టమర్లకు మంచి సేవ కోసం మీ స్థితిని అప్డేట్‌గా ఉంచండి.",
+    "availability.guidelineUpdated":
+      "కస్టమర్లకు మంచి సేవ కోసం మీ స్థితిని అప్డేట్‌గా ఉంచండి.",
     "availability.guidelines": "మార్గదర్శకాలు",
     "availability.loading": "లోడ్ అవుతోంది...",
     "availability.manage": "లభ్యత నిర్వహించండి",
@@ -625,7 +677,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "availability.offline": "ఆఫ్‌లైన్",
     "availability.offlineHint": "మీరు కొత్త పనులు తీసుకోవడం లేదు",
     "availability.setAvailability": "మీ లభ్యత సెట్ చేయండి",
-    "availability.subtitle": "మీ ప్రస్తుత పని స్థితిని ఎంచుకోండి. మీరు లభ్యంగా ఉన్నప్పుడు మాత్రమే కస్టమర్లకు కనిపిస్తారు.",
+    "availability.subtitle":
+      "మీ ప్రస్తుత పని స్థితిని ఎంచుకోండి. మీరు లభ్యంగా ఉన్నప్పుడు మాత్రమే కస్టమర్లకు కనిపిస్తారు.",
     "availability.updateFailed": "లభ్యత అప్డేట్ కాలేదు. మళ్లీ ప్రయత్నించండి.",
     "availability.updateSuccess": "లభ్యత విజయవంతంగా అప్డేట్ అయింది!",
     "availability.mustBeApproved": "లభ్యత మార్చడానికి ముందు మీకు ఆమోదం ఉండాలి.",
@@ -647,16 +700,20 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "cleaner.searchAssignments": "అసైన్‌మెంట్, కస్టమర్, లొకేషన్ వెతకండి...",
     "cleaner.startService": "సర్వీస్ ప్రారంభించండి",
     "cleaner.starting": "ప్రారంభిస్తోంది...",
-    "cleaner.validAmount": "పని పూర్తి చేసే ముందు సరైన సేకరించిన మొత్తాన్ని నమోదు చేయండి.",
+    "cleaner.validAmount":
+      "పని పూర్తి చేసే ముందు సరైన సేకరించిన మొత్తాన్ని నమోదు చేయండి.",
     "cleaner.customer": "కస్టమర్",
-    "cleaner.earningsReconcileNote": "అడ్మిన్ రీకన్సిలియేషన్ తర్వాత సంపాదన అప్డేట్ అవుతుంది.",
+    "cleaner.earningsReconcileNote":
+      "అడ్మిన్ రీకన్సిలియేషన్ తర్వాత సంపాదన అప్డేట్ అవుతుంది.",
     "cleaner.markCollected": "సేకరించినట్లు మార్క్ చేయండి",
     "cleaner.paymentCollected": "చెల్లింపు సేకరణ విజయవంతంగా నమోదు అయింది.",
-    "cleaner.paymentCollectedSummary": "Rs. {amount} {type} ద్వారా సేకరించబడింది",
+    "cleaner.paymentCollectedSummary":
+      "Rs. {amount} {type} ద్వారా సేకరించబడింది",
     "cleaner.paymentPendingCollection": "చెల్లింపు సేకరణ పెండింగ్‌లో ఉంది.",
     "cleaner.updatePayment": "చెల్లింపు అప్డేట్ అవుతోంది...",
     "cleaner.validCollectedAmount": "సరైన సేకరించిన మొత్తాన్ని నమోదు చేయండి.",
-    "rating.availableLater": "మీ రేటింగ్ సమర్పించబడింది. మరొక రేటింగ్ అందుబాటులో ఉన్నప్పుడు ఇక్కడ కనిపిస్తుంది.",
+    "rating.availableLater":
+      "మీ రేటింగ్ సమర్పించబడింది. మరొక రేటింగ్ అందుబాటులో ఉన్నప్పుడు ఇక్కడ కనిపిస్తుంది.",
     "rating.cleanerRatedCustomer": "క్లీనర్ కస్టమర్‌కు రేటింగ్ ఇచ్చారు",
     "rating.customerRatedCleaner": "కస్టమర్ క్లీనర్‌కు రేటింగ్ ఇచ్చారు",
     "rating.loading": "రేటింగ్స్ లోడ్ అవుతున్నాయి...",
@@ -681,7 +738,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "earnings.earnings": "సంపాదన",
     "earnings.settled": "సెటిల్ అయింది",
     "earnings.settledHint": "అడ్మిన్ వాటా ఇప్పటికే ఇచ్చారు.",
-    "earnings.subtitle": "అడ్మిన్ రీకన్సిలియేషన్ తర్వాత సంపాదన అప్డేట్ అవుతుంది.",
+    "earnings.subtitle":
+      "అడ్మిన్ రీకన్సిలియేషన్ తర్వాత సంపాదన అప్డేట్ అవుతుంది.",
     "earnings.totalEarned": "మొత్తం సంపాదన",
     "earnings.totalEarnedHint": "అడ్మిన్ విభజన తర్వాత మీ వాటా.",
     "earnings.updated": "చివరిగా అప్డేట్",
@@ -692,7 +750,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "profile.email": "ఇమెయిల్",
     "profile.failed": "ప్రొఫైల్ అప్డేట్ కాలేదు",
     "profile.fullName": "పూర్తి పేరు",
-    "profile.identityNote": "భద్రత కోసం గుర్తింపు వివరాలు మాస్క్ చేసి చూపిస్తాం. ధృవీకరణ తర్వాత పూర్తి వివరాలు చూడటానికి View నొక్కండి.",
+    "profile.identityNote":
+      "భద్రత కోసం గుర్తింపు వివరాలు మాస్క్ చేసి చూపిస్తాం. ధృవీకరణ తర్వాత పూర్తి వివరాలు చూడటానికి View నొక్కండి.",
     "profile.identityVerification": "గుర్తింపు ధృవీకరణ",
     "profile.memberSince": "సభ్యత్వం ప్రారంభం",
     "profile.myProfile": "నా ప్రొఫైల్",
@@ -705,7 +764,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "profile.saving": "సేవ్ అవుతోంది...",
     "profile.updated": "ప్రొఫైల్ విజయవంతంగా అప్డేట్ అయింది!",
     "profile.verify": "ధృవీకరించండి",
-    "profile.verifyDigits": "పూర్తి వివరాలు చూడడానికి మీ ఫోన్ నంబర్ చివరి 4 అంకెలు నమోదు చేయండి.",
+    "profile.verifyDigits":
+      "పూర్తి వివరాలు చూడడానికి మీ ఫోన్ నంబర్ చివరి 4 అంకెలు నమోదు చేయండి.",
     "profile.verifyFailed": "ధృవీకరణ విఫలమైంది. మళ్లీ ప్రయత్నించండి.",
     "profile.verifyIdentity": "మీ గుర్తింపును ధృవీకరించండి",
     "profile.verifyPlaceholder": "ఫోన్ చివరి 4 అంకెలు",
@@ -841,10 +901,14 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "address.labelRequired": "घर या ऑफिस जैसा आसान लेबल जोड़ें.",
     "address.line2": "पता लाइन 2",
     "address.loading": "पते लोड हो रहे हैं...",
-    "address.locationBeforeBooking": "बुकिंग से पहले मेरा लाइव लोकेशन उपयोग करें दबाएं.",
-    "address.locationBeforeSaving": "सेव करने से पहले मेरा लाइव लोकेशन उपयोग करें दबाएं.",
-    "address.locationCaptured": "लोकेशन कैप्चर हो गया. इसे दिशा-निर्देशों के लिए उपयोग किया जाएगा.",
-    "address.locationCapturedService": "लोकेशन कैप्चर हो गया. इसे सेवा दिशा-निर्देशों के लिए उपयोग किया जाएगा.",
+    "address.locationBeforeBooking":
+      "बुकिंग से पहले मेरा लाइव लोकेशन उपयोग करें दबाएं.",
+    "address.locationBeforeSaving":
+      "सेव करने से पहले मेरा लाइव लोकेशन उपयोग करें दबाएं.",
+    "address.locationCaptured":
+      "लोकेशन कैप्चर हो गया. इसे दिशा-निर्देशों के लिए उपयोग किया जाएगा.",
+    "address.locationCapturedService":
+      "लोकेशन कैप्चर हो गया. इसे सेवा दिशा-निर्देशों के लिए उपयोग किया जाएगा.",
     "address.manage": "अपने पते प्रबंधित करें",
     "address.noAddresses": "अभी कोई पता नहीं जोड़ा गया.",
     "address.noSaved": "अभी कोई सेव किया पता नहीं है.",
@@ -885,7 +949,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "booking.editPending": "पेंडिंग बुकिंग संपादित करें",
     "booking.failed": "विफल",
     "booking.fixBookingDetail": "हाइलाइट किया गया बुकिंग विवरण ठीक करें.",
-    "booking.fixBeforeBooking": "बुकिंग से पहले हाइलाइट किया गया पता फील्ड ठीक करें.",
+    "booking.fixBeforeBooking":
+      "बुकिंग से पहले हाइलाइट किया गया पता फील्ड ठीक करें.",
     "booking.highestPrice": "सबसे ज्यादा कीमत",
     "booking.inProgress": "चल रहा है",
     "booking.instructions": "निर्देश",
@@ -918,7 +983,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "booking.thisWeek": "इस सप्ताह",
     "booking.today": "आज",
     "booking.tomorrow": "कल",
-    "booking.trackHint": "सक्रिय बुकिंग ट्रैक करें और लंबित अनुरोध प्रबंधित करें.",
+    "booking.trackHint":
+      "सक्रिय बुकिंग ट्रैक करें और लंबित अनुरोध प्रबंधित करें.",
     "booking.washesKicker": "आपकी वॉश",
     "auth.aadhaarRequired": "क्लीनर साइनअप के लिए आधार नंबर जरूरी है.",
     "auth.continue": "जारी रखें",
@@ -928,6 +994,10 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "auth.drivingLicenseOptional": "ड्राइविंग लाइसेंस वैकल्पिक",
     "auth.emailOptional": "ईमेल पता वैकल्पिक",
     "auth.enterOtp": "OTP दर्ज करें",
+    "auth.fullNameRequired": "कृपया अपना पूरा नाम दर्ज करें।",
+    "auth.mobileNumberRequired": "कृपया अपना मोबाइल नंबर दर्ज करें।",
+    "auth.mobileNumberInvalid": "कृपया 10 अंकों का सही मोबाइल नंबर दर्ज करें।",
+    "auth.otpRequired": "कृपया अपने फोन पर भेजा गया OTP दर्ज करें।",
     "auth.firstDetails": "आपकी पहली डोरस्टेप वॉश से पहले कुछ जानकारी चाहिए.",
     "auth.freshCode": "नया कोड चाहिए?",
     "auth.fullName": "पूरा नाम",
@@ -941,21 +1011,26 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "auth.signingIn": "लॉगिन हो रहा है...",
     "auth.signupLoading": "बना रहे हैं...",
     "auth.verifyPhone": "अपना फोन सत्यापित करें",
-    "auth.verifySubtitle": "Washioo खाते में लॉगिन या साइनअप के लिए अपना मोबाइल नंबर दर्ज करें.",
+    "auth.verifySubtitle":
+      "Washioo खाते में लॉगिन या साइनअप के लिए अपना मोबाइल नंबर दर्ज करें.",
     "auth.welcomeBack": "फिर से स्वागत है",
     "auth.welcomeSubtitle": "जारी रखने के लिए फोन पर भेजा OTP दर्ज करें.",
     "availability.approvalStatus": "स्वीकृति स्थिति",
-    "availability.approvalWarning": "Available होने से पहले एडमिन स्वीकृति जरूरी है.",
+    "availability.approvalWarning":
+      "Available होने से पहले एडमिन स्वीकृति जरूरी है.",
     "availability.available": "उपलब्ध",
     "availability.availableHint": "नए काम लेने के लिए तैयार",
     "availability.busy": "व्यस्त",
     "availability.busyHint": "अभी काम पर हैं",
     "availability.currentStatus": "वर्तमान स्थिति",
-    "availability.guidelineApproved": "Available होने से पहले आपकी प्रोफाइल एडमिन से स्वीकृत होनी चाहिए.",
-    "availability.guidelineAvailable": "नए काम लेने के लिए तैयार हों तो Available सेट करें.",
+    "availability.guidelineApproved":
+      "Available होने से पहले आपकी प्रोफाइल एडमिन से स्वीकृत होनी चाहिए.",
+    "availability.guidelineAvailable":
+      "नए काम लेने के लिए तैयार हों तो Available सेट करें.",
     "availability.guidelineBusy": "काम करते समय Busy सेट करें.",
     "availability.guidelineOffline": "काम नहीं कर रहे हों तो Offline सेट करें.",
-    "availability.guidelineUpdated": "बेहतर सेवा के लिए अपनी स्थिति अपडेट रखें.",
+    "availability.guidelineUpdated":
+      "बेहतर सेवा के लिए अपनी स्थिति अपडेट रखें.",
     "availability.guidelines": "दिशा-निर्देश",
     "availability.loading": "लोड हो रहा है...",
     "availability.manage": "उपलब्धता प्रबंधित करें",
@@ -963,7 +1038,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "availability.offline": "ऑफलाइन",
     "availability.offlineHint": "आप नए काम स्वीकार नहीं कर रहे",
     "availability.setAvailability": "अपनी उपलब्धता सेट करें",
-    "availability.subtitle": "अपनी वर्तमान काम स्थिति चुनें. ग्राहक आपको तभी देखेंगे जब आप उपलब्ध होंगे.",
+    "availability.subtitle":
+      "अपनी वर्तमान काम स्थिति चुनें. ग्राहक आपको तभी देखेंगे जब आप उपलब्ध होंगे.",
     "availability.updateFailed": "उपलब्धता अपडेट नहीं हुई. फिर कोशिश करें.",
     "availability.updateSuccess": "उपलब्धता सफलतापूर्वक अपडेट हुई!",
     "availability.mustBeApproved": "उपलब्धता बदलने से पहले स्वीकृति जरूरी है.",
@@ -994,7 +1070,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "cleaner.paymentPendingCollection": "भुगतान कलेक्शन लंबित है.",
     "cleaner.updatePayment": "भुगतान अपडेट हो रहा है...",
     "cleaner.validCollectedAmount": "सही कलेक्ट की गई राशि दर्ज करें.",
-    "rating.availableLater": "आपकी रेटिंग जमा हो गई है. दूसरी रेटिंग उपलब्ध होने पर यहां दिखेगी.",
+    "rating.availableLater":
+      "आपकी रेटिंग जमा हो गई है. दूसरी रेटिंग उपलब्ध होने पर यहां दिखेगी.",
     "rating.cleanerRatedCustomer": "क्लीनर ने ग्राहक को रेट किया",
     "rating.customerRatedCleaner": "ग्राहक ने क्लीनर को रेट किया",
     "rating.loading": "रेटिंग लोड हो रही हैं...",
@@ -1030,7 +1107,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "profile.email": "ईमेल",
     "profile.failed": "प्रोफाइल अपडेट नहीं हुई",
     "profile.fullName": "पूरा नाम",
-    "profile.identityNote": "सुरक्षा के लिए पहचान विवरण मास्क किए गए हैं. सत्यापन के बाद पूरा विवरण देखने के लिए View दबाएं.",
+    "profile.identityNote":
+      "सुरक्षा के लिए पहचान विवरण मास्क किए गए हैं. सत्यापन के बाद पूरा विवरण देखने के लिए View दबाएं.",
     "profile.identityVerification": "पहचान सत्यापन",
     "profile.memberSince": "सदस्यता से",
     "profile.myProfile": "मेरी प्रोफाइल",
@@ -1043,7 +1121,8 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
     "profile.saving": "सेव हो रहा है...",
     "profile.updated": "प्रोफाइल सफलतापूर्वक अपडेट हुई!",
     "profile.verify": "सत्यापित करें",
-    "profile.verifyDigits": "पूरा विवरण देखने के लिए अपने फोन नंबर के अंतिम 4 अंक दर्ज करें.",
+    "profile.verifyDigits":
+      "पूरा विवरण देखने के लिए अपने फोन नंबर के अंतिम 4 अंक दर्ज करें.",
     "profile.verifyFailed": "सत्यापन विफल. फिर कोशिश करें.",
     "profile.verifyIdentity": "अपनी पहचान सत्यापित करें",
     "profile.verifyPlaceholder": "फोन के अंतिम 4 अंक",
@@ -1052,11 +1131,15 @@ const dictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
   },
 };
 
-const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
+const extraDictionaries: Record<
+  LanguageCode,
+  Record<TranslationKey, string>
+> = {
   en: {
     "auth.aadhaarInvalid": "Aadhaar number must contain exactly 12 digits.",
     "auth.aadhaarNumber": "Aadhaar number",
-    "auth.drivingLicenseInvalid": "Driving license must contain 15 to 16 characters.",
+    "auth.drivingLicenseInvalid":
+      "Driving license must contain 15 to 16 characters.",
     "booking.rejected": "Rejected",
     "common.add": "Add",
     "common.cleaner": "Cleaner",
@@ -1065,14 +1148,16 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
     "cleaner.callCustomer": "Call customer",
     "profile.aadhaar": "Aadhaar",
     "profile.drivingLicense": "Driving License",
-    "profile.fullDetailsUnavailable": "Full document number is not available from the API. Showing the masked value.",
+    "profile.fullDetailsUnavailable":
+      "Full document number is not available from the API. Showing the masked value.",
     "services.defaultDescription": "Premium doorstep wash service.",
     "services.loading": "Loading services...",
     "services.minutes": "{minutes} mins",
     "services.noneActive": "No active services are available.",
     "services.premium": "Premium Services",
     "services.selectWash": "Select Your Vehicle Wash Service",
-    "services.selectWashHint": "Choose a professional doorstep wash, pick your address and time, and track the booking from pending to completion.",
+    "services.selectWashHint":
+      "Choose a professional doorstep wash, pick your address and time, and track the booking from pending to completion.",
     "vehicles.added": "Vehicle added.",
     "vehicles.addVehicle": "Add Vehicle",
     "vehicles.bike": "Bike",
@@ -1083,7 +1168,8 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
     "vehicles.editVehicle": "Edit Vehicle",
     "vehicles.loading": "Loading vehicles...",
     "vehicles.manage": "Manage Your Vehicles",
-    "vehicles.manageHint": "Save your bike or car details once and reuse them while booking.",
+    "vehicles.manageHint":
+      "Save your bike or car details once and reuse them while booking.",
     "vehicles.myVehicles": "My Vehicles",
     "vehicles.noPlate": "No license plate added",
     "vehicles.none": "No vehicles added yet.",
@@ -1095,7 +1181,8 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
   te: {
     "auth.aadhaarInvalid": "ఆధార్ నంబర్ ఖచ్చితంగా 12 అంకెలు ఉండాలి.",
     "auth.aadhaarNumber": "ఆధార్ నంబర్",
-    "auth.drivingLicenseInvalid": "డ్రైవింగ్ లైసెన్స్ 15 నుండి 16 అక్షరాలు ఉండాలి.",
+    "auth.drivingLicenseInvalid":
+      "డ్రైవింగ్ లైసెన్స్ 15 నుండి 16 అక్షరాలు ఉండాలి.",
     "booking.rejected": "తిరస్కరించబడింది",
     "common.add": "జోడించండి",
     "common.cleaner": "క్లీనర్",
@@ -1103,14 +1190,16 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
     "common.delete": "తొలగించండి",
     "profile.aadhaar": "ఆధార్",
     "profile.drivingLicense": "డ్రైవింగ్ లైసెన్స్",
-    "profile.fullDetailsUnavailable": "API నుండి పూర్తి డాక్యుమెంట్ నంబర్ అందుబాటులో లేదు. మాస్క్ చేసిన విలువ చూపిస్తున్నాం.",
+    "profile.fullDetailsUnavailable":
+      "API నుండి పూర్తి డాక్యుమెంట్ నంబర్ అందుబాటులో లేదు. మాస్క్ చేసిన విలువ చూపిస్తున్నాం.",
     "services.defaultDescription": "ప్రీమియం డోర్‌స్టెప్ వాష్ సర్వీస్.",
     "services.loading": "సర్వీసులు లోడ్ అవుతున్నాయి...",
     "services.minutes": "{minutes} నిమిషాలు",
     "services.noneActive": "ప్రస్తుతం యాక్టివ్ సర్వీసులు లేవు.",
     "services.premium": "ప్రీమియం సర్వీసులు",
     "services.selectWash": "మీ వాహన వాష్ సర్వీస్ ఎంచుకోండి",
-    "services.selectWashHint": "ప్రొఫెషనల్ డోర్‌స్టెప్ వాష్ ఎంచుకుని, చిరునామా మరియు సమయం సెట్ చేసి, బుకింగ్ పూర్తయ్యే వరకు ట్రాక్ చేయండి.",
+    "services.selectWashHint":
+      "ప్రొఫెషనల్ డోర్‌స్టెప్ వాష్ ఎంచుకుని, చిరునామా మరియు సమయం సెట్ చేసి, బుకింగ్ పూర్తయ్యే వరకు ట్రాక్ చేయండి.",
     "vehicles.added": "వాహనం జోడించబడింది.",
     "vehicles.addVehicle": "వాహనం జోడించండి",
     "vehicles.bike": "బైక్",
@@ -1121,7 +1210,8 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
     "vehicles.editVehicle": "వాహనం సవరించండి",
     "vehicles.loading": "వాహనాలు లోడ్ అవుతున్నాయి...",
     "vehicles.manage": "మీ వాహనాలను నిర్వహించండి",
-    "vehicles.manageHint": "మీ బైక్ లేదా కారు వివరాలను ఒకసారి సేవ్ చేసి బుకింగ్ సమయంలో మళ్లీ వాడండి.",
+    "vehicles.manageHint":
+      "మీ బైక్ లేదా కారు వివరాలను ఒకసారి సేవ్ చేసి బుకింగ్ సమయంలో మళ్లీ వాడండి.",
     "vehicles.myVehicles": "నా వాహనాలు",
     "vehicles.noPlate": "లైసెన్స్ ప్లేట్ జోడించలేదు",
     "vehicles.none": "ఇంకా వాహనాలు జోడించలేదు.",
@@ -1133,7 +1223,8 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
   hi: {
     "auth.aadhaarInvalid": "आधार नंबर ठीक 12 अंकों का होना चाहिए.",
     "auth.aadhaarNumber": "आधार नंबर",
-    "auth.drivingLicenseInvalid": "ड्राइविंग लाइसेंस 15 से 16 अक्षरों का होना चाहिए.",
+    "auth.drivingLicenseInvalid":
+      "ड्राइविंग लाइसेंस 15 से 16 अक्षरों का होना चाहिए.",
     "booking.rejected": "अस्वीकार किया गया",
     "common.add": "जोड़ें",
     "common.cleaner": "क्लीनर",
@@ -1141,14 +1232,16 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
     "common.delete": "हटाएं",
     "profile.aadhaar": "आधार",
     "profile.drivingLicense": "ड्राइविंग लाइसेंस",
-    "profile.fullDetailsUnavailable": "API से पूरा डॉक्यूमेंट नंबर उपलब्ध नहीं है. मास्क की हुई वैल्यू दिखाई जा रही है.",
+    "profile.fullDetailsUnavailable":
+      "API से पूरा डॉक्यूमेंट नंबर उपलब्ध नहीं है. मास्क की हुई वैल्यू दिखाई जा रही है.",
     "services.defaultDescription": "प्रीमियम डोरस्टेप वॉश सेवा.",
     "services.loading": "सेवाएं लोड हो रही हैं...",
     "services.minutes": "{minutes} मिनट",
     "services.noneActive": "अभी कोई सक्रिय सेवा उपलब्ध नहीं है.",
     "services.premium": "प्रीमियम सेवाएं",
     "services.selectWash": "अपनी वाहन वॉश सेवा चुनें",
-    "services.selectWashHint": "प्रोफेशनल डोरस्टेप वॉश चुनें, पता और समय सेट करें, और बुकिंग को पूरा होने तक ट्रैक करें.",
+    "services.selectWashHint":
+      "प्रोफेशनल डोरस्टेप वॉश चुनें, पता और समय सेट करें, और बुकिंग को पूरा होने तक ट्रैक करें.",
     "vehicles.added": "वाहन जोड़ा गया.",
     "vehicles.addVehicle": "वाहन जोड़ें",
     "vehicles.bike": "बाइक",
@@ -1159,7 +1252,8 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
     "vehicles.editVehicle": "वाहन संपादित करें",
     "vehicles.loading": "वाहन लोड हो रहे हैं...",
     "vehicles.manage": "अपने वाहन प्रबंधित करें",
-    "vehicles.manageHint": "अपनी बाइक या कार की जानकारी एक बार सेव करें और बुकिंग में दोबारा इस्तेमाल करें.",
+    "vehicles.manageHint":
+      "अपनी बाइक या कार की जानकारी एक बार सेव करें और बुकिंग में दोबारा इस्तेमाल करें.",
     "vehicles.myVehicles": "मेरे वाहन",
     "vehicles.noPlate": "लाइसेंस प्लेट नहीं जोड़ी गई",
     "vehicles.none": "अभी कोई वाहन नहीं जोड़ा गया.",
@@ -1170,7 +1264,10 @@ const extraDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = 
   },
 };
 
-const latestChangeDictionaries: Record<LanguageCode, Record<TranslationKey, string>> = {
+const latestChangeDictionaries: Record<
+  LanguageCode,
+  Record<TranslationKey, string>
+> = {
   en: {
     "admin.aadhaarCard": "Aadhaar Card",
     "admin.approveCleaner": "Approve Cleaner",
@@ -1178,14 +1275,17 @@ const latestChangeDictionaries: Record<LanguageCode, Record<TranslationKey, stri
     "admin.cleanerDetailsTitle": "Cleaner Details - {name}",
     "admin.documentReview": "Document Review",
     "admin.downloadDocument": "Download",
-    "admin.downloadDocumentFailed": "Unable to download document. Refresh and try again.",
+    "admin.downloadDocumentFailed":
+      "Unable to download document. Refresh and try again.",
     "admin.downloadingDocument": "Downloading",
     "admin.fullAadhaarNumber": "Full Aadhaar Number",
     "admin.fullLicenseNumber": "Full License Number",
     "admin.maskedAadhaarNumber": "Masked Aadhaar Number",
     "admin.maskedLicenseNumber": "Masked License Number",
-    "admin.noReviewActionNeeded": "This cleaner is already approved and has no pending document changes.",
-    "admin.openDetailsForRejection": "Open details and enter a rejection reason.",
+    "admin.noReviewActionNeeded":
+      "This cleaner is already approved and has no pending document changes.",
+    "admin.openDetailsForRejection":
+      "Open details and enter a rejection reason.",
     "admin.pendingAadhaar": "Pending Aadhaar",
     "admin.pendingDrivingLicense": "Pending Driving License",
     "admin.pendingReplacementDocuments": "Pending Replacement Documents",
@@ -1232,7 +1332,8 @@ const latestChangeDictionaries: Record<LanguageCode, Record<TranslationKey, stri
     "profile.saveLicense": "Save License",
     "profile.saveProfilePhoto": "Save Profile Photo",
     "profile.selectAadhaarImage": "Please select an Aadhaar image.",
-    "profile.selectDrivingLicenseImage": "Please select a driving license image.",
+    "profile.selectDrivingLicenseImage":
+      "Please select a driving license image.",
     "profile.selectProfilePhoto": "Please select a profile photo.",
     "profile.uploadFailed": "Upload failed.",
     "profile.uploaded": "Uploaded",
@@ -1245,17 +1346,21 @@ const latestChangeDictionaries: Record<LanguageCode, Record<TranslationKey, stri
     "admin.cleanerDetailsTitle": "క్లీనర్ వివరాలు - {name}",
     "admin.documentReview": "డాక్యుమెంట్ సమీక్ష",
     "admin.downloadDocument": "డౌన్‌లోడ్",
-    "admin.downloadDocumentFailed": "డాక్యుమెంట్ డౌన్‌లోడ్ కాలేదు. రిఫ్రెష్ చేసి మళ్లీ ప్రయత్నించండి.",
+    "admin.downloadDocumentFailed":
+      "డాక్యుమెంట్ డౌన్‌లోడ్ కాలేదు. రిఫ్రెష్ చేసి మళ్లీ ప్రయత్నించండి.",
     "admin.downloadingDocument": "డౌన్‌లోడ్ అవుతోంది",
     "admin.fullAadhaarNumber": "పూర్తి ఆధార్ నంబర్",
     "admin.fullLicenseNumber": "పూర్తి లైసెన్స్ నంబర్",
     "admin.maskedAadhaarNumber": "మాస్క్ చేసిన ఆధార్ నంబర్",
     "admin.maskedLicenseNumber": "మాస్క్ చేసిన లైసెన్స్ నంబర్",
-    "admin.noReviewActionNeeded": "ఈ క్లీనర్ ఇప్పటికే ఆమోదించబడ్డారు. పెండింగ్ డాక్యుమెంట్ మార్పులు లేవు.",
-    "admin.openDetailsForRejection": "వివరాలు తెరిచి తిరస్కరణ కారణం నమోదు చేయండి.",
+    "admin.noReviewActionNeeded":
+      "ఈ క్లీనర్ ఇప్పటికే ఆమోదించబడ్డారు. పెండింగ్ డాక్యుమెంట్ మార్పులు లేవు.",
+    "admin.openDetailsForRejection":
+      "వివరాలు తెరిచి తిరస్కరణ కారణం నమోదు చేయండి.",
     "admin.pendingAadhaar": "పెండింగ్ ఆధార్",
     "admin.pendingDrivingLicense": "పెండింగ్ డ్రైవింగ్ లైసెన్స్",
-    "admin.pendingReplacementDocuments": "పెండింగ్ రీప్లేస్‌మెంట్ డాక్యుమెంట్లు",
+    "admin.pendingReplacementDocuments":
+      "పెండింగ్ రీప్లేస్‌మెంట్ డాక్యుమెంట్లు",
     "admin.reasonRequired": "కారణం అవసరం.",
     "admin.rejectCleaner": "క్లీనర్‌ను తిరస్కరించండి",
     "admin.requestResubmission": "మళ్లీ సమర్పించమని అడగండి",
@@ -1288,7 +1393,8 @@ const latestChangeDictionaries: Record<LanguageCode, Record<TranslationKey, stri
     "profile.drivingLicenseImage": "డ్రైవింగ్ లైసెన్స్ చిత్రం",
     "profile.drivingLicenseSubmitted": "డ్రైవింగ్ లైసెన్స్ సమీక్షకు పంపబడింది.",
     "profile.identityVerification": "గుర్తింపు వెరిఫికేషన్",
-    "profile.keepCurrentNumber": "ప్రస్తుత నంబర్ అలాగే ఉంచడానికి ఖాళీగా వదిలేయండి",
+    "profile.keepCurrentNumber":
+      "ప్రస్తుత నంబర్ అలాగే ఉంచడానికి ఖాళీగా వదిలేయండి",
     "profile.missing": "లేదు",
     "profile.noImageSelected": "చిత్రం ఎంచుకోలేదు",
     "profile.optional": "ఐచ్ఛికం",
@@ -1299,7 +1405,8 @@ const latestChangeDictionaries: Record<LanguageCode, Record<TranslationKey, stri
     "profile.saveLicense": "లైసెన్స్ సేవ్ చేయండి",
     "profile.saveProfilePhoto": "ప్రొఫైల్ ఫోటో సేవ్ చేయండి",
     "profile.selectAadhaarImage": "దయచేసి ఆధార్ చిత్రం ఎంచుకోండి.",
-    "profile.selectDrivingLicenseImage": "దయచేసి డ్రైవింగ్ లైసెన్స్ చిత్రం ఎంచుకోండి.",
+    "profile.selectDrivingLicenseImage":
+      "దయచేసి డ్రైవింగ్ లైసెన్స్ చిత్రం ఎంచుకోండి.",
     "profile.selectProfilePhoto": "దయచేసి ప్రొఫైల్ ఫోటో ఎంచుకోండి.",
     "profile.uploadFailed": "అప్‌లోడ్ విఫలమైంది.",
     "profile.uploaded": "అప్‌లోడ్ అయింది",
@@ -1312,14 +1419,17 @@ const latestChangeDictionaries: Record<LanguageCode, Record<TranslationKey, stri
     "admin.cleanerDetailsTitle": "क्लीनर विवरण - {name}",
     "admin.documentReview": "दस्तावेज समीक्षा",
     "admin.downloadDocument": "डाउनलोड",
-    "admin.downloadDocumentFailed": "दस्तावेज डाउनलोड नहीं हुआ. रिफ्रेश करके फिर कोशिश करें.",
+    "admin.downloadDocumentFailed":
+      "दस्तावेज डाउनलोड नहीं हुआ. रिफ्रेश करके फिर कोशिश करें.",
     "admin.downloadingDocument": "डाउनलोड हो रहा है",
     "admin.fullAadhaarNumber": "पूरा आधार नंबर",
     "admin.fullLicenseNumber": "पूरा लाइसेंस नंबर",
     "admin.maskedAadhaarNumber": "मास्क किया हुआ आधार नंबर",
     "admin.maskedLicenseNumber": "मास्क किया हुआ लाइसेंस नंबर",
-    "admin.noReviewActionNeeded": "यह क्लीनर पहले से मंजूर है और कोई दस्तावेज बदलाव लंबित नहीं है.",
-    "admin.openDetailsForRejection": "विवरण खोलें और अस्वीकार करने का कारण दर्ज करें.",
+    "admin.noReviewActionNeeded":
+      "यह क्लीनर पहले से मंजूर है और कोई दस्तावेज बदलाव लंबित नहीं है.",
+    "admin.openDetailsForRejection":
+      "विवरण खोलें और अस्वीकार करने का कारण दर्ज करें.",
     "admin.pendingAadhaar": "लंबित आधार",
     "admin.pendingDrivingLicense": "लंबित ड्राइविंग लाइसेंस",
     "admin.pendingReplacementDocuments": "लंबित बदले हुए दस्तावेज",
@@ -1353,7 +1463,8 @@ const latestChangeDictionaries: Record<LanguageCode, Record<TranslationKey, stri
     "profile.chooseImage": "इमेज चुनें",
     "profile.chooseLicenseImage": "लाइसेंस इमेज चुनें",
     "profile.drivingLicenseImage": "ड्राइविंग लाइसेंस इमेज",
-    "profile.drivingLicenseSubmitted": "ड्राइविंग लाइसेंस समीक्षा के लिए भेजा गया.",
+    "profile.drivingLicenseSubmitted":
+      "ड्राइविंग लाइसेंस समीक्षा के लिए भेजा गया.",
     "profile.identityVerification": "पहचान वेरिफिकेशन",
     "profile.keepCurrentNumber": "मौजूदा नंबर रखने के लिए खाली छोड़ें",
     "profile.missing": "नहीं है",
@@ -1391,7 +1502,8 @@ const getInitialLanguage = (): LanguageCode => {
 };
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<LanguageCode>(getInitialLanguage);
+  const [language, setLanguageState] =
+    useState<LanguageCode>(getInitialLanguage);
 
   useEffect(() => {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
@@ -1423,7 +1535,9 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
+    <LanguageContext.Provider value={value}>
+      {children}
+    </LanguageContext.Provider>
   );
 }
 

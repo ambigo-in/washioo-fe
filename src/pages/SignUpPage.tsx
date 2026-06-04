@@ -36,7 +36,9 @@ export default function SignUpPage() {
     null,
   );
   const [drivingLicenseRequired, setDrivingLicenseRequired] = useState(
-    String(import.meta.env.VITE_DRIVING_LICENSE_REQUIRED || "false").toLowerCase() === "true",
+    String(
+      import.meta.env.VITE_DRIVING_LICENSE_REQUIRED || "false",
+    ).toLowerCase() === "true",
   );
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
@@ -93,12 +95,17 @@ export default function SignUpPage() {
     event.preventDefault();
 
     if (!fullName.trim()) {
-      setError(t("auth.fullName"));
+      setError(t("auth.fullNameRequired"));
+      return;
+    }
+
+    if (!otpCode.trim()) {
+      setError(t("auth.otpRequired"));
       return;
     }
 
     if (otpCode.trim().length < 4) {
-      setError(t("auth.welcomeSubtitle"));
+      setError(t("auth.otpRequired"));
       return;
     }
 
@@ -117,10 +124,7 @@ export default function SignUpPage() {
       return;
     }
 
-    if (
-      accountType === "cleaner" &&
-      !isValidAadhaarNumber(aadhaarNumber)
-    ) {
+    if (accountType === "cleaner" && !isValidAadhaarNumber(aadhaarNumber)) {
       setError(t("auth.aadhaarInvalid"));
       return;
     }
@@ -137,7 +141,10 @@ export default function SignUpPage() {
       return;
     }
 
-    if (accountType === "cleaner" && !isValidDrivingLicenseNumber(drivingLicenseNumber)) {
+    if (
+      accountType === "cleaner" &&
+      !isValidDrivingLicenseNumber(drivingLicenseNumber)
+    ) {
       setError(t("auth.drivingLicenseInvalid"));
       return;
     }
@@ -197,9 +204,14 @@ export default function SignUpPage() {
       }
       await login().catch(() => undefined);
 
-      navigate(state?.termsAcceptedAtOtp || termsAccepted ? dashboardPath : "/accept-terms", {
-        replace: true,
-      });
+      navigate(
+        state?.termsAcceptedAtOtp || termsAccepted
+          ? dashboardPath
+          : "/accept-terms",
+        {
+          replace: true,
+        },
+      );
     } catch (err) {
       setError(String(err));
     }
@@ -232,7 +244,10 @@ export default function SignUpPage() {
 
         <input
           value={fullName}
-          onChange={(event) => setFullName(event.target.value)}
+          onChange={(event) => {
+            setFullName(event.target.value);
+            if (error) setError("");
+          }}
           placeholder={t("auth.fullName")}
           autoComplete="name"
         />
@@ -250,7 +265,10 @@ export default function SignUpPage() {
         />
         <input
           value={otpCode}
-          onChange={(event) => setOtpCode(event.target.value)}
+          onChange={(event) => {
+            setOtpCode(event.target.value);
+            if (error) setError("");
+          }}
           placeholder={t("auth.enterOtp")}
           autoComplete="one-time-code"
           name="otp"
@@ -316,7 +334,11 @@ export default function SignUpPage() {
             </label>
           </>
         )}
-        <LoadingButton isLoading={loading} loadingText={t("auth.signupLoading")} type="submit">
+        <LoadingButton
+          isLoading={loading}
+          loadingText={t("auth.signupLoading")}
+          type="submit"
+        >
           {t("auth.createAccount")}
         </LoadingButton>
 

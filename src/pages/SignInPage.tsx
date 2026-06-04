@@ -63,8 +63,13 @@ export default function SignInPage() {
   const handleSignIn = async (event: FormEvent) => {
     event.preventDefault();
 
+    if (!otpCode.trim()) {
+      setError(t("auth.otpRequired"));
+      return;
+    }
+
     if (otpCode.trim().length < 4) {
-      setError(t("auth.welcomeSubtitle"));
+      setError(t("auth.otpRequired"));
       return;
     }
 
@@ -91,9 +96,14 @@ export default function SignInPage() {
         await acceptTerms();
       }
 
-      navigate(state?.termsAcceptedAtOtp || termsAccepted ? dashboardPath : "/accept-terms", {
-        replace: true,
-      });
+      navigate(
+        state?.termsAcceptedAtOtp || termsAccepted
+          ? dashboardPath
+          : "/accept-terms",
+        {
+          replace: true,
+        },
+      );
     } catch (err) {
       setError(String(err));
     }
@@ -127,7 +137,10 @@ export default function SignInPage() {
         />
         <input
           value={otpCode}
-          onChange={(event) => setOtpCode(event.target.value)}
+          onChange={(event) => {
+            setOtpCode(event.target.value);
+            if (error) setError("");
+          }}
           aria-label={t("auth.enterOtp")}
           placeholder={t("auth.enterOtp")}
           autoComplete="one-time-code"
@@ -135,7 +148,11 @@ export default function SignInPage() {
           inputMode="numeric"
           pattern="[0-9]*"
         />
-        <LoadingButton isLoading={loading} loadingText={t("auth.signingIn")} type="submit">
+        <LoadingButton
+          isLoading={loading}
+          loadingText={t("auth.signingIn")}
+          type="submit"
+        >
           {t("auth.login")}
         </LoadingButton>
 
