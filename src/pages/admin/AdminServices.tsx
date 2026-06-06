@@ -7,6 +7,11 @@ import {
   uploadServiceCategoryImage,
 } from "../../api/adminApi";
 import { getApiErrorMessage } from "../../api/client";
+import {
+  IMAGE_UPLOAD_ACCEPT,
+  MAX_IMAGE_UPLOAD_SIZE_MB,
+  validateImageUploadFile,
+} from "../../utils/imageUploadValidation";
 import type {
   AdminServiceCategory,
   ServiceCategoryPayload,
@@ -21,13 +26,6 @@ import {
   useDashboardQueryState,
 } from "../../components/dashboard/DashboardControls";
 import "./AdminServices.css";
-
-const MAX_SERVICE_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
-const ALLOWED_SERVICE_IMAGE_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
 
 export default function AdminServices() {
   const [services, setServices] = useState<AdminServiceCategory[]>([]);
@@ -194,12 +192,9 @@ export default function AdminServices() {
     setSelectedImageFile(null);
 
     if (!file) return;
-    if (!ALLOWED_SERVICE_IMAGE_TYPES.has(file.type)) {
-      setFormError("Only JPG, PNG, and WebP images are allowed.");
-      return;
-    }
-    if (file.size > MAX_SERVICE_IMAGE_SIZE_BYTES) {
-      setFormError("Image file must be 5 MB or smaller.");
+    const validationError = validateImageUploadFile(file);
+    if (validationError) {
+      setFormError(validationError);
       return;
     }
 
@@ -396,7 +391,7 @@ export default function AdminServices() {
                   <input
                     id="service-image-upload"
                     type="file"
-                    accept="image/jpeg,image/png,image/webp"
+                    accept={IMAGE_UPLOAD_ACCEPT}
                     onChange={(e) =>
                       handleImageFileChange(e.target.files?.[0] ?? null)
                     }
@@ -408,8 +403,8 @@ export default function AdminServices() {
                     Choose Image
                   </label>
                   <span className="field-hint">
-                    JPG, PNG, or WebP up to 5 MB. Selecting a new file replaces
-                    the current service image.
+                    JPG, PNG, or WebP up to {MAX_IMAGE_UPLOAD_SIZE_MB} MB.
+                    Selecting a new file replaces the current service image.
                   </span>
                   {selectedImageFile && (
                     <span className="selected-file-name">

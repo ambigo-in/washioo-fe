@@ -18,6 +18,11 @@ import {
   normalizeAadhaarNumber,
   normalizeDrivingLicenseNumber,
 } from "../../utils/identityValidation";
+import {
+  IMAGE_UPLOAD_ACCEPT,
+  MAX_IMAGE_UPLOAD_SIZE_MB,
+  validateImageUploadFile,
+} from "../../utils/imageUploadValidation";
 import "./CleanerProfile.css";
 
 interface ProfileFormData {
@@ -145,6 +150,25 @@ export default function CleanerProfile() {
     setVerificationModal({ isOpen: false, type: null });
     setVerificationPassword("");
     setError("");
+  };
+
+  const handleImageSelection = (
+    file: File | null | undefined,
+    setFile: React.Dispatch<React.SetStateAction<File | null>>,
+  ) => {
+    setSuccess("");
+    setFile(null);
+
+    if (!file) return;
+
+    const validationError = validateImageUploadFile(file);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setError("");
+    setFile(file);
   };
 
   const handleProfilePhotoUpload = async () => {
@@ -365,13 +389,19 @@ export default function CleanerProfile() {
                   <input
                     key={profilePhotoFile?.name || "profile-photo-empty"}
                     type="file"
-                    accept="image/jpeg,image/png,image/webp"
+                    accept={IMAGE_UPLOAD_ACCEPT}
                     onChange={(event) =>
-                      setProfilePhotoFile(event.target.files?.[0] || null)
+                      handleImageSelection(
+                        event.target.files?.[0] || null,
+                        setProfilePhotoFile,
+                      )
                     }
                     disabled={uploadingDocument !== null}
                   />
                 </label>
+                <small className="upload-hint">
+                  JPG, PNG, or WebP up to {MAX_IMAGE_UPLOAD_SIZE_MB} MB.
+                </small>
                 <small>{profilePhotoFile?.name || t("profile.noImageSelected")}</small>
                 <LoadingButton
                   type="button"
@@ -398,13 +428,19 @@ export default function CleanerProfile() {
                   <input
                     key={aadhaarImageFile?.name || "aadhaar-empty"}
                     type="file"
-                    accept="image/jpeg,image/png,image/webp"
+                    accept={IMAGE_UPLOAD_ACCEPT}
                     onChange={(event) =>
-                      setAadhaarImageFile(event.target.files?.[0] || null)
+                      handleImageSelection(
+                        event.target.files?.[0] || null,
+                        setAadhaarImageFile,
+                      )
                     }
                     disabled={uploadingDocument !== null}
                   />
                 </label>
+                <small className="upload-hint">
+                  JPG, PNG, or WebP up to {MAX_IMAGE_UPLOAD_SIZE_MB} MB.
+                </small>
                 <small>{aadhaarImageFile?.name || t("profile.noImageSelected")}</small>
                 <LoadingButton
                   type="button"
@@ -430,13 +466,19 @@ export default function CleanerProfile() {
                   <input
                     key={drivingLicenseImageFile?.name || "license-empty"}
                     type="file"
-                    accept="image/jpeg,image/png,image/webp"
+                    accept={IMAGE_UPLOAD_ACCEPT}
                     onChange={(event) =>
-                      setDrivingLicenseImageFile(event.target.files?.[0] || null)
+                      handleImageSelection(
+                        event.target.files?.[0] || null,
+                        setDrivingLicenseImageFile,
+                      )
                     }
                     disabled={uploadingDocument !== null}
                   />
                 </label>
+                <small className="upload-hint">
+                  JPG, PNG, or WebP up to {MAX_IMAGE_UPLOAD_SIZE_MB} MB.
+                </small>
                 <small>
                   {drivingLicenseImageFile?.name || t("profile.noImageSelected")}
                 </small>
