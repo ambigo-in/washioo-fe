@@ -9,7 +9,17 @@ import "../styles/BookNowSection.css";
 
 type DisplayService = ServiceCategory & { image: string };
 
-const serviceImageFor = (serviceName: string) => {
+const serviceImageFor = (service: ServiceCategory) => {
+  if (service.image_url) return service.image_url;
+
+  const serviceName = service.service_name;
+  const name = serviceName.toLowerCase();
+  if (name.includes("bike")) return "/p2.png";
+  if (name.includes("car")) return "/p1.png";
+  return "/p3.png";
+};
+
+const fallbackServiceImageFor = (serviceName: string) => {
   const name = serviceName.toLowerCase();
   if (name.includes("bike")) return "/p2.png";
   if (name.includes("car")) return "/p1.png";
@@ -23,7 +33,7 @@ const BookingsPage: React.FC = () => {
   const { items, loading, error } = useAppSelector((state) => state.services);
   const services: DisplayService[] = items.map((service) => ({
     ...service,
-    image: serviceImageFor(service.service_name),
+    image: serviceImageFor(service),
   }));
 
   React.useEffect(() => {
@@ -67,6 +77,11 @@ const BookingsPage: React.FC = () => {
                     src={service.image}
                     alt={service.service_name}
                     className="service-image"
+                    onError={(event) => {
+                      event.currentTarget.src = fallbackServiceImageFor(
+                        service.service_name,
+                      );
+                    }}
                   />
                 </div>
 

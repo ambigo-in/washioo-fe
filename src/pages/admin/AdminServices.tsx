@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   fetchAdminServiceCategories,
   createServiceCategory,
   updateServiceCategory,
   deleteServiceCategory,
+  uploadServiceCategoryImage,
 } from "../../api/adminApi";
+import { getApiErrorMessage } from "../../api/client";
 import type {
   AdminServiceCategory,
   ServiceCategoryPayload,
@@ -20,12 +22,23 @@ import {
 } from "../../components/dashboard/DashboardControls";
 import "./AdminServices.css";
 
+const MAX_SERVICE_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_SERVICE_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+
 export default function AdminServices() {
   const [services, setServices] = useState<AdminServiceCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [formError, setFormError] = useState("");
+  const [formMessage, setFormMessage] = useState("");
+  const formRef = useRef<HTMLDivElement | null>(null);
   const query = useDashboardQueryState<"all" | "active" | "inactive">("all");
 
   const [formData, setFormData] = useState<ServiceCategoryPayload>({
@@ -36,6 +49,7 @@ export default function AdminServices() {
     allow_extra_payment: false,
     max_extra_amount: 0,
     extra_payment_instructions: "",
+    image_url: null,
     is_active: true,
   });
 
@@ -45,7 +59,7 @@ export default function AdminServices() {
         const response = await fetchAdminServiceCategories();
         setServices(response.services);
       } catch (error) {
-        console.error("Failed to fetch services:", error);
+        setFormError(getApiErrorMessage(error));
       } finally {
         setLoading(false);
       }
@@ -56,24 +70,58 @@ export default function AdminServices() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setFormError("");
+    setFormMessage("");
     try {
+      let savedService: AdminServiceCategory;
       if (editingId) {
-        await updateServiceCategory(editingId, formData);
+        const response = await updateServiceCategory(editingId, formData);
+        savedService = response.service;
       } else {
-        await createServiceCategory(formData);
+        const response = await createServiceCategory(formData);
+        savedService = response.service;
+      }
+
+      if (selectedImageFile) {
+        try {
+          await uploadServiceCategoryImage(savedService.id, selectedImageFile);
+        } catch (error) {
+          setFormError(
+            `Service details were saved, but image upload failed: ${getApiErrorMessage(error)}`,
+          );
+          const response = await fetchAdminServiceCategories();
+          setServices(response.services);
+          return;
+        }
       }
       // Refresh the list
       const response = await fetchAdminServiceCategories();
       setServices(response.services);
+      setFormMessage(
+        editingId
+          ? "Service updated successfully."
+          : "Service created successfully.",
+      );
       resetForm();
     } catch (error) {
-      console.error("Failed to save service:", error);
+      setFormError(getApiErrorMessage(error));
     } finally {
       setSaving(false);
     }
   };
 
+  const scrollToForm = () => {
+    window.setTimeout(() => {
+      formRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 0);
+  };
+
   const handleEdit = (service: AdminServiceCategory) => {
+    setFormError("");
+    setFormMessage("");
     setFormData({
       service_name: service.service_name,
       description: service.description || "",
@@ -82,32 +130,45 @@ export default function AdminServices() {
       allow_extra_payment: service.allow_extra_payment,
       max_extra_amount: service.max_extra_amount ?? 0,
       extra_payment_instructions: service.extra_payment_instructions || "",
+      image_url: service.image_url,
       is_active: service.is_active,
     });
+    setSelectedImageFile(null);
     setEditingId(service.id);
     setShowForm(true);
+    scrollToForm();
   };
 
   const handleDelete = async (serviceId: string) => {
     if (!confirm("Are you sure you want to delete this service?")) return;
+    setFormError("");
+    setFormMessage("");
     try {
       await deleteServiceCategory(serviceId);
       const response = await fetchAdminServiceCategories();
       setServices(response.services);
+      setFormMessage("Service deactivated successfully.");
     } catch (error) {
-      console.error("Failed to delete service:", error);
+      setFormError(getApiErrorMessage(error));
     }
   };
 
   const handleToggleActive = async (service: AdminServiceCategory) => {
+    setFormError("");
+    setFormMessage("");
     try {
       await updateServiceCategory(service.id, {
         is_active: !service.is_active,
       });
       const response = await fetchAdminServiceCategories();
       setServices(response.services);
+      setFormMessage(
+        service.is_active
+          ? "Service deactivated successfully."
+          : "Service activated successfully.",
+      );
     } catch (error) {
-      console.error("Failed to toggle service:", error);
+      setFormError(getApiErrorMessage(error));
     }
   };
 
@@ -120,11 +181,34 @@ export default function AdminServices() {
       allow_extra_payment: false,
       max_extra_amount: 0,
       extra_payment_instructions: "",
+      image_url: null,
       is_active: true,
     });
+    setSelectedImageFile(null);
     setEditingId(null);
     setShowForm(false);
   };
+
+  const handleImageFileChange = (file?: File | null) => {
+    setFormError("");
+    setSelectedImageFile(null);
+
+    if (!file) return;
+    if (!ALLOWED_SERVICE_IMAGE_TYPES.has(file.type)) {
+      setFormError("Only JPG, PNG, and WebP images are allowed.");
+      return;
+    }
+    if (file.size > MAX_SERVICE_IMAGE_SIZE_BYTES) {
+      setFormError("Image file must be 5 MB or smaller.");
+      return;
+    }
+
+    setSelectedImageFile(file);
+  };
+
+  const getServiceImage = (service: AdminServiceCategory, index: number) =>
+    service.image_url || (index % 2 === 0 ? "/p2.png" : "/p1.png");
+
   const filteredServices = services
     .filter((service) => {
       if (query.status === "active") return service.is_active;
@@ -150,7 +234,19 @@ export default function AdminServices() {
         {/* Header Actions */}
         <div className="page-header">
           <h2>Service Categories</h2>
-          <button className="btn-add" onClick={() => setShowForm(!showForm)}>
+          <button
+            className="btn-add"
+            onClick={() => {
+              setFormError("");
+              setFormMessage("");
+              if (showForm) {
+                resetForm();
+              } else {
+                setShowForm(true);
+                scrollToForm();
+              }
+            }}
+          >
             {showForm ? "Cancel" : "+ Add Service"}
           </button>
         </div>
@@ -171,9 +267,12 @@ export default function AdminServices() {
           />
         </div>
 
+        {formError && <p className="service-alert error">{formError}</p>}
+        {formMessage && <p className="service-alert success">{formMessage}</p>}
+
         {/* Service Form */}
         {showForm && (
-          <div className="service-form-card">
+          <div className="service-form-card" ref={formRef}>
             <h3>{editingId ? "Edit Service" : "Add New Service"}</h3>
             <form onSubmit={handleSubmit}>
               <div className="form-row">
@@ -285,6 +384,41 @@ export default function AdminServices() {
                 </div>
               </div>
               <div className="form-row">
+                <div className="form-group service-image-field">
+                  <label>Service Image</label>
+                  {formData.image_url && (
+                    <img
+                      src={formData.image_url}
+                      alt=""
+                      className="service-image-preview"
+                    />
+                  )}
+                  <input
+                    id="service-image-upload"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) =>
+                      handleImageFileChange(e.target.files?.[0] ?? null)
+                    }
+                  />
+                  <label
+                    className="image-upload-button"
+                    htmlFor="service-image-upload"
+                  >
+                    Choose Image
+                  </label>
+                  <span className="field-hint">
+                    JPG, PNG, or WebP up to 5 MB. Selecting a new file replaces
+                    the current service image.
+                  </span>
+                  {selectedImageFile && (
+                    <span className="selected-file-name">
+                      Selected: {selectedImageFile.name}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="form-row">
                 <label className="checkbox-label">
                   <input
                     type="checkbox"
@@ -317,12 +451,15 @@ export default function AdminServices() {
           </div>
         ) : visibleServices.length > 0 ? (
           <div className="services-list">
-            {visibleServices.map((service) => (
+            {visibleServices.map((service, index) => (
               <div
                 key={service.id}
                 className={`admin-service-card ${
                   !service.is_active ? "inactive" : ""
                 }`}
+                style={{
+                  backgroundImage: `url("${getServiceImage(service, index)}")`,
+                }}
               >
                 <div className="admin-service-card-content">
                   <div className="service-header">

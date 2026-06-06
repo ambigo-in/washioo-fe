@@ -106,6 +106,21 @@ export const updateServiceCategory = (
     },
   );
 
+export const uploadServiceCategoryImage = (serviceId: string, file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return apiRequest<{ message: string; service: AdminServiceCategory }>(
+    `/services/admin/service-categories/${serviceId}/image`,
+    {
+      method: "POST",
+      auth: true,
+      body: formData,
+      timeoutMs: 60000,
+    },
+  );
+};
+
 export const deleteServiceCategory = (serviceId: string) =>
   apiRequest<{ message: string; service_id: string }>(
     `/services/admin/service-categories/${serviceId}`,

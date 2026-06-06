@@ -32,6 +32,7 @@ export interface ServiceCategory {
   allow_extra_payment?: boolean;
   max_extra_amount?: number | null;
   extra_payment_instructions?: string | null;
+  image_url?: string | null;
   is_active: boolean;
 }
 

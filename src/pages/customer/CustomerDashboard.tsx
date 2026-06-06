@@ -22,7 +22,9 @@ export default function CustomerDashboard() {
     (state) => state.services,
   );
   const loading = customerLoading || servicesLoading;
-  const serviceImages = ["/p2.png", "/p1.png"];
+  const fallbackServiceImages = ["/p2.png", "/p1.png"];
+  const fallbackServiceImage = (index: number) =>
+    fallbackServiceImages[index % fallbackServiceImages.length] || "/p1.png";
 
   useEffect(() => {
     dispatch(loadCustomerBookings());
@@ -132,9 +134,15 @@ export default function CustomerDashboard() {
             {activeServices.map((service, index) => (
               <div key={service.id} className="customer-service-card">
                 <img
-                  src={serviceImages[index % serviceImages.length]}
+                  src={
+                    service.image_url ||
+                    fallbackServiceImage(index)
+                  }
                   alt={service.service_name}
                   className="customer-service-image"
+                  onError={(event) => {
+                    event.currentTarget.src = fallbackServiceImage(index);
+                  }}
                 />
                 <h3>{service.service_name}</h3>
                 <p>{service.description}</p>
