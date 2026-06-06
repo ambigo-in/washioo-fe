@@ -13,6 +13,7 @@
 
 .stats-overview,
 .quick-actions,
+.data-exports,
 .recent-bookings {
   background: var(--brand-white);
   border: 1px solid var(--brand-border);
@@ -109,6 +110,76 @@
 
 .section-header h2 {
   margin: 0;
+}
+
+.section-header p {
+  color: var(--brand-text-muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+  margin: 4px 0 0;
+}
+
+.export-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.export-card {
+  align-items: flex-start;
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
+  border-radius: 10px;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 118px;
+  padding: 13px;
+  text-align: left;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.export-card:hover:not(:disabled) {
+  border-color: var(--brand-teal-border);
+  box-shadow: 0 8px 20px rgba(var(--brand-teal-rgb), 0.1);
+  transform: translateY(-1px);
+}
+
+.export-card:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.export-label {
+  color: var(--brand-text);
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.export-description {
+  color: var(--brand-text-muted);
+  flex: 1;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.export-action {
+  color: var(--brand-teal-dark);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.export-alert {
+  background: #fff4f4;
+  border: 1px solid #f5b5b5;
+  border-radius: 8px;
+  color: #a61b1b;
+  font-size: 0.86rem;
+  font-weight: 800;
+  margin: 0 0 12px;
+  padding: 10px 12px;
 }
 
 .view-all {

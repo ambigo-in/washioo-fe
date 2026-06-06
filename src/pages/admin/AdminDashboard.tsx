@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchAllBookings, fetchCleaners } from "../../api/adminApi";
+import {
+  downloadAdminExport,
+  fetchAllBookings,
+  fetchCleaners,
+  type AdminExportDataset,
+} from "../../api/adminApi";
+import { getApiErrorMessage } from "../../api/client";
 import type { AdminBooking } from "../../types/adminTypes";
 import type { CleanerProfile } from "../../types/cleanerTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
@@ -13,11 +19,51 @@ import "./AdminDashboard.css";
 
 const RECENT_BOOKINGS_PAGE_SIZE = 5;
 
+const exportOptions: Array<{
+  dataset: AdminExportDataset;
+  label: string;
+  description: string;
+}> = [
+  {
+    dataset: "all",
+    label: "Full Workbook",
+    description: "Users, cleaners, bookings, ratings, and payments",
+  },
+  {
+    dataset: "cleaners",
+    label: "Cleaners",
+    description: "Profiles, verification status, availability, and ratings",
+  },
+  {
+    dataset: "bookings",
+    label: "Bookings",
+    description: "Customers, services, schedules, assignments, and payments",
+  },
+  {
+    dataset: "ratings",
+    label: "Ratings",
+    description: "Feedback, scores, reviewers, and booking context",
+  },
+  {
+    dataset: "users",
+    label: "Users",
+    description: "Accounts, roles, status, and ratings summary",
+  },
+  {
+    dataset: "payments",
+    label: "Payments",
+    description: "Collections, splits, handovers, and legacy fields",
+  },
+];
+
 export default function AdminDashboard() {
   const [bookings, setBookings] = useState<AdminBooking[]>([]);
   const [cleaners, setCleaners] = useState<CleanerProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [recentPage, setRecentPage] = useState(1);
+  const [exportingDataset, setExportingDataset] =
+    useState<AdminExportDataset | null>(null);
+  const [exportError, setExportError] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,6 +119,18 @@ export default function AdminDashboard() {
     recentPage,
     RECENT_BOOKINGS_PAGE_SIZE,
   );
+
+  const handleExport = async (dataset: AdminExportDataset) => {
+    setExportError("");
+    setExportingDataset(dataset);
+    try {
+      await downloadAdminExport(dataset);
+    } catch (error) {
+      setExportError(getApiErrorMessage(error));
+    } finally {
+      setExportingDataset(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -162,6 +220,38 @@ export default function AdminDashboard() {
                 <p>View and manage users</p>
               </div>
             </Link>
+          </div>
+        </section>
+
+        <section className="data-exports">
+          <div className="section-header">
+            <div>
+              <h2>Data Exports</h2>
+              <p>Download Excel workbooks for offline analysis and reporting.</p>
+            </div>
+          </div>
+          {exportError && <p className="export-alert">{exportError}</p>}
+          <div className="export-grid">
+            {exportOptions.map((option) => {
+              const isExporting = exportingDataset === option.dataset;
+              return (
+                <button
+                  key={option.dataset}
+                  type="button"
+                  className="export-card"
+                  onClick={() => handleExport(option.dataset)}
+                  disabled={exportingDataset !== null}
+                >
+                  <span className="export-label">{option.label}</span>
+                  <span className="export-description">
+                    {option.description}
+                  </span>
+                  <span className="export-action">
+                    {isExporting ? "Preparing..." : "Download .xlsx"}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </section>
 

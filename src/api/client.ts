@@ -404,6 +404,107 @@ export const apiRequest = async <T>(
   return requestPromise;
 };
 
+const readFilenameFromDisposition = (
+  contentDisposition: string | null,
+  fallback: string,
+) => {
+  if (!contentDisposition) return fallback;
+
+  const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+  if (utf8Match?.[1]) return decodeURIComponent(utf8Match[1]);
+
+  const filenameMatch = contentDisposition.match(/filename="?([^";]+)"?/i);
+  return filenameMatch?.[1] || fallback;
+};
+
+const triggerBlobDownload = (blob: Blob, filename: string) => {
+  const objectUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(objectUrl);
+};
+
+export const apiDownload = async (
+  path: string,
+  {
+    auth = false,
+    filename = "download.xlsx",
+    retryOnUnauthorized = true,
+    timeoutMs,
+  }: {
+    auth?: boolean;
+    filename?: string;
+    retryOnUnauthorized?: boolean;
+    timeoutMs?: number;
+  } = {},
+): Promise<void> => {
+  if (auth && shouldRefreshAccessToken()) {
+    try {
+      await refreshTokens();
+    } catch {
+      // The response retry path below will handle an expired access token.
+    }
+  }
+
+  const headers: Record<string, string> = {};
+  if (auth) {
+    const accessToken = getAccessToken();
+    if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+  }
+
+  const requestSignal = createRequestSignal(undefined, timeoutMs);
+  let response: Response;
+
+  try {
+    response = await fetch(apiUrl(path), {
+      method: "GET",
+      headers,
+      signal: requestSignal.signal,
+    });
+  } catch (error) {
+    if (isAbortError(error)) {
+      throw new ApiError("Download timed out or was cancelled.", 408, null);
+    }
+    throw error;
+  } finally {
+    requestSignal.cleanup();
+  }
+
+  if (response.status === 401 && auth && retryOnUnauthorized) {
+    const refreshed = await refreshTokens();
+    if (refreshed) {
+      return apiDownload(path, {
+        auth,
+        filename,
+        retryOnUnauthorized: false,
+        timeoutMs,
+      });
+    }
+  }
+
+  if (!response.ok) {
+    const payload = await parseResponse(response);
+    throw new ApiError(
+      readErrorMessage(payload, "Download failed. Please try again."),
+      response.status,
+      payload,
+    );
+  }
+
+  const blob = await response.blob();
+  triggerBlobDownload(
+    blob,
+    readFilenameFromDisposition(
+      response.headers.get("Content-Disposition"),
+      filename,
+    ),
+  );
+};
+
 export const getApiErrorMessage = (error: unknown) => {
   if (error instanceof ApiError) return error.message;
   if (error instanceof Error) return error.message;

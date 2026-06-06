@@ -1,4 +1,9 @@
-import { apiRequest, withQuery, type PaginationParams } from "./client";
+import {
+  apiDownload,
+  apiRequest,
+  withQuery,
+  type PaginationParams,
+} from "./client";
 import {
   isValidAadhaarNumber,
   isValidDrivingLicenseNumber,
@@ -53,6 +58,21 @@ export const runAllCleanupTasks = () =>
   apiRequest<CleanupResultResponse>("/admin/cleanup/run-all", {
     method: "POST",
     auth: true,
+  });
+
+export type AdminExportDataset =
+  | "all"
+  | "cleaners"
+  | "bookings"
+  | "ratings"
+  | "users"
+  | "payments";
+
+export const downloadAdminExport = (dataset: AdminExportDataset) =>
+  apiDownload(`/admin/exports/${dataset}`, {
+    auth: true,
+    filename: `washioo-${dataset}-export.xlsx`,
+    timeoutMs: 60000,
   });
 
 // Service Category APIs
