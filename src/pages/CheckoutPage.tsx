@@ -26,6 +26,13 @@ import {
 } from "../utils/dateTimeUtils";
 import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/checkout.css";
+import { fetchService } from "../api/servicesApi";
+import {
+  getServicePriceLabel,
+  getServiceExtraPaymentNote,
+  formatCurrency,
+} from "../utils/servicePriceUtils";
+import type { ServiceCategory } from "../types/apiTypes";
 
 type CheckoutState = {
   serviceId: string;
@@ -96,7 +103,9 @@ const CheckoutPage: React.FC = () => {
   const [instructions, setInstructions] = useState("");
   const today = getLocalDateInputValue();
   const tomorrow = getLocalDateInputValue(addLocalDays(1));
-  const minScheduledTime = scheduledDate ? getMinTimeForDate(scheduledDate) : undefined;
+  const minScheduledTime = scheduledDate
+    ? getMinTimeForDate(scheduledDate)
+    : undefined;
 
   const hasUnsavedAddress = !!(
     formData.address_line1.trim() ||
@@ -274,8 +283,7 @@ const CheckoutPage: React.FC = () => {
     }
 
     if (!bookingAddressId) {
-      nextFieldErrors.selectedAddress =
-        t("booking.addressRequired");
+      nextFieldErrors.selectedAddress = t("booking.addressRequired");
     }
 
     if (!scheduledDate || !scheduledTime) {
@@ -320,6 +328,27 @@ const CheckoutPage: React.FC = () => {
     (vehicle) => vehicle.id === selectedVehicleId,
   );
 
+  const [serviceDetails, setServiceDetails] = useState<ServiceCategory | null>(
+    null,
+  );
+
+  useEffect(() => {
+    let mounted = true;
+    if (!serviceData?.serviceId) return;
+    (async () => {
+      try {
+        const res = await fetchService(serviceData.serviceId);
+        if (!mounted) return;
+        setServiceDetails(res.service);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [serviceData?.serviceId]);
+
   return (
     <>
       <Header />
@@ -360,7 +389,9 @@ const CheckoutPage: React.FC = () => {
                     }}
                     type="button"
                   >
-                    <h3>{address.address_label || t("address.selectedFallback")}</h3>
+                    <h3>
+                      {address.address_label || t("address.selectedFallback")}
+                    </h3>
                     <p>{formatAddress(address)}</p>
                   </button>
                 ))}
@@ -463,7 +494,9 @@ const CheckoutPage: React.FC = () => {
                   onClick={getLiveLocation}
                   type="button"
                 >
-                  {locating ? t("address.capturingLocation") : t("address.useLiveLocation")}
+                  {locating
+                    ? t("address.capturingLocation")
+                    : t("address.useLiveLocation")}
                 </button>
                 {fieldErrors.location && (
                   <p
@@ -492,13 +525,25 @@ const CheckoutPage: React.FC = () => {
 
           <aside className="booking-summary">
             <h2>{serviceData?.serviceName || t("booking.selectedService")}</h2>
-            <div className="summary-price">Rs. {serviceData?.price || 0}</div>
+            <div className="summary-price">
+              {serviceDetails
+                ? getServicePriceLabel(serviceDetails)
+                : formatCurrency(serviceData?.price ?? 0)}
+            </div>
             <p>{serviceData?.duration || 0} mins estimated</p>
+
+            {serviceDetails?.allow_extra_payment && (
+              <p className="service-extra-note">
+                {getServiceExtraPaymentNote(serviceDetails)}
+              </p>
+            )}
 
             {selectedAddress && (
               <div className="selected-address-summary">
                 <span>{t("booking.serviceAddress")}</span>
-                <strong>{selectedAddress.address_label || t("common.address")}</strong>
+                <strong>
+                  {selectedAddress.address_label || t("common.address")}
+                </strong>
                 <p>{formatAddress(selectedAddress)}</p>
               </div>
             )}
@@ -593,7 +638,9 @@ const CheckoutPage: React.FC = () => {
                   }
                   onClick={() => {
                     setScheduledTime(
-                      timeOption === "now" ? getLocalTimeInputValue() : timeOption,
+                      timeOption === "now"
+                        ? getLocalTimeInputValue()
+                        : timeOption,
                     );
                     if (!scheduledDate) {
                       setScheduledDate(today);

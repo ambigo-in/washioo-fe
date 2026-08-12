@@ -6,7 +6,12 @@
 }
 
 body {
-  background: linear-gradient(135deg, var(--brand-teal-soft), var(--brand-white), var(--brand-teal-soft));
+  background: linear-gradient(
+    135deg,
+    var(--brand-teal-soft),
+    var(--brand-white),
+    var(--brand-teal-soft)
+  );
   color: var(--brand-text);
 }
 
@@ -19,6 +24,25 @@ button {
   transition: 0.3s ease;
 }
 
-input, button {
+input,
+button {
   font-family: inherit;
+}
+
+/* Price display helpers */
+.service-price,
+.starting-price,
+.summary-price {
+  font-weight: 600;
+  color: var(--brand-accent, #0b6b6b);
+}
+
+.service-extra-note {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: var(--brand-text-muted, #6c757d);
+}
+
+.service-extra-note.small {
+  font-size: 0.8rem;
 }

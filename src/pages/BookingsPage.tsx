@@ -6,6 +6,10 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { loadServices } from "../store/slices/servicesSlice";
 import { useLanguage } from "../i18n/LanguageContext";
 import "../styles/BookNowSection.css";
+import {
+  getServicePriceLabel,
+  getServiceExtraPaymentNote,
+} from "../utils/servicePriceUtils";
 
 type DisplayService = ServiceCategory & { image: string };
 
@@ -87,16 +91,26 @@ const BookingsPage: React.FC = () => {
 
                 <div className="service-details">
                   <h2>{service.service_name}</h2>
-                  <p>{service.description || t("services.defaultDescription")}</p>
+                  <p>
+                    {service.description || t("services.defaultDescription")}
+                  </p>
 
                   <div className="service-meta">
-                    <span>Rs. {service.base_price}</span>
+                    <span className="service-price">
+                      {getServicePriceLabel(service)}
+                    </span>
                     <span>
                       {t("services.minutes", {
                         minutes: service.estimated_duration_minutes || 0,
                       })}
                     </span>
                   </div>
+
+                  {service.allow_extra_payment && (
+                    <p className="service-extra-note">
+                      {getServiceExtraPaymentNote(service)}
+                    </p>
+                  )}
 
                   <button
                     className="book-service-btn"
@@ -116,4 +130,3 @@ const BookingsPage: React.FC = () => {
 };
 
 export default BookingsPage;
-

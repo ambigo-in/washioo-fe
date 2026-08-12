@@ -10,14 +10,20 @@ import { loadServices } from "../../store/slices/servicesSlice";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { formatScheduleDateTime } from "../../utils/dateTimeUtils";
 import "./CustomerDashboard.css";
+import {
+  getServicePriceLabel,
+  getServiceExtraPaymentNote,
+} from "../../utils/servicePriceUtils";
 
 export default function CustomerDashboard() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { t } = useLanguage();
-  const { bookings, addresses, loading: customerLoading } = useAppSelector(
-    (state) => state.customer,
-  );
+  const {
+    bookings,
+    addresses,
+    loading: customerLoading,
+  } = useAppSelector((state) => state.customer);
   const { items: services, loading: servicesLoading } = useAppSelector(
     (state) => state.services,
   );
@@ -134,10 +140,7 @@ export default function CustomerDashboard() {
             {activeServices.map((service, index) => (
               <div key={service.id} className="customer-service-card">
                 <img
-                  src={
-                    service.image_url ||
-                    fallbackServiceImage(index)
-                  }
+                  src={service.image_url || fallbackServiceImage(index)}
                   alt={service.service_name}
                   className="customer-service-image"
                   onError={(event) => {
@@ -147,11 +150,16 @@ export default function CustomerDashboard() {
                 <h3>{service.service_name}</h3>
                 <p>{service.description}</p>
                 <div className="service-footer">
-                  <span className="price">₹{service.base_price}</span>
+                  <span className="price">{getServicePriceLabel(service)}</span>
                   <span className="duration">
                     {service.estimated_duration_minutes} min
                   </span>
                 </div>
+                {service.allow_extra_payment && (
+                  <p className="service-extra-note small">
+                    {getServiceExtraPaymentNote(service)}
+                  </p>
+                )}
                 <button
                   className="customer-book-service-btn"
                   onClick={() => handleBookNow(service)}

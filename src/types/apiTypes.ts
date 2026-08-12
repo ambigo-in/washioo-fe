@@ -201,6 +201,8 @@ export interface CustomerBooking {
   id: string;
   booking_reference: string;
   service_name: string;
+  service_category_id?: string | null;
+  service?: ServiceCategory | null;
   scheduled_date: string;
   scheduled_time: string;
   booking_status: BookingStatus;

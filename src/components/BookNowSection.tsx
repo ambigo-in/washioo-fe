@@ -1,6 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { useEffect, useState } from "react";
+import { fetchServices } from "../api/servicesApi";
+import { formatCurrency } from "../utils/servicePriceUtils";
 import "../styles/BookNowSection.css";
 
 const BookNowSection: React.FC = () => {
@@ -8,8 +11,34 @@ const BookNowSection: React.FC = () => {
   const { isAuthenticated, hasRole } = useAuth();
 
   const handleBookClick = () => {
-    navigate(isAuthenticated && hasRole("customer") ? "/bookings" : "/verify-phone");
+    navigate(
+      isAuthenticated && hasRole("customer") ? "/bookings" : "/verify-phone",
+    );
   };
+
+  const [startingPrice, setStartingPrice] = useState<number | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetchServices();
+        const active = res.services.filter((s) => s.is_active);
+        if (!mounted) return;
+        if (active.length === 0) {
+          setStartingPrice(null);
+          return;
+        }
+        const min = Math.min(...active.map((s) => s.base_price));
+        setStartingPrice(min);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <>
@@ -21,6 +50,11 @@ const BookNowSection: React.FC = () => {
             Fast doorstep vehicle care with simple booking, transparent pricing,
             and a clean finish every time.
           </p>
+          {startingPrice != null && (
+            <p className="starting-price">
+              Starting at {formatCurrency(startingPrice)}
+            </p>
+          )}
         </div>
 
         <button onClick={handleBookClick} className="book-now-btn">
@@ -35,4 +69,3 @@ const BookNowSection: React.FC = () => {
 };
 
 export default BookNowSection;
-

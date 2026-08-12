@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { fetchServices } from "../api/servicesApi";
 import type { ServiceCategory } from "../types/apiTypes";
+import {
+  getServicePriceLabel,
+  getServiceExtraPaymentNote,
+} from "../utils/servicePriceUtils";
 import "../styles/VehicleServiceShowcase.css";
 
 const fallbackServiceImage = (serviceName: string) => {
@@ -85,10 +89,20 @@ const VehicleServicesShowcase: React.FC = () => {
                   <div>
                     <span>Premium doorstep care</span>
                     <h3>{service.service_name}</h3>
+                    <div className="service-price-row">
+                      <span className="service-price">
+                        {getServicePriceLabel(service)}
+                      </span>
+                    </div>
                     <p>
                       {service.description ||
                         "Quality wash and detailing services."}
                     </p>
+                    {service.allow_extra_payment && (
+                      <p className="service-extra-note">
+                        {getServiceExtraPaymentNote(service)}
+                      </p>
+                    )}
                   </div>
                   <button
                     type="button"

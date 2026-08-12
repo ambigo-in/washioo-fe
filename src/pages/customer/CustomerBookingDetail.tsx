@@ -16,6 +16,10 @@ import {
   formatDisplayTime,
   formatScheduleDateTime,
 } from "../../utils/dateTimeUtils";
+import {
+  getServicePriceLabel,
+  getServiceExtraPaymentNote,
+} from "../../utils/servicePriceUtils";
 import { useLanguage } from "../../i18n/LanguageContext";
 import "./CustomerBookingDetail.css";
 
@@ -67,14 +71,16 @@ export default function CustomerBookingDetail() {
   const cleanerDetails = booking?.assignment?.cleaner_details;
   const showCleanerDetails = Boolean(
     cleanerDetails &&
-      booking &&
-      ["accepted", "in_progress", "completed"].includes(booking.booking_status),
+    booking &&
+    ["accepted", "in_progress", "completed"].includes(booking.booking_status),
   );
 
   return (
     <DashboardLayout title={t("booking.details")}>
       {loading ? (
-        <div className="customer-detail-state">{t("booking.loadingDetails")}</div>
+        <div className="customer-detail-state">
+          {t("booking.loadingDetails")}
+        </div>
       ) : error ? (
         <div className="customer-detail-state error">
           <p>{error}</p>
@@ -88,10 +94,17 @@ export default function CustomerBookingDetail() {
                 {booking.booking_reference}
               </span>
               <h2>{booking.service_name}</h2>
-              <p>{formatScheduleDateTime(booking.scheduled_date, booking.scheduled_time)}</p>
+              <p>
+                {formatScheduleDateTime(
+                  booking.scheduled_date,
+                  booking.scheduled_time,
+                )}
+              </p>
             </div>
             <span className={`booking-status ${booking.booking_status}`}>
-              {t(`booking.${booking.booking_status === "in_progress" ? "inProgress" : booking.booking_status}`)}
+              {t(
+                `booking.${booking.booking_status === "in_progress" ? "inProgress" : booking.booking_status}`,
+              )}
             </span>
           </section>
 
@@ -102,7 +115,23 @@ export default function CustomerBookingDetail() {
                 <div>
                   <dt>{t("common.price")}</dt>
                   <dd>
-                    Rs. {formatMoney(booking.final_price ?? booking.estimated_price)}
+                    {booking.service ? (
+                      <>
+                        {getServicePriceLabel(booking.service!)}
+                        {booking.service!.allow_extra_payment && (
+                          <p className="service-extra-note small">
+                            {getServiceExtraPaymentNote(booking.service!)}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        Rs.{" "}
+                        {formatMoney(
+                          booking.final_price ?? booking.estimated_price,
+                        )}
+                      </>
+                    )}
                   </dd>
                 </div>
                 <div>
@@ -121,16 +150,21 @@ export default function CustomerBookingDetail() {
               <dl>
                 <div>
                   <dt>{t("common.make")}</dt>
-                  <dd>{booking.vehicle_details?.make || t("common.notProvided")}</dd>
+                  <dd>
+                    {booking.vehicle_details?.make || t("common.notProvided")}
+                  </dd>
                 </div>
                 <div>
                   <dt>{t("common.model")}</dt>
-                  <dd>{booking.vehicle_details?.model || t("common.notProvided")}</dd>
+                  <dd>
+                    {booking.vehicle_details?.model || t("common.notProvided")}
+                  </dd>
                 </div>
                 <div>
                   <dt>{t("common.licensePlate")}</dt>
                   <dd>
-                    {booking.vehicle_details?.license_plate || t("common.notProvided")}
+                    {booking.vehicle_details?.license_plate ||
+                      t("common.notProvided")}
                   </dd>
                 </div>
               </dl>
@@ -153,7 +187,9 @@ export default function CustomerBookingDetail() {
                     )}
                   </div>
                   <div>
-                    <strong>{cleanerDetails.name || t("common.cleaner")}</strong>
+                    <strong>
+                      {cleanerDetails.name || t("common.cleaner")}
+                    </strong>
                     <span>
                       {cleanerDetails.verification_badge
                         ? t("booking.verifiedCleaner")
@@ -174,10 +210,13 @@ export default function CustomerBookingDetail() {
               <section className="customer-detail-card payment-card">
                 <h3>{t("booking.payment")}</h3>
                 {paymentStatus === "pending_collection" ? (
-                  <p className="payment-pending">{t("booking.paymentPending")}</p>
+                  <p className="payment-pending">
+                    {t("booking.paymentPending")}
+                  </p>
                 ) : (
                   <span className="customer-paid-pill">
-                    {t("booking.paidVia")} {paymentType === "upi" ? t("common.upi") : t("common.cash")}
+                    {t("booking.paidVia")}{" "}
+                    {paymentType === "upi" ? t("common.upi") : t("common.cash")}
                   </span>
                 )}
               </section>

@@ -18,6 +18,10 @@ import type {
 } from "../../types/adminTypes";
 import DashboardLayout from "../../components/dashboard/DashboardLayout";
 import {
+  getServicePriceLabel,
+  formatCurrency,
+} from "../../utils/servicePriceUtils";
+import {
   FilterSelect,
   PaginationControls,
   SearchInput,
@@ -469,7 +473,7 @@ export default function AdminServices() {
                       </span>
                     </div>
                     <div className="service-price">
-                      Rs. {service.base_price.toLocaleString()}
+                      {getServicePriceLabel(service)}
                     </div>
                   </div>
 
@@ -490,7 +494,9 @@ export default function AdminServices() {
                       service.max_extra_amount != null && (
                         <span>
                           <strong>Max extra</strong>
-                          Rs. {service.max_extra_amount.toLocaleString()}
+                          {service.max_extra_amount != null
+                            ? formatCurrency(service.max_extra_amount)
+                            : "-"}
                         </span>
                       )}
                   </div>
