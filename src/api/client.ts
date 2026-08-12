@@ -26,6 +26,7 @@ type RequestOptions = {
   priority?: "normal" | "background";
   signal?: AbortSignal;
   timeoutMs?: number;
+  cache?: RequestCache;
 };
 
 type QueuedRequest<T> = {
@@ -114,7 +115,8 @@ const configuredMaxConcurrentReads = Number(
   import.meta.env.VITE_MAX_CONCURRENT_API_READS,
 );
 const MAX_CONCURRENT_API_READS =
-  Number.isFinite(configuredMaxConcurrentReads) && configuredMaxConcurrentReads > 0
+  Number.isFinite(configuredMaxConcurrentReads) &&
+  configuredMaxConcurrentReads > 0
     ? configuredMaxConcurrentReads
     : 4;
 const OVERLOAD_RETRY_STATUSES = new Set([429, 503]);
@@ -122,8 +124,7 @@ const configuredRequestTimeoutMs = Number(
   import.meta.env.VITE_API_REQUEST_TIMEOUT_MS,
 );
 const DEFAULT_REQUEST_TIMEOUT_MS =
-  Number.isFinite(configuredRequestTimeoutMs) &&
-  configuredRequestTimeoutMs > 0
+  Number.isFinite(configuredRequestTimeoutMs) && configuredRequestTimeoutMs > 0
     ? configuredRequestTimeoutMs
     : 15000;
 
@@ -219,7 +220,10 @@ const refreshTokens = async () => {
 
   refreshRequest = (async () => {
     let response: Response;
-    const requestSignal = createRequestSignal(undefined, DEFAULT_REQUEST_TIMEOUT_MS);
+    const requestSignal = createRequestSignal(
+      undefined,
+      DEFAULT_REQUEST_TIMEOUT_MS,
+    );
     try {
       response = await fetch(apiUrl("/auth/refresh-token"), {
         method: "POST",
@@ -251,7 +255,10 @@ const refreshTokens = async () => {
         return false;
       }
       throw new ApiError(
-        readErrorMessage(payload, "Session refresh is temporarily unavailable. Please try again."),
+        readErrorMessage(
+          payload,
+          "Session refresh is temporarily unavailable. Please try again.",
+        ),
         response.status,
         payload,
       );
@@ -283,6 +290,7 @@ export const apiRequest = async <T>(
     priority = "normal",
     signal,
     timeoutMs,
+    cache = "default",
   }: RequestOptions = {},
 ): Promise<T> => {
   if (auth && shouldRefreshAccessToken()) {
@@ -332,6 +340,7 @@ export const apiRequest = async <T>(
                 ? body
                 : JSON.stringify(body),
           signal: requestSignal.signal,
+          cache,
         });
       } catch (error) {
         if (isAbortError(error)) {
@@ -346,7 +355,9 @@ export const apiRequest = async <T>(
         attempt < maxAttempts &&
         OVERLOAD_RETRY_STATUSES.has(response.status)
       ) {
-        const retryAfterMs = parseRetryAfterMs(response.headers.get("Retry-After"));
+        const retryAfterMs = parseRetryAfterMs(
+          response.headers.get("Retry-After"),
+        );
         const fallbackMs = priority === "background" ? 1500 : 600;
         await sleep(retryAfterMs ?? fallbackMs * attempt);
         continue;

@@ -81,7 +81,9 @@ export const fetchAdminServiceCategories = (params: PaginationParams = {}) =>
     message: string;
     services: AdminServiceCategory[];
     total: number;
-  }>(withQuery("/services/", { limit: 50, offset: 0, ...params }));
+  }>(withQuery("/services/", { limit: 50, offset: 0, ...params }), {
+    cache: "no-store",
+  });
 
 export const createServiceCategory = (payload: ServiceCategoryPayload) =>
   apiRequest<{ message: string; service: AdminServiceCategory }>(
