@@ -16,7 +16,7 @@ const HeroSection: React.FC = () => {
   const handleOilChange = () => {
     navigate(
       isAuthenticated && hasRole("customer")
-        ? "/bookings/oil-change"
+        ? "bookings"
         : "/verify-phone",
     );
   };
