@@ -1,12 +1,7 @@
 .vehicle-services-section {
   width: 100%;
   padding: 56px 40px;
-  background: linear-gradient(
-    135deg,
-    var(--brand-teal-soft) 0%,
-    var(--brand-white) 50%,
-    var(--brand-teal-soft) 100%
-  );
+  background: linear-gradient(135deg, var(--brand-teal-soft) 0%, var(--brand-white) 50%, var(--brand-teal-soft) 100%);
 }
 
 .vehicle-services-overlay {
@@ -15,9 +10,13 @@
   border-radius: 28px;
   padding: clamp(28px, 5vw, 56px);
   position: relative;
-  background:
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.66)),
-    url("/p9.png") center/cover no-repeat;
+  background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.16),
+      rgba(0, 0, 0, 0.66)
+    ),
+    url("/p9.png")
+      center/cover no-repeat;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -62,9 +61,7 @@
   min-height: 48px;
   padding: 0 22px;
   cursor: pointer;
-  transition:
-    background 0.25s ease,
-    transform 0.25s ease;
+  transition: background 0.25s ease, transform 0.25s ease;
   white-space: nowrap;
 }
 
@@ -82,71 +79,64 @@
 }
 
 .service-card {
-  min-height: 160px;
-  border-radius: 16px;
+  min-height: 360px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 24px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  justify-content: flex-end;
   overflow: hidden;
-  padding: 12px;
+  padding: 18px 18px 24px;
   position: relative;
-  background: #ffffff;
-  box-shadow: 0 12px 28px rgba(14, 20, 21, 0.06);
-  transition:
-    box-shadow 0.25s ease,
-    transform 0.25s ease;
+  background: var(--brand-teal-deep);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24);
+  transition: box-shadow 0.35s ease, transform 0.35s ease;
+}
+
+.service-card::after {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.04) 0%,
+    rgba(0, 0, 0, 0.16) 42%,
+    rgba(0, 0, 0, 0.62) 100%
+  );
+  content: "";
+  inset: 0;
+  position: absolute;
+  z-index: 1;
 }
 
 .service-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 18px 40px rgba(14, 20, 21, 0.09);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.32);
+  transform: translateY(-8px);
 }
 
 .service-card-media {
-  position: relative;
-  z-index: 0;
-  width: 140px;
-  height: 110px;
-  flex-shrink: 0;
-  border-radius: 12px;
-  overflow: hidden;
-  background: linear-gradient(
-    180deg,
-    rgba(var(--brand-teal-rgb), 0.06),
-    rgba(0, 0, 0, 0.02)
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.service-price-bubble {
+  inset: 0;
   position: absolute;
-  left: 18px;
-  bottom: 24px;
-  z-index: 3;
-  background: white;
-  color: var(--brand-teal-dark);
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-weight: 800;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  z-index: 0;
 }
 
 .service-card-media img {
-  width: 120px;
-  height: 80px;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   display: block;
 }
 
 .service-card-content {
-  width: calc(100% - 160px);
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  color: var(--brand-text-dark);
-  padding: 12px 16px;
+  gap: 16px;
+  color: var(--brand-white);
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(var(--brand-teal-rgb), 0.94), rgba(var(--brand-teal-dark-rgb), 0.94));
+  backdrop-filter: blur(12px);
   position: relative;
   z-index: 2;
 }
@@ -154,10 +144,11 @@
 .service-card-content span {
   display: block;
   font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.6px;
+  font-weight: 800;
+  letter-spacing: 1px;
   margin-bottom: 6px;
-  opacity: 0.9;
+  opacity: 0.82;
+  text-transform: uppercase;
 }
 
 .service-card h3 {
@@ -168,19 +159,23 @@
 }
 
 .service-arrow {
-  min-width: 84px;
-  min-height: 44px;
+  min-width: 78px;
+  min-height: 46px;
   border-radius: 999px;
   border: none;
-  background: var(--brand-teal);
-  color: white;
-  font-size: 0.92rem;
+  background: var(--brand-white);
+  color: var(--brand-teal-dark);
+  font-size: 0.96rem;
   font-weight: 800;
   cursor: pointer;
   flex-shrink: 0;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
 }
+
 .service-arrow:hover {
-  transform: translateY(-3px);
+  background: var(--brand-teal);
+  color: var(--brand-white);
+  transform: translateY(-2px);
 }
 
 /* Tablet */

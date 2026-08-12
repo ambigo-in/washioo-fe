@@ -9,7 +9,12 @@ import {
 } from "../utils/servicePriceUtils";
 import "../styles/VehicleServiceShowcase.css";
 
-// Using SVG placeholders in /public/assets for demo visuals
+const fallbackServiceImage = (serviceName: string) => {
+  const name = serviceName.toLowerCase();
+  if (name.includes("bike")) return "/p2.png";
+  if (name.includes("car")) return "/p1.png";
+  return "/p3.png";
+};
 
 const VehicleServicesShowcase: React.FC = () => {
   const navigate = useNavigate();
@@ -67,23 +72,16 @@ const VehicleServicesShowcase: React.FC = () => {
             {activeServices.map((service) => (
               <article key={service.id} className="service-card">
                 <div className="service-card-media">
-                  <div className="service-price-bubble">
-                    {service.base_price ? `₹${service.base_price}` : ""}
-                  </div>
                   <img
                     src={
                       service.image_url ||
-                      (service.service_name.toLowerCase().includes("bike")
-                        ? "/assets/service-bike.svg"
-                        : "/assets/service-car.svg")
+                      fallbackServiceImage(service.service_name)
                     }
                     alt={service.service_name}
                     onError={(event) => {
-                      event.currentTarget.src = service.service_name
-                        .toLowerCase()
-                        .includes("bike")
-                        ? "/assets/service-bike.svg"
-                        : "/assets/service-car.svg";
+                      event.currentTarget.src = fallbackServiceImage(
+                        service.service_name,
+                      );
                     }}
                   />
                 </div>
