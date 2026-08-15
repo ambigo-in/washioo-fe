@@ -52,7 +52,7 @@ const BookNowSection: React.FC = () => {
           </p>
           {startingPrice != null && (
             <p className="starting-price">
-              Starting at {formatCurrency(startingPrice)}
+              <span style={{fontSize:"9px"}}>Starting at</span> {formatCurrency(startingPrice)}
             </p>
           )}
         </div>
