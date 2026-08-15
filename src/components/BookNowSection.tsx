@@ -45,14 +45,14 @@ const BookNowSection: React.FC = () => {
       <section className="book-now" aria-labelledby="book-now-title">
         <div className="book-now-content">
           <span className="book-now-label">Ready when you are</span>
-          <h1 id="book-now-title">Book Your First Wash Today</h1>
-          <p>
-            Fast doorstep vehicle care with simple booking, transparent pricing,
-            and a clean finish every time.
+          <h1 id="book-now-title">Book Your First Wash</h1>
+          <p className="book-now-description">
+            Fast doorstep vehicle care with simple booking and transparent
+            pricing
           </p>
           {startingPrice != null && (
             <p className="starting-price">
-              <span style={{fontSize:"9px"}}>Starting at</span> {formatCurrency(startingPrice)}
+              Starting from <strong>{formatCurrency(startingPrice)}</strong>
             </p>
           )}
         </div>
@@ -61,9 +61,6 @@ const BookNowSection: React.FC = () => {
           Book Now
         </button>
       </section>
-      {/* <footer className="footer">
-        <p>Copyright 2026 Washioo. All rights reserved.</p>
-      </footer> */}
     </>
   );
 };

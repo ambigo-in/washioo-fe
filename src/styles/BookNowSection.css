@@ -1,417 +1,212 @@
-.bookings-page {
-  min-height: 100vh;
-  padding: 70px 20px 90px;
-  background: linear-gradient(180deg, var(--brand-teal-soft) 0%, var(--brand-white) 50%, var(--brand-teal-soft) 100%);
-}
-
-/* Header Section */
-.bookings-header {
-  max-width: 950px;
-  margin: 0 auto 70px;
-  text-align: center;
-}
-
-.bookings-header span {
-  display: inline-block;
-  color: var(--brand-teal);
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 2px;
-  margin-bottom: 16px;
-}
-
-.bookings-header h1 {
-  font-size: 56px;
-  font-weight: 800;
-  color: var(--brand-text);
-  line-height: 1.2;
-  margin-bottom: 18px;
-}
-
-.bookings-header p {
-  font-size: 20px;
-  color: var(--brand-text-muted);
-  line-height: 1.8;
-  max-width: 760px;
-  margin: auto;
-}
-
-/* Loading & Error States */
-.loading-state,
-.error-state {
-  text-align: center;
-  font-size: 22px;
-  font-weight: 600;
-  padding: 60px 20px;
-  color: var(--brand-teal-dark);
-}
-
-.error-state {
-  color: #dc2626;
-}
-
-/* Services Grid */
-.services-grid {
-  max-width: 1380px;
-  margin: auto;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 35px;
-}
-
-/* Individual Card */
-.service-booking-card {
-  background: rgba(255, 255, 255, 0.97);
-  border-radius: 30px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(var(--brand-teal-rgb), 0.08);
-  transition: all 0.35s ease;
-  display: flex;
-  flex-direction: column;
-}
-
-.service-booking-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 28px 70px rgba(var(--brand-teal-rgb), 0.15);
-}
-
-/* Image */
-.service-image-wrapper {
-  width: 100%;
-  height: 300px;
-  overflow: hidden;
-}
-
-.service-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.45s ease;
-}
-
-.service-booking-card:hover .service-image {
-  transform: scale(1.08);
-}
-
-/* Details */
-.service-details {
-  padding: 34px;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-}
-
-.service-details h2 {
-  font-size: 34px;
-  font-weight: 800;
-  color: var(--brand-text);
-  margin-bottom: 14px;
-}
-
-.service-details p {
-  color: var(--brand-text-muted);
-  font-size: 17px;
-  line-height: 1.8;
-  margin-bottom: 24px;
-  flex-grow: 1;
-}
-
-/* Price + Duration */
-.service-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 28px;
-  font-size: 19px;
-  font-weight: 700;
-  color: var(--brand-teal-dark);
-}
-
-/* Button */
-.book-service-btn {
-  width: 100%;
-  padding: 16px;
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dark));
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.35s ease;
-  box-shadow: 0 14px 30px rgba(var(--brand-teal-rgb), 0.18);
-}
-
-.book-service-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 38px rgba(var(--brand-teal-rgb), 0.28);
-}
-
-.book-service-btn:active {
-  transform: scale(0.98);
-}
-
+/* Book Now Section - Modern Professional Design */
 .book-now {
-  align-items: center;
-  background:
-    radial-gradient(circle at top left, rgba(var(--brand-teal-rgb), 0.2), transparent 32%),
-    linear-gradient(135deg, var(--brand-teal), var(--brand-teal-dark));
-  color: var(--brand-white);
+  background: linear-gradient(
+    135deg,
+    var(--brand-teal) 0%,
+    var(--brand-teal-dark) 100%
+  );
+  border-radius: 16px;
+  color: white;
   display: flex;
-  gap: 32px;
+  align-items: center;
   justify-content: space-between;
-  margin: 0 auto;
+  gap: 40px;
+  margin: 60px auto;
+  max-width: 1200px;
   overflow: hidden;
-  padding: clamp(42px, 7vw, 78px) clamp(20px, 7vw, 96px);
+  padding: 50px 48px;
   position: relative;
-  width: 100%;
+  box-shadow: 0 12px 40px rgba(var(--brand-teal-rgb), 0.15);
 }
 
-.book-now::after {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
+.book-now::before {
   content: "";
-  height: 220px;
   position: absolute;
-  right: -90px;
-  top: -110px;
-  width: 220px;
+  top: -50%;
+  right: -15%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .book-now-content {
-  max-width: 720px;
+  flex: 1;
   position: relative;
   z-index: 1;
+  max-width: 550px;
 }
 
 .book-now-label {
-  background: rgba(255, 255, 255, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: 999px;
-  display: inline-flex;
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 1.4px;
-  margin-bottom: 18px;
-  padding: 9px 14px;
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  margin-bottom: 16px;
+  padding: 6px 12px;
   text-transform: uppercase;
 }
 
-.book-now h1 {
-  font-size: clamp(2rem, 5vw, 4rem);
+.book-now-content h1 {
+  font-size: 42px;
   font-weight: 800;
-  line-height: 1.08;
-  margin-bottom: 16px;
+  line-height: 1.2;
+  margin: 12px 0 16px;
+  color: white;
 }
 
-.book-now p {
-  color: rgba(255, 255, 255, 0.86);
-  font-size: clamp(1rem, 2vw, 1.18rem);
-  line-height: 1.75;
-  max-width: 620px;
+.book-now-description {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+
+.starting-price {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  font-weight: 500;
+}
+
+.starting-price strong {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  margin-left: 4px;
 }
 
 .book-now-btn {
-  background: var(--brand-white);
+  background: white;
   border: none;
-  border-radius: 999px;
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18);
+  border-radius: 10px;
   color: var(--brand-teal-dark);
   cursor: pointer;
   flex: 0 0 auto;
-  font-size: 1.08rem;
-  font-weight: 800;
-  min-height: 58px;
-  min-width: 172px;
-  padding: 16px 30px;
+  font-size: 16px;
+  font-weight: 700;
+  min-width: 150px;
+  padding: 14px 32px;
   position: relative;
-  transition: color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
   z-index: 1;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .book-now-btn:hover {
-  box-shadow: 0 24px 44px rgba(0, 0, 0, 0.22);
-  color: var(--brand-teal-deep);
-  transform: translateY(-3px);
+  background: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+.book-now-btn:active {
+  transform: translateY(0);
 }
 
 .book-now-btn:focus-visible {
-  outline: 3px solid rgba(255, 255, 255, 0.45);
-  outline-offset: 4px;
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
 }
 
-.footer {
-  background: #000000;
-  border-top: 1px solid #000000;
-  color: var(--brand-white);
-  font-size: 0.95rem;
-  font-weight: 600;
-  padding: 24px 20px;
-  text-align: center;
-}
-
-/* Large Tablet */
-@media (max-width: 1200px) {
-  .bookings-header h1 {
-    font-size: 46px;
+/* Tablet & Large Screens */
+@media (max-width: 1024px) {
+  .book-now {
+    gap: 32px;
+    padding: 42px 40px;
   }
 
-  .services-grid {
-    gap: 28px;
+  .book-now-content h1 {
+    font-size: 36px;
   }
 
-  .service-image-wrapper {
-    height: 260px;
+  .book-now-description {
+    font-size: 15px;
   }
 }
 
 /* Tablet */
-@media (max-width: 1024px) {
-  .services-grid {
-    grid-template-columns: 1fr;
-    max-width: 760px;
-  }
-
-  .bookings-header h1 {
-    font-size: 42px;
-  }
-
-  .bookings-header p {
-    font-size: 18px;
-  }
-
-  .service-image-wrapper {
-    height: 280px;
-  }
-}
-
-/* Mobile */
 @media (max-width: 768px) {
-  .bookings-page {
-    padding: 50px 16px 70px;
-  }
-
-  .bookings-header {
-    margin-bottom: 50px;
-  }
-
-  .bookings-header h1 {
-    font-size: 34px;
-  }
-
-  .bookings-header p {
-    font-size: 17px;
-    line-height: 1.7;
-  }
-
-  .service-booking-card {
-    border-radius: 24px;
-  }
-
-  .service-image-wrapper {
-    height: 230px;
-  }
-
-  .service-details {
-    padding: 26px;
-  }
-
-  .service-details h2 {
-    font-size: 28px;
-  }
-
-  .service-details p {
-    font-size: 16px;
-  }
-
-  .service-meta {
-    font-size: 17px;
-  }
-
-  .book-service-btn {
-    padding: 14px;
-    font-size: 17px;
-  }
-
   .book-now {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-}
-
-/* Small Mobile */
-@media (max-width: 480px) {
-  .bookings-page {
-    padding: 40px 12px 60px;
-  }
-
-  .bookings-header span {
-    font-size: 12px;
-  }
-
-  .bookings-header h1 {
-    font-size: 28px;
-  }
-
-  .bookings-header p {
-    font-size: 15px;
-  }
-
-  .service-image-wrapper {
-    height: 200px;
-  }
-
-  .service-details {
-    padding: 22px;
-  }
-
-  .service-details h2 {
-    font-size: 24px;
-  }
-
-  .service-details p {
-    font-size: 15px;
-  }
-
-  .service-meta {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
-    font-size: 16px;
-  }
-
-  .book-service-btn {
-    font-size: 16px;
-    padding: 13px;
-  }
-
-  .book-now {
     gap: 24px;
-    padding: 38px 18px;
+    padding: 36px 28px;
+    margin: 40px 16px;
+  }
+
+  .book-now::before {
+    display: none;
+  }
+
+  .book-now-content {
+    max-width: 100%;
+  }
+
+  .book-now-content h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+
+  .book-now-description {
+    font-size: 15px;
+    margin-bottom: 16px;
   }
 
   .book-now-btn {
     width: 100%;
-  }
-
-  .loading-state,
-  .error-state {
-    font-size: 18px;
-    padding: 40px 12px;
+    min-width: unset;
   }
 }
 
-/* Extra Small Devices */
-@media (max-width: 360px) {
-  .bookings-header h1 {
-    font-size: 24px;
+/* Mobile */
+@media (max-width: 480px) {
+  .book-now {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+    padding: 28px 20px;
+    margin: 30px 12px;
+    border-radius: 12px;
   }
 
-  .service-details h2 {
-    font-size: 22px;
+  .book-now-label {
+    font-size: 11px;
+    padding: 5px 10px;
+    margin-bottom: 12px;
   }
 
-  .book-service-btn {
+  .book-now-content h1 {
+    font-size: 26px;
+    margin-bottom: 10px;
+  }
+
+  .book-now-description {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  .starting-price {
+    font-size: 13px;
+  }
+
+  .starting-price strong {
+    font-size: 16px;
+  }
+
+  .book-now-btn {
+    padding: 12px 24px;
     font-size: 15px;
+    width: 100%;
+    min-width: unset;
   }
 }
