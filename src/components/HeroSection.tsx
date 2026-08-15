@@ -80,57 +80,7 @@ const HeroSection: React.FC = () => {
       {/* RIGHT SIDE: Promo Area */}
       <div className="hero-promo">
         {/* Background Image securely filling the space */}
-        <img
-          src="banner2.jpg"
-          alt="Free mechanic for oil change"
-          className="hero-promo-image"
-        />
-
-        {/* Overlay Content */}
-        <div className="hero-promo-content">
-          <div className="hero-promo-badge">
-            <span className="hero-promo-badge-top">✨ FESTIVE OFFER ✨</span>
-            <p className="hero-promo-badge-main">
-              FREE MECHANIC <br /> <span>FOR OIL CHANGE</span>
-            </p>
-          </div>
-
-          <div className="promo-bottom-container">
-            <ul className="hero-promo-features">
-              <li>
-                <span className="hero-promo-feature-icon">💧</span>
-                <span>
-                  Premium
-                  <br />
-                  Oil Brands
-                </span>
-              </li>
-              <li>
-                <span className="hero-promo-feature-icon">🔧</span>
-                <span>
-                  Free Oil
-                  <br />
-                  Change
-                </span>
-              </li>
-              <li>
-                <span className="hero-promo-feature-icon">👨‍🔧</span>
-                <span>
-                  Expert
-                  <br />
-                  Mechanic
-                </span>
-              </li>
-              <li>
-                <span className="hero-promo-feature-icon">🏠</span>
-                <span>
-                  Doorstep
-                  <br />
-                  Service
-                </span>
-              </li>
-            </ul>
-
+           <div className="promo-bottom-container">
             <div className="hero-promo-cta">
               <button className="promo-btn" onClick={handleOilChange}>
                 Book Oil Change Now →
@@ -140,7 +90,12 @@ const HeroSection: React.FC = () => {
               </p>
             </div>
           </div>
-        </div>
+        <img
+          src="banner.png"
+          alt="Free mechanic for oil change"
+          className="hero-promo-image"
+        />
+        {/* </div> */}
       </div>
     </main>
   );

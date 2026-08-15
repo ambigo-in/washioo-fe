@@ -83,7 +83,7 @@ const VehicleServicesShowcase: React.FC = () => {
             {activeServices.map((service) => (
               <article key={service.id} className="service-card">
                 <div className="service-card-copy">
-                  <h3>{service.service_name}</h3>
+                  <h4>{service.service_name}</h4>
                   <p className="service-card-description">
                     {getCompactServiceDescription(service)}
                   </p>
