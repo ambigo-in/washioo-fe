@@ -56,7 +56,9 @@
   border-radius: 28px;
   background: rgba(255, 255, 255, 0.94);
   box-shadow: 0 12px 30px rgba(14, 57, 59, 0.06);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .service-card:hover {
@@ -106,7 +108,11 @@
   height: 190px;
   border-radius: 22px;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(13, 166, 173, 0.14), rgba(13, 166, 173, 0.06));
+  background: linear-gradient(
+    135deg,
+    rgba(13, 166, 173, 0.14),
+    rgba(13, 166, 173, 0.06)
+  );
 }
 
 .service-card-media img {
@@ -133,7 +139,9 @@
   font-size: 1.08rem;
   font-weight: 800;
   cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
   box-shadow: 0 14px 22px rgba(15, 167, 168, 0.2);
 }
 
