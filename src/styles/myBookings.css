@@ -160,6 +160,18 @@
   overflow-wrap: anywhere;
 }
 
+.booking-cancelled-note {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #991b1b;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-top: 10px;
+  padding: 10px 12px;
+}
+
 .booking-cleaner-summary {
   display: flex;
   align-items: center;

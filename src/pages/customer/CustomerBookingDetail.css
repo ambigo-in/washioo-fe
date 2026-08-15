@@ -159,6 +159,16 @@
   grid-column: 1 / -1;
 }
 
+.cancellation-card {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.cancellation-card h3,
+.cancellation-card p {
+  color: #991b1b;
+}
+
 .customer-detail-state {
   background: var(--brand-white);
   border: 1px solid var(--brand-border);

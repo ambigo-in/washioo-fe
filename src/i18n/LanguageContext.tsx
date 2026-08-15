@@ -1140,6 +1140,8 @@ const extraDictionaries: Record<
     "auth.aadhaarNumber": "Aadhaar number",
     "auth.drivingLicenseInvalid":
       "Driving license must contain 15 to 16 characters.",
+    "booking.cancelledAutoHint":
+      "Booking cancelled. Please book again for the service.",
     "booking.rejected": "Rejected",
     "common.add": "Add",
     "common.cleaner": "Cleaner",

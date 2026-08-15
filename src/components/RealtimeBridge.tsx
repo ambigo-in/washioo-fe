@@ -20,6 +20,7 @@ const dataRefreshEvents = new Set([
   "booking_assignment_updated",
   "admin_action_required",
   "booking_status_changed",
+  "booking_auto_cancelled",
   "assignment_accepted",
   "assignment_rejected",
   "service_started",

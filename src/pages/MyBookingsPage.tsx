@@ -417,6 +417,12 @@ const MyBookingsPage: React.FC = () => {
                   <p>{formatAddress(booking.address)}</p>
                 </div>
 
+                {booking.booking_status === "cancelled" && (
+                  <div className="booking-cancelled-note">
+                    {t("booking.cancelledAutoHint")}
+                  </div>
+                )}
+
                 {booking.assignment?.cleaner_details &&
                   ["accepted", "in_progress", "completed"].includes(
                     booking.booking_status,

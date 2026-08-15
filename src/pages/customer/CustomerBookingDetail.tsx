@@ -175,6 +175,13 @@ export default function CustomerBookingDetail() {
               <p>{formatAddress(address)}</p>
             </section>
 
+            {booking.booking_status === "cancelled" && (
+              <section className="customer-detail-card cancellation-card">
+                <h3>{t("booking.cancelled")}</h3>
+                <p>{t("booking.cancelledAutoHint")}</p>
+              </section>
+            )}
+
             {showCleanerDetails && cleanerDetails && (
               <section className="customer-detail-card cleaner-detail-card">
                 <h3>{t("booking.cleanerDetails")}</h3>

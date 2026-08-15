@@ -14,6 +14,7 @@ const customerTypes = new Set([
   "cleaner_started_route",
   "service_started",
   "service_completed",
+  "booking_auto_cancelled",
   "customer_rating",
   "payment_collected",
 ]);
