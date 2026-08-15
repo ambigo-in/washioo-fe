@@ -193,12 +193,15 @@
 /* Bottom Features Container */
 .promo-bottom-container {
   position: absolute;
-  inset: 0;
+  left: 50%;
+  bottom: 20px;
   z-index: 2;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 0 24px 26px;
+  transform: translateX(-50%);
+  width: min(100%, 420px);
+  padding: 70px 16px;
   pointer-events: none;
 }
 
@@ -252,7 +255,7 @@
   border: none;
   padding: 14px 30px;
   border-radius: 10px;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 12px 25px rgba(255, 183, 3, 0.28);
@@ -268,9 +271,9 @@
 
 .hero-promo-subtext {
   margin-top: 12px;
-  font-size: 12px;
-  color: #e2e8f0; /* Softened text color to pop against green */
-  font-weight: 500;
+  font-size: 16px;
+  color: #fcfcfd; /* Softened text color to pop against green */
+  font-weight: bold;
 }
 
 /* ---------- RESPONSIVE ---------- */
@@ -278,17 +281,76 @@
   .hero-main {
     flex-direction: column;
   }
+
+  .hero-content,
+  .hero-promo {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .hero-content {
+    padding: 32px 20px 18px;
+  }
+
   .hero-promo {
     border-radius: 0;
-    min-height: 420px; /* reduced for tablet/mobile stacking */
+    min-height: 420px;
   }
+
+  .promo-bottom-container {
+    width: min(100%, 420px);
+    bottom: 18px;
+    padding: 20px 16px;
+    font-size: 10px;
+  }
+
+  .promo-btn {
+    width: min(100%, 280px);
+  }
+
   .hero-promo-features {
     flex-wrap: wrap;
     gap: 16px;
   }
+
   .hero-promo-features li {
     min-width: 45%;
-    border-right: none !important; /* Remove borders on wrap */
+    border-right: none !important;
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-badge {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+
+  .hero-title {
+    font-size: clamp(26px, 7vw, 38px);
+  }
+
+  .hero-features-grid {
+    gap: 10px;
+  }
+
+  .feature-card {
+    flex: 1 1 calc(50% - 10px);
+    min-width: 0;
+  }
+
+  .hero-promo {
+    min-height: 320px;
+  }
+
+  .promo-btn {
+    width: 100%;
+    max-width: 240px;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .hero-promo-subtext {
+    font-size: 12px;
   }
 }

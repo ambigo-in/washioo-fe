@@ -83,11 +83,11 @@ const HeroSection: React.FC = () => {
            <div className="promo-bottom-container">
             <div className="hero-promo-cta">
               <button className="promo-btn" onClick={handleOilChange}>
-                Book Oil Change Now →
+                Book Oil Change Now → Limited Time Offer!
               </button>
-              <p className="hero-promo-subtext">
+              {/* <p className="hero-promo-subtext">
                 Limited Time Offer – Book Now!
-              </p>
+              </p> */}
             </div>
           </div>
         <img
