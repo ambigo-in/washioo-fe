@@ -3,10 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import { fetchServices } from "../api/servicesApi";
 import type { ServiceCategory } from "../types/apiTypes";
-import {
-  getServicePriceLabel,
-  getServiceExtraPaymentNote,
-} from "../utils/servicePriceUtils";
+import { getServicePriceLabel } from "../utils/servicePriceUtils";
 import "../styles/VehicleServiceShowcase.css";
 
 const fallbackServiceImage = (serviceName: string) => {
@@ -14,6 +11,25 @@ const fallbackServiceImage = (serviceName: string) => {
   if (name.includes("bike")) return "/p2.png";
   if (name.includes("car")) return "/p1.png";
   return "/p3.png";
+};
+
+const getCompactServiceDescription = (service: ServiceCategory) => {
+  const fallback = service.service_name.toLowerCase().includes("bike")
+    ? "Complete bike cleaning inside & out"
+    : service.service_name.toLowerCase().includes("car")
+      ? "Premium car wash for a showroom shine"
+      : "Quality wash and detailing services.";
+
+  const rawDescription = service.description?.trim();
+  if (!rawDescription) return fallback;
+
+  const cleanDescription = rawDescription.replace(/\s+/g, " ");
+
+  if (cleanDescription.length <= 50) {
+    return cleanDescription;
+  }
+
+  return `${cleanDescription.slice(0, 47).trim()}...`;
 };
 
 const VehicleServicesShowcase: React.FC = () => {
@@ -24,7 +40,7 @@ const VehicleServicesShowcase: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const activeServices = useMemo(
-    () => services.filter((service) => service.is_active),
+    () => services.filter((service) => service.is_active).slice(0, 2),
     [services],
   );
 
@@ -51,16 +67,11 @@ const VehicleServicesShowcase: React.FC = () => {
 
   return (
     <section className="vehicle-services-section">
-      <div className="vehicle-services-overlay">
-        <div className="vehicle-services-header">
-          <div>
-            <p className="section-label">SERVICES</p>
-            <h2>What Can We Do For Your Vehicle?</h2>
-          </div>
-
-          <button onClick={handleBookClick} className="view-all-btn">
-            View All
-          </button>
+      <div className="vehicle-services-wrap">
+        <div className="vehicle-services-heading">
+          <span className="section-line" />
+          <h2>Our Services</h2>
+          <span className="section-line" />
         </div>
 
         {loading ? (
@@ -71,6 +82,18 @@ const VehicleServicesShowcase: React.FC = () => {
           <div className="services-card-row">
             {activeServices.map((service) => (
               <article key={service.id} className="service-card">
+                <div className="service-card-copy">
+                  <h3>{service.service_name}</h3>
+                  <p className="service-card-description">
+                    {getCompactServiceDescription(service)}
+                  </p>
+                  <div className="service-price-row">
+                    <span className="service-price">
+                      {getServicePriceLabel(service)}
+                    </span>
+                  </div>
+                </div>
+
                 <div className="service-card-media">
                   <img
                     src={
@@ -85,34 +108,15 @@ const VehicleServicesShowcase: React.FC = () => {
                     }}
                   />
                 </div>
-                <div className="service-card-content">
-                  <div>
-                    <span>Premium doorstep care</span>
-                    <h3>{service.service_name}</h3>
-                    <div className="service-price-row">
-                      <span className="service-price">
-                        {getServicePriceLabel(service)}
-                      </span>
-                    </div>
-                    <p>
-                      {service.description ||
-                        "Quality wash and detailing services."}
-                    </p>
-                    {service.allow_extra_payment && (
-                      <p className="service-extra-note">
-                        {getServiceExtraPaymentNote(service)}
-                      </p>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleBookClick}
-                    className="service-arrow"
-                    aria-label={`Book ${service.service_name}`}
-                  >
-                    Book
-                  </button>
-                </div>
+
+                <button
+                  type="button"
+                  onClick={handleBookClick}
+                  className="service-arrow"
+                  aria-label={`Book ${service.service_name}`}
+                >
+                  Book Now <span aria-hidden="true">→</span>
+                </button>
               </article>
             ))}
           </div>
