@@ -40,7 +40,7 @@ const VehicleServicesShowcase: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const activeServices = useMemo(
-    () => services.filter((service) => service.is_active).slice(0, 2),
+    () => services.filter((service) => service.is_active),
     [services],
   );
 
