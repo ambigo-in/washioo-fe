@@ -87,6 +87,7 @@ const VehicleServicesShowcase: React.FC = () => {
                   <p className="service-card-description">
                     {getCompactServiceDescription(service)}
                   </p>
+
                   <div className="service-price-row">
                     <span className="service-price">
                       {getServicePriceLabel(service)}
@@ -94,29 +95,31 @@ const VehicleServicesShowcase: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="service-card-media">
-                  <img
-                    src={
-                      service.image_url ||
-                      fallbackServiceImage(service.service_name)
-                    }
-                    alt={service.service_name}
-                    onError={(event) => {
-                      event.currentTarget.src = fallbackServiceImage(
-                        service.service_name,
-                      );
-                    }}
-                  />
-                </div>
+                <div className="service-card-right">
+                  <div className="service-card-media">
+                    <img
+                      src={
+                        service.image_url ||
+                        fallbackServiceImage(service.service_name)
+                      }
+                      alt={service.service_name}
+                      onError={(event) => {
+                        event.currentTarget.src = fallbackServiceImage(
+                          service.service_name,
+                        );
+                      }}
+                    />
+                  </div>
 
-                <button
-                  type="button"
-                  onClick={handleBookClick}
-                  className="service-arrow"
-                  aria-label={`Book ${service.service_name}`}
-                >
-                  Book Now <span aria-hidden="true">→</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={handleBookClick}
+                    className="service-arrow"
+                    aria-label={`Book ${service.service_name}`}
+                  >
+                    Book Now <span aria-hidden="true">→</span>
+                  </button>
+                </div>
               </article>
             ))}
           </div>
