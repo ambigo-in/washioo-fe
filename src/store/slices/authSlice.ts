@@ -1,4 +1,8 @@
-import { createAsyncThunk, createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import {
   acceptTerms,
   getCurrentUser,
@@ -123,18 +127,27 @@ export const hydrateSession = createAsyncThunk(
   "auth/hydrateSession",
   async (_, { rejectWithValue }) => {
     if (!getAccessToken()) return null;
+
     try {
       const response = await getCurrentUser();
       return response.user;
     } catch (error) {
-      if (
-        error instanceof ApiError &&
-        error.status !== 401 &&
-        error.status !== 403
-      ) {
-        return rejectWithValue(getApiErrorMessage(error));
+      if (error instanceof ApiError) {
+        if (error.status === 401 || error.status === 403) {
+          clearTokens();
+        } else {
+          return rejectWithValue({
+            message: getApiErrorMessage(error),
+            keepSession: true,
+          });
+        }
+      } else {
+        return rejectWithValue({
+          message: getApiErrorMessage(error),
+          keepSession: true,
+        });
       }
-      clearTokens();
+
       return rejectWithValue(getApiErrorMessage(error));
     }
   },
@@ -163,17 +176,20 @@ export const acceptTermsRequest = createAsyncThunk(
   },
 );
 
-export const logoutSession = createAsyncThunk("auth/logoutSession", async () => {
-  const refreshToken = getRefreshToken();
-  if (refreshToken && getAccessToken()) {
-    try {
-      await logoutUser(refreshToken);
-    } catch {
-      // Local logout should still complete when the server token is stale.
+export const logoutSession = createAsyncThunk(
+  "auth/logoutSession",
+  async () => {
+    const refreshToken = getRefreshToken();
+    if (refreshToken && getAccessToken()) {
+      try {
+        await logoutUser(refreshToken);
+      } catch {
+        // Local logout should still complete when the server token is stale.
+      }
     }
-  }
-  clearTokens();
-});
+    clearTokens();
+  },
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -183,7 +199,9 @@ const authSlice = createSlice({
       saveTokens(action.payload.access_token, action.payload.refresh_token);
       state.user = action.payload.user ?? null;
       state.termsAccepted =
-        action.payload.terms_accepted ?? action.payload.user?.terms_accepted ?? false;
+        action.payload.terms_accepted ??
+        action.payload.user?.terms_accepted ??
+        false;
       state.isAuthenticated = true;
       state.isLoading = false;
       state.loading = false;
@@ -221,12 +239,36 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(hydrateSession.rejected, (state, action) => {
+        const payload = action.payload;
+        const keepSession =
+          typeof payload === "object" &&
+          payload !== null &&
+          "keepSession" in payload &&
+          Boolean((payload as { keepSession?: boolean }).keepSession);
+
+        if (keepSession && getAccessToken()) {
+          state.user = state.user ?? null;
+          state.isAuthenticated = true;
+          state.activeRole = getTokenActiveRole();
+          state.termsAccepted =
+            state.user?.terms_accepted ?? state.termsAccepted;
+          state.isLoading = false;
+          state.error = null;
+          return;
+        }
+
         state.user = null;
         state.isAuthenticated = false;
         state.activeRole = null;
         state.termsAccepted = false;
         state.isLoading = false;
-        state.error = String(action.payload ?? "Session expired.");
+        state.error = String(
+          typeof payload === "string"
+            ? payload
+            : payload && typeof payload === "object" && "message" in payload
+              ? String((payload as { message?: string }).message)
+              : "Session expired.",
+        );
       })
       .addCase(refreshCurrentUser.fulfilled, (state, action) => {
         state.user = action.payload;
@@ -259,7 +301,9 @@ const authSlice = createSlice({
         saveTokens(action.payload.access_token, action.payload.refresh_token);
         state.user = action.payload.user ?? null;
         state.termsAccepted =
-          action.payload.terms_accepted ?? action.payload.user?.terms_accepted ?? false;
+          action.payload.terms_accepted ??
+          action.payload.user?.terms_accepted ??
+          false;
         state.isAuthenticated = true;
         state.activeRole = action.payload.account_type ?? getTokenActiveRole();
       })
@@ -267,7 +311,9 @@ const authSlice = createSlice({
         saveTokens(action.payload.access_token, action.payload.refresh_token);
         state.user = action.payload.user ?? null;
         state.termsAccepted =
-          action.payload.terms_accepted ?? action.payload.user?.terms_accepted ?? false;
+          action.payload.terms_accepted ??
+          action.payload.user?.terms_accepted ??
+          false;
         state.isAuthenticated = true;
         state.activeRole = action.payload.account_type ?? getTokenActiveRole();
       })
@@ -311,7 +357,9 @@ const authSlice = createSlice({
           action.type !== hydrateSession.rejected.type,
         (state, action: { payload?: unknown }) => {
           state.loading = false;
-          state.error = String(action.payload ?? "Authentication request failed.");
+          state.error = String(
+            action.payload ?? "Authentication request failed.",
+          );
         },
       );
   },
